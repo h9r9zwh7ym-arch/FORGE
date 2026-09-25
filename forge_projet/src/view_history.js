@@ -43,18 +43,18 @@ function renderHistory(){
       return `<button class="row tap stagger" style="--i:${Math.min(i++,12)}" data-a="openSessionDetail" data-id="${s.id}">
         ${sessionIcon(s)}
         <div class="grow"><div class="t">${esc(sessionTitle(s))}${prs?` <span class="pr-badge">💥 ${prs}</span>`:""}</div>
-        <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries · ${fmtKg(sessionVolume(s))}</div></div>
+        <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries${sessionVolume(s)?" · "+fmtKg(sessionVolume(s)):""}</div></div>
         <div class="val">${s.durationSec?fmtDuration(s.durationSec):""}</div><span class="chev">${icon("chev")}</span>
       </button>`;
     }).join("");
     return `<h2 class="sh">${MOIS_LONG[d.getMonth()].replace(/^./,c=>c.toUpperCase())} ${d.getFullYear()}</h2>
-      <div class="sh-sub">${m.list.length} séance${m.list.length>1?"s":""} · ${fmtKg(vol)}</div>
+      <div class="sh-sub">${m.list.length} séance${m.list.length>1?"s":""}${vol?" · "+fmtKg(vol):""}</div>
       <div class="group">${rows}</div>`;
   }).join("");
   const more = all.length - sessions.length;
   return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
     <h1 class="lt">Historique</h1>
-    <div class="sh-sub" style="margin-top:-4px">${all.length} séance${all.length>1?"s":""} au total · ${fmtKg(totalVolumeAllTime())} soulevés</div>
+    <div class="sh-sub" style="margin-top:-4px">${all.length} séance${all.length>1?"s":""} au total${totalVolumeAllTime()?" · "+fmtKg(totalVolumeAllTime())+" soulevés":""}</div>
     ${html}
     ${more>0?`<div class="btnrow"><button class="btn secondary" data-a="histMore">Afficher ${Math.min(more,25)} séance${Math.min(more,25)>1?"s":""} de plus <span class="muted-n">· ${more} restante${more>1?"s":""}</span></button></div>`:""}
   </div>`;
@@ -79,8 +79,8 @@ function sessionDetailHTML(s){
     <div class="stat-strip">
       <div class="stat-box"><div class="num">${s.durationSec?fmtDuration(s.durationSec):"–"}</div><div class="lbl">durée</div></div>
       <div class="stat-box"><div class="num">${sessionSetCount(s)}</div><div class="lbl">séries</div></div>
-      <div class="stat-box"><div class="num">${fmtKg(sessionVolume(s))}</div><div class="lbl">soulevés</div></div>
-      <div class="stat-box"><div class="num">${sessionPRCount(s)}</div><div class="lbl">records</div></div>
+      ${sessionVolume(s) ? `<div class="stat-box"><div class="num">${fmtKg(sessionVolume(s))}</div><div class="lbl">soulevés</div></div>` : `<div class="stat-box"><div class="num">${sessionReps(s)}</div><div class="lbl">répétitions</div></div>`}
+      ${sessionPRCount(s) ? `<div class="stat-box pr"><div class="num">${sessionPRCount(s)}</div><div class="lbl">record${sessionPRCount(s)>1?"s":""}</div></div>` : ""}
     </div>
     <div class="group" style="margin-top:14px">${rows||'<div style="padding:16px" class="s">Aucune série complétée.</div>'}</div>
     <div class="btnrow"><button class="btn secondary" data-a="redoSession" data-id="${s.id}">${icon("repeat")} Refaire cette séance</button></div>

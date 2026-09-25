@@ -1045,3 +1045,30 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 .ov-row.done .ls-ring>span{background:var(--green);color:#fff}
 .ov-row.done .ls-ring svg{color:#fff}
 .pc-inline{margin:8px 20px 12px}
+
+/* ================= v1.7 : cohérence et finitions ================= */
+/* une seule couleur de sélection pour les filtres (façon iOS) ; l'orange reste l'action */
+#pickerCats .chip.on,#pickerChips .chip.on,.type-chip.on{background:var(--label);color:var(--bg2)}
+.chip,.type-chip{transition:background .2s,color .2s,transform .15s cubic-bezier(.32,1.4,.4,1)}
+.chip:active,.type-chip:active{transform:scale(.93)}
+/* bouton fermer des feuilles : rond gris, comme iOS */
+.sheet-hd .icon-btn[data-a="closesheet"]{width:30px;height:30px;border-radius:15px;background:var(--fill);color:var(--label2)}
+.sheet-hd .icon-btn[data-a="closesheet"] svg{width:14px;height:14px}
+.sheet-hd .icon-btn[data-a="closesheet"]:active{transform:scale(.9)}
+/* muscles d'une fiche : neutres, principal en gras */
+.mchip{background:var(--fill2);color:var(--label)}
+.mchip.main{background:var(--fill);font-weight:700}
+.mchip small{font-weight:600;color:var(--label2);font-size:.8em;margin-left:3px}
+/* célébration : pastille pleine en dégradé */
+.celebrate-ring{background:var(--grad);color:#fff;box-shadow:0 14px 30px -14px var(--glow),0 0 0 10px var(--tint-bg)}
+.stat-box.pr .num{color:var(--tint)}
+.lp-seg.grew{animation:segGlow .8s ease}
+@keyframes segGlow{0%{box-shadow:0 0 0 0 var(--glow)}40%{box-shadow:0 0 10px 1px var(--glow)}100%{box-shadow:none}}
+.lh-pct b.bump{animation:chipBump .5s cubic-bezier(.32,1.5,.4,1)}
+.validate:active{transform:scale(.96)}
+.row.tap,.row-main{transition:background .15s}
+.row.tap:active{background:var(--fill2)}
+@media (prefers-reduced-motion:reduce){.lp-seg.grew,.lh-pct b.bump{animation:none!important}}
+.info-btn{color:var(--label2)!important;background:var(--fill2)!important}
+.info-btn:active{color:var(--tint)!important;transform:scale(.9)}
+.fc-info{color:var(--label2)}

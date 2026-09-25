@@ -1046,6 +1046,33 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 .ov-row.done .ls-ring>span{background:var(--green);color:#fff}
 .ov-row.done .ls-ring svg{color:#fff}
 .pc-inline{margin:8px 20px 12px}
+
+/* ================= v1.7 : cohérence et finitions ================= */
+/* une seule couleur de sélection pour les filtres (façon iOS) ; l'orange reste l'action */
+#pickerCats .chip.on,#pickerChips .chip.on,.type-chip.on{background:var(--label);color:var(--bg2)}
+.chip,.type-chip{transition:background .2s,color .2s,transform .15s cubic-bezier(.32,1.4,.4,1)}
+.chip:active,.type-chip:active{transform:scale(.93)}
+/* bouton fermer des feuilles : rond gris, comme iOS */
+.sheet-hd .icon-btn[data-a="closesheet"]{width:30px;height:30px;border-radius:15px;background:var(--fill);color:var(--label2)}
+.sheet-hd .icon-btn[data-a="closesheet"] svg{width:14px;height:14px}
+.sheet-hd .icon-btn[data-a="closesheet"]:active{transform:scale(.9)}
+/* muscles d'une fiche : neutres, principal en gras */
+.mchip{background:var(--fill2);color:var(--label)}
+.mchip.main{background:var(--fill);font-weight:700}
+.mchip small{font-weight:600;color:var(--label2);font-size:.8em;margin-left:3px}
+/* célébration : pastille pleine en dégradé */
+.celebrate-ring{background:var(--grad);color:#fff;box-shadow:0 14px 30px -14px var(--glow),0 0 0 10px var(--tint-bg)}
+.stat-box.pr .num{color:var(--tint)}
+.lp-seg.grew{animation:segGlow .8s ease}
+@keyframes segGlow{0%{box-shadow:0 0 0 0 var(--glow)}40%{box-shadow:0 0 10px 1px var(--glow)}100%{box-shadow:none}}
+.lh-pct b.bump{animation:chipBump .5s cubic-bezier(.32,1.5,.4,1)}
+.validate:active{transform:scale(.96)}
+.row.tap,.row-main{transition:background .15s}
+.row.tap:active{background:var(--fill2)}
+@media (prefers-reduced-motion:reduce){.lp-seg.grew,.lh-pct b.bump{animation:none!important}}
+.info-btn{color:var(--label2)!important;background:var(--fill2)!important}
+.info-btn:active{color:var(--tint)!important;transform:scale(.9)}
+.fc-info{color:var(--label2)}
 </style></head><body><div id="app"></div><nav class="tabbar" aria-label="Onglets"></nav><div id="restbar"></div><div id="overlay" role="dialog"></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="fileImport" accept="application/json,.json" style="display:none"><script>
 // ================= MATÉRIEL =================
 // Catalogue du matériel reconnu par le moteur de suggestion. Chaque exercice de la
@@ -1417,6 +1444,85 @@ const EXO_RAW = [
 ["pont_fessier_elastique","Pont fessier élastique",["fessiers"],["bands"],"hinge",false,{sets:3,repsMin:15,repsMax:20,restSec:45},
   ["Élastique au-dessus des genoux, allongé, pieds à plat.","Monte les hanches en poussant les genoux vers l'extérieur contre l'élastique.","Redescends contrôlé."],
   "Garde les genoux alignés avec les pieds, sans les laisser rentrer."],
+// --- ajouts v1.7 ---
+["pompes_archer","Pompes archer",["pect","triceps","epaules"],["bodyweight"],"push",true,{sets:3,repsMin:4,repsMax:8,restSec:90},
+  ["Mains très écartées, corps aligné tête-bassin-talons.","Descends vers une main en gardant l'autre bras presque tendu sur le côté.","Pousse pour remonter, puis alterne le côté."],
+  "Variante avancée : maîtrise d'abord 15 pompes classiques propres avant de l'aborder."],
+["planche_commando","Planche commando (up-down)",["abdos","triceps","epaules"],["bodyweight"],"core",false,{sets:3,repsMin:6,repsMax:12,restSec:60},
+  ["Départ en planche sur les avant-bras, pieds légèrement écartés.","Monte en appui sur une main puis l'autre jusqu'à la position de pompe.","Redescends sur les avant-bras une main après l'autre, en alternant la main qui commence."],
+  "Écarte les pieds pour limiter la rotation du bassin ; garde le dos neutre sans creuser."],
+["russian_twist","Russian twist",["abdos"],["bodyweight"],"core",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Assis, genoux fléchis, buste incliné vers l'arrière avec le dos droit.","Tourne les épaules d'un côté puis de l'autre, mains devant la poitrine.","Garde le mouvement contrôlé ; pieds au sol pour la version facile."],
+  "Évite d'arrondir le bas du dos : si c'est le cas, réduis l'inclinaison du buste."],
+["flutter_kicks","Ciseaux (flutter kicks)",["abdos"],["bodyweight"],"core",false,{sets:3,repsMin:20,repsMax:30,restSec:45},
+  ["Allongé sur le dos, mains sous les fessiers, jambes tendues légèrement décollées.","Alterne de petits battements haut-bas avec les jambes.","Garde le bas du dos plaqué au sol, respire régulièrement."],
+  "Si le bas du dos décolle, monte les jambes plus haut ou fléchis légèrement les genoux."],
+["montees_genoux","Montées de genoux (high knees)",["cardio","quadriceps"],["bodyweight"],"core",false,{sets:3,repsMin:20,repsMax:40,restSec:30},
+  ["Cours sur place en montant les genoux vers la hauteur des hanches.","Atterris sur l'avant du pied, bras qui accompagnent le mouvement.","Garde un rythme soutenu pendant la durée (en secondes)."],
+  "Commence par une version marchée si les chevilles ou les genoux sont sensibles aux impacts."],
+["fentes_sautees","Fentes sautées",["quadriceps","fessiers","cardio"],["bodyweight"],"lunge",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Départ en position de fente, genoux proches de 90°.","Saute et inverse les jambes en l'air.","Réceptionne-toi en douceur directement dans la fente suivante."],
+  "Exercice à impact : maîtrise les fentes classiques d'abord et atterris toujours genou avant aligné avec le pied."],
+["ytw_sol","Y-T-W allongé",["epaules","dos"],["bodyweight"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:45},
+  ["Allongé sur le ventre, front près du sol, bras tendus devant.","Décolle les bras en formant un Y, puis un T, puis un W en serrant les omoplates.","Tiens une seconde en haut de chaque lettre, redescends contrôlé."],
+  "Mouvement léger et contrôlé : ne cambre pas le bas du dos pour monter plus haut."],
+["marche_ours","Marche de l'ours (bear crawl)",["abdos","epaules","cardio"],["bodyweight"],"core",false,{sets:3,repsMin:20,repsMax:40,restSec:45},
+  ["À quatre pattes, genoux décollés de quelques centimètres.","Avance en bougeant main et pied opposés en même temps.","Garde le dos plat et le bassin stable pendant la durée (en secondes)."],
+  "Garde les genoux bas et les pas courts pour ne pas perdre le gainage."],
+["rowing_appui_banc","Rowing haltères appui sur banc incliné",["dos","biceps"],["dumbbells","bench"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Allongé sur le ventre sur le banc incliné, un haltère dans chaque main.","Tire les coudes vers l'arrière en serrant les omoplates.","Redescends contrôlé jusqu'à l'extension des bras."],
+  "Le banc soutient le buste : idéal pour épargner le bas du dos. Évite de relever la tête."],
+["squat_bulgare_halteres","Squat bulgare haltères",["quadriceps","fessiers"],["dumbbells","bench"],"lunge",true,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Pied arrière sur le banc, un haltère dans chaque main, bras le long du corps.","Descends à la verticale, genou avant aligné avec le pied.","Remonte en poussant sur le talon avant."],
+  "Commence léger : l'équilibre est plus exigeant qu'en fente classique."],
+["curl_zottman","Curl Zottman",["biceps","avantbras"],["dumbbells"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Monte les haltères paumes vers le haut, coudes fixes près du corps.","En haut, tourne les poignets paumes vers le bas.","Redescends lentement dans cette position, puis retourne les paumes en bas."],
+  "Prends une charge plus légère qu'au curl classique : la descente en pronation est exigeante pour l'avant-bras."],
+["mollets_assis_haltere","Mollets assis (haltère)",["mollets"],["dumbbells","bench"],"calf",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Assis au bout du banc, avant des pieds sur un support, haltère posé sur les genoux.","Monte les talons le plus haut possible.","Redescends lentement en étirant les mollets."],
+  "Garde un mouvement lent et complet plutôt que des rebonds."],
+["woodchopper_haltere","Bûcheron haltère (woodchopper)",["abdos","epaules"],["dumbbells"],"core",true,{sets:3,repsMin:10,repsMax:12,restSec:45},
+  ["Debout, haltère tenu à deux mains près d'une hanche, genoux légèrement fléchis.","Monte l'haltère en diagonale au-dessus de l'épaule opposée en pivotant le buste et le pied arrière.","Redescends contrôlé ; fais toutes les reps d'un côté puis change."],
+  "La rotation vient des hanches et du buste ensemble : ne tords pas uniquement le bas du dos."],
+["front_squat_barre","Front squat barre",["quadriceps","fessiers","abdos"],["barbell"],"squat",false,{sets:4,repsMin:5,repsMax:8,restSec:120},
+  ["Barre posée sur l'avant des épaules, coudes hauts.","Descends en gardant le buste droit, genoux dans l'axe des pieds.","Remonte en poussant le sol, coudes toujours hauts."],
+  "Si les coudes tombent, la barre glisse : réduis la charge et travaille la mobilité des poignets."],
+["fente_arriere_barre","Fente arrière barre",["quadriceps","fessiers"],["barbell"],"lunge",true,{sets:3,repsMin:6,repsMax:10,restSec:90},
+  ["Barre sur le haut du dos, pieds largeur de hanches.","Recule d'un grand pas et descends jusqu'à ce que les deux genoux soient proches de 90°.","Reviens en poussant sur le talon avant."],
+  "Garde le buste droit et commence léger : la barre rend l'équilibre plus délicat."],
+["shrugs_barre","Shrugs barre",["dos"],["barbell"],"pull",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Debout, barre tenue bras tendus devant les cuisses.","Monte les épaules vers les oreilles sans plier les coudes.","Tiens une seconde en haut puis redescends lentement."],
+  "Ne fais pas rouler les épaules : un mouvement vertical suffit et épargne l'articulation."],
+["good_morning_barre","Good morning barre",["ischios","fessiers","dos"],["barbell"],"hinge",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Barre sur le haut du dos, genoux légèrement fléchis.","Pousse les hanches en arrière en inclinant le buste, dos neutre.","Remonte en contractant fessiers et ischios."],
+  "Exercice technique : commence avec la barre à vide et arrête la descente dès que le dos s'arrondit."],
+["halo_kb","Halo kettlebell",["epaules","abdos"],["kettlebell"],"push",false,{sets:3,repsMin:6,repsMax:10,restSec:45},
+  ["Kettlebell tenu par les cornes, à l'envers, devant la poitrine.","Fais-le tourner autour de la tête, au plus près, en gardant les abdos serrés.","Alterne le sens à chaque répétition."],
+  "Prends une charge légère : c'est un exercice de mobilité et de stabilité d'épaule."],
+["fente_goblet_kb","Fente arrière goblet kettlebell",["quadriceps","fessiers"],["kettlebell"],"lunge",true,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Kettlebell tenu contre la poitrine, coudes serrés.","Recule d'un grand pas et descends genoux proches de 90°.","Reviens en poussant sur le talon avant."],
+  "Garde le buste droit et le kettlebell près du corps."],
+["swing_kb_uni","Swing kettlebell à une main",["fessiers","ischios","abdos"],["kettlebell"],"hinge",true,{sets:3,repsMin:10,repsMax:15,restSec:75},
+  ["Kettlebell dans une main, pieds un peu plus larges que les hanches.","Bascule les hanches en arrière, puis projette-les vers l'avant pour propulser le kettlebell.","Garde les épaules de face malgré la charge d'un seul côté."],
+  "Le mouvement vient des hanches, pas du bras ; maîtrise le swing à deux mains avant cette variante."],
+["tirage_vertical_elastique","Tirage vertical élastique",["dos","biceps"],["bands"],"pull",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Élastique fixé en hauteur, à genoux ou assis face au point d'ancrage.","Tire les mains vers le haut de la poitrine en abaissant les coudes.","Remonte les bras lentement en gardant la tension."],
+  "Vérifie que l'ancrage est solide avant chaque série."],
+["pallof_press","Pallof press élastique",["abdos"],["bands"],"core",true,{sets:3,repsMin:8,repsMax:12,restSec:45},
+  ["Élastique fixé à hauteur de poitrine, debout de profil par rapport à l'ancrage.","Tends les bras devant toi en résistant à la rotation.","Tiens deux secondes, ramène les mains à la poitrine ; fais les deux côtés."],
+  "Le buste ne doit pas tourner : éloigne-toi moins si tu n'arrives pas à rester de face."],
+["souleve_elastique","Soulevé de terre élastique",["ischios","fessiers"],["bands"],"hinge",false,{sets:3,repsMin:12,repsMax:15,restSec:60},
+  ["Debout sur l'élastique, pieds largeur de hanches, poignées en main.","Pousse les hanches en arrière, dos neutre, genoux légèrement fléchis.","Remonte en contractant les fessiers."],
+  "Garde l'élastique sous le milieu des pieds pour qu'il ne glisse pas."],
+["kickback_fessier_elastique","Kickback fessier élastique",["fessiers"],["bands"],"hinge",true,{sets:3,repsMin:12,repsMax:15,restSec:45},
+  ["À quatre pattes, élastique autour des pieds ou fixé à une cheville.","Pousse une jambe vers l'arrière et le haut, genou fléchi ou tendu.","Redescends contrôlé ; fais toutes les reps puis change de côté."],
+  "Ne cambre pas le bas du dos pour monter plus haut : l'amplitude vient de la hanche."],
+["tractions_negatives","Tractions négatives",["dos","biceps"],["bodyweight","pullup_bar"],"pull",false,{sets:3,repsMin:3,repsMax:6,restSec:90},
+  ["Monte en haut de la barre à l'aide d'un support, menton au-dessus.","Descends le plus lentement possible (3 à 5 s) jusqu'à bras tendus.","Reprends appui sur le support pour remonter."],
+  "Idéal pour progresser vers la traction ; arrête quand la descente n'est plus contrôlée."],
+["releve_jambes_suspendu","Relevé de jambes tendues suspendu",["abdos"],["bodyweight","pullup_bar"],"core",false,{sets:3,repsMin:6,repsMax:12,restSec:75},
+  ["Suspendu à la barre, épaules engagées, corps immobile.","Monte les jambes tendues jusqu'à l'horizontale ou plus haut.","Redescends lentement sans te balancer."],
+  "Si tu te balances, reviens au relevé de genoux suspendu."],
 ];
 
 const EXOS = EXO_RAW.map(([id,n,muscles,equip,pattern,uni,def,cues,safety])=>({
@@ -1472,6 +1578,12 @@ const PICTO_OF = {
   curl_biceps:"curl", curl_marteau:"curl", curl_concentre:"curl", curl_incline:"curl", curl_barre:"curl", curl_biceps_elastique:"curl", curl_poignets:"curl",
   extension_triceps_nuque:"triceps", kickback_triceps:"triceps", extension_triceps_allonge:"triceps", barre_front:"triceps", extension_triceps_elastique:"triceps",
   shrugs_halteres:"carry", marche_fermier:"carry", kb_fermier:"carry",
+  // v1.7
+  pompes_archer:"pushup", planche_commando:"plank", russian_twist:"crunch", flutter_kicks:"crunch", montees_genoux:"cardio", fentes_sautees:"lunge",
+  ytw_sol:"raise", marche_ours:"plank", rowing_appui_banc:"row", squat_bulgare_halteres:"lunge", curl_zottman:"curl", mollets_assis_haltere:"calf",
+  woodchopper_haltere:"overhead", front_squat_barre:"squat", fente_arriere_barre:"lunge", shrugs_barre:"carry", good_morning_barre:"hinge",
+  halo_kb:"overhead", fente_goblet_kb:"lunge", swing_kb_uni:"hinge", tirage_vertical_elastique:"hang", pallof_press:"plank",
+  souleve_elastique:"hinge", kickback_fessier_elastique:"bridge", tractions_negatives:"hang", releve_jambes_suspendu:"hang",
 };
 const PICTO_BY_PATTERN = { squat:"squat", hinge:"hinge", push:"pushup", pull:"row", lunge:"lunge", core:"plank", calf:"calf" };
 
@@ -1511,7 +1623,7 @@ function defaultState(){
     templates: [],         // modèles enregistrés : [{id, n, exos:[{exoId, sets}]}]
     importedProgram: [],
     medals: {},            // {familleId: {t: palier atteint 0-4, d: {1: iso, 2: iso…}}}
-    settings: { theme:"auto", unit:"kg", todayTab:"custom", name:"" },
+    settings: { theme:"auto", unit:"kg", todayTab:"custom", name:"", sound:true },
     meta: { createdAt: new Date().toISOString(), prCount:0 },
   };
 }
@@ -2480,6 +2592,112 @@ document.addEventListener("change", e=>{
   const name = el.dataset.c;
   if(ACT[name]) ACT[name](el.dataset, el);
 });
+// ================= SONS =================
+// Sons synthétisés en direct avec Web Audio (aucun fichier) : courts, doux et
+// accordés entre eux (gamme de do majeur), pour accompagner les animations.
+// Le contexte audio n'existe qu'après un premier toucher (règle de Safari iOS) ;
+// avant cela, et si les sons sont coupés dans le Profil, sfx() ne fait rien.
+
+let AC = null, SFX_OUT = null, NOISE = null;
+function audioReady(){
+  if(!AC){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return false;
+    try{
+      AC = new Ctx();
+      const comp = AC.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.ratio.value = 4;
+      SFX_OUT = AC.createGain(); SFX_OUT.gain.value = 0.9;
+      SFX_OUT.connect(comp); comp.connect(AC.destination);
+    }catch(e){ AC = null; return false; }
+  }
+  if(AC.state==="suspended") AC.resume();
+  return true;
+}
+// déverrouillage au premier geste (iOS exige un son joué pendant un geste)
+["pointerdown","touchend","keydown"].forEach(ev=>document.addEventListener(ev, function unlock(){
+  if(!soundOn()) return;
+  if(audioReady()){
+    const b = AC.createBuffer(1,1,22050), src = AC.createBufferSource();
+    src.buffer = b; src.connect(AC.destination); src.start(0);
+  }
+}, { passive:true }));
+
+function soundOn(){ return !(typeof S!=="undefined" && S.settings && S.settings.sound===false); }
+
+// note : fréquence, départ (s, relatif), durée, options
+function tone(f, t, dur, o){
+  o = o||{};
+  const t0 = AC.currentTime + t;
+  const osc = AC.createOscillator(), g = AC.createGain();
+  osc.type = o.type || "sine";
+  osc.frequency.setValueAtTime(f, t0);
+  if(o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t0+dur);
+  const peak = o.gain==null ? 0.25 : o.gain, att = o.att || 0.006;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(peak, t0+att);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  osc.connect(g);
+  if(o.pan && AC.createStereoPanner){ const p = AC.createStereoPanner(); p.pan.value = o.pan; g.connect(p); p.connect(SFX_OUT); }
+  else g.connect(SFX_OUT);
+  osc.start(t0); osc.stop(t0+dur+0.05);
+}
+// cloche : fondamentale + partiels inharmoniques qui s'éteignent plus vite
+function bell(f, t, dur, gain){
+  tone(f, t, dur, { gain:gain, type:"sine" });
+  tone(f*2.76, t, dur*0.45, { gain:gain*0.35 });
+  tone(f*5.4, t, dur*0.2, { gain:gain*0.12 });
+}
+// souffle filtré (whoosh)
+function whoosh(t, dur, from, to, gain){
+  if(!NOISE){
+    NOISE = AC.createBuffer(1, AC.sampleRate*1, AC.sampleRate);
+    const d = NOISE.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+  }
+  const t0 = AC.currentTime + t;
+  const src = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  src.buffer = NOISE; f.type = "bandpass"; f.Q.value = 1.2;
+  f.frequency.setValueAtTime(from, t0); f.frequency.exponentialRampToValueAtTime(to, t0+dur);
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain||0.2, t0+dur*0.4); g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  src.connect(f); f.connect(g); g.connect(SFX_OUT);
+  src.start(t0); src.stop(t0+dur+0.05);
+}
+
+// notes (Hz)
+const NT = { C5:523.25, D5:587.33, E5:659.25, G5:783.99, A5:880, C6:1046.5, D6:1174.7, E6:1318.5, G6:1568, A6:1760, C7:2093 };
+const SFX = {
+  tick(){ tone(1900, 0, 0.035, { gain:0.2, type:"triangle" }); },
+  step(up){ tone(up ? 1500 : 1150, 0, 0.05, { gain:0.24, type:"triangle", to: up ? 1750 : 950 }); },
+  open(){ tone(420, 0, 0.12, { gain:0.3, to:760 }); },
+  close(){ tone(700, 0, 0.1, { gain:0.26, to:380 }); },
+  seg(){ tone(1250, 0, 0.04, { gain:0.18, type:"triangle" }); },
+  swipe(){ whoosh(0, 0.22, 900, 2600, 0.35); },
+  set(){ bell(NT.E6, 0, 0.35, 0.16); bell(NT.A6, 0.075, 0.5, 0.14); },
+  exo(){ [NT.C6, NT.E6, NT.G6, NT.C7].forEach((f,i)=>bell(f, i*0.07, 0.55, 0.13)); },
+  pr(){ [NT.G6, NT.C7, NT.E6, NT.G6, NT.C7].forEach((f,i)=>tone(f*(1+Math.random()*0.01), i*0.05, 0.3, { gain:0.22, type:"triangle", pan:(i%2?.4:-.4) })); bell(NT.C6, 0, 0.8, 0.12); },
+  complete(){
+    [NT.C5, NT.E5, NT.G5].forEach((f,i)=>tone(f, i*0.1, 1.4, { gain:0.12, type:"triangle", att:0.03 }));
+    [NT.C6, NT.E6, NT.G6, NT.C7].forEach((f,i)=>bell(f, 0.32+i*0.08, 0.9, 0.12));
+    whoosh(0.3, 0.6, 3000, 8000, 0.05);
+  },
+  medal(){ [NT.G5, NT.C6, NT.E6, NT.G6].forEach((f,i)=>bell(f, i*0.09, 0.8, 0.12)); },
+  count(){ tone(NT.A5, 0, 0.16, { gain:0.45, type:"triangle" }); tone(NT.A5*2, 0, 0.08, { gain:0.14 }); },
+  go(){ whoosh(0, 0.5, 400, 4000, 0.16); [NT.C5, NT.G5, NT.C6, NT.E6].forEach((f,i)=>tone(f, 0.05+i*0.03, 0.9, { gain:0.1, type:"triangle", att:0.02 })); },
+  restTick(){ tone(NT.E6, 0, 0.08, { gain:0.3, type:"triangle" }); },
+  restEnd(){ bell(NT.A5, 0, 1.1, 0.2); bell(NT.E6, 0.14, 1.1, 0.16); },
+  remove(){ tone(260, 0, 0.14, { gain:0.4, to:150 }); },
+};
+function sfx(name, arg){
+  if(!soundOn() || !SFX[name]) return;
+  if(!AC || AC.state!=="running"){ if(!audioReady() || AC.state!=="running") return; }
+  try{ SFX[name](arg); }catch(e){}
+}
+
+// petit « tic » pour les contrôles de sélection (segments, puces, interrupteurs, onglets, bandeau)
+document.addEventListener("click", e=>{
+  const b = e.target.closest && e.target.closest(".seg button, .type-chip, .chip, .tabbtn, .ls-chip, .navbtn, .wp-day, .tpl-daypick button");
+  if(b && !b.disabled) sfx("seg");
+});
 // ================= EFFETS VISUELS =================
 // Onde au toucher, textes flottants, ouverture/fermeture fluide des blocs,
 // animation de lancement de séance. Tout porte sur des éléments HTML (jamais sur
@@ -2537,6 +2755,7 @@ function morphHeight(el, mutate, done){
 // ouvre (contenu déjà inséré) ou ferme (contenu retiré à la fin) un bloc .clp
 function animateCollapse(el, open, html){
   if(!el) return;
+  sfx(open ? "open" : "close");
   if(open){
     morphHeight(el, ()=>{ el.innerHTML = html||""; el.classList.remove("clp-in"); void el.offsetWidth; el.classList.add("clp-in"); },
       ()=>setTimeout(()=>el.classList.remove("clp-in"), 500));
@@ -2600,9 +2819,9 @@ function showLaunch(session){
     setTimeout(()=>el.remove(), 420);
   };
   el.addEventListener("click", leave);
-  if(reduce){ timers.push(setTimeout(leave, 900)); return; }
-  [0,550,1100].forEach(t=>timers.push(setTimeout(()=>haptic(12), t)));
-  timers.push(setTimeout(()=>haptic([20,40,30]), 1650));
+  if(reduce){ sfx("go"); timers.push(setTimeout(leave, 900)); return; }
+  [0,550,1100].forEach(t=>timers.push(setTimeout(()=>{ haptic(12); sfx("count"); }, t)));
+  timers.push(setTimeout(()=>{ haptic([20,40,30]); sfx("go"); }, 1650));
   timers.push(setTimeout(leave, 3000));
 }
 // ================= TIMER DE REPOS =================
@@ -2634,13 +2853,14 @@ function tickRest(){
     if(navigator.vibrate) try{ navigator.vibrate([120,60,120]); }catch(e){}
     toast("⚡ C'est reparti — série suivante");
     if(typeof restReady!=="undefined") restReady = true;
+    sfx("restEnd");
     stopRestTimer();
     return;
   }
   // 3 dernières secondes : l'anneau bat et le téléphone vibre à chaque seconde
   const wrap = document.querySelector(".ring-wrap");
   if(wrap) wrap.classList.toggle("ending", remain<=3);
-  if(remain<=3 && remain!==restState.lastTick){ restState.lastTick = remain; if(navigator.vibrate) try{ navigator.vibrate(10); }catch(e){} }
+  if(remain<=3 && remain!==restState.lastTick){ restState.lastTick = remain; if(navigator.vibrate) try{ navigator.vibrate(10); }catch(e){} sfx("restTick"); }
   renderRestBar(remain);
   if(typeof updateFocusRing==="function") updateFocusRing(remain, restState.totalSec);
 }
@@ -3055,6 +3275,7 @@ function showCelebration(session, ups, xpBefore, xpAfter){
     animateCounts(qs(".cel"));
   }));
   setTimeout(()=>confettiBurst(null, innerHeight*0.3, ups.length||levelUp ? 150 : 90), 150);
+  setTimeout(()=>sfx(ups.length||levelUp ? "medal" : "exo"), 200);
 }
 
 Object.assign(ACT, {
@@ -3234,7 +3455,7 @@ function proposalPaneHTML(draft){
       <button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter</button>
       ${imported?"":`<button class="btn secondary sm" data-a="regenSession">${icon("repeat")} Autre proposition</button>`}
     </div>
-    <div class="btnrow"><button class="btn big" data-a="startSession">${icon("play")} Commencer cette séance</button></div>`;
+    <div class="btnrow"><button class="btn ${heroShown?"secondary":"big"}" data-a="startSession">${icon("play")} Commencer cette séance</button></div>`;
 }
 
 // ---------- séances enregistrées & planning ----------
@@ -3375,7 +3596,7 @@ function customPaneHTML(){
       <button class="btn secondary sm" data-a="customFill">✨ Compléter</button>
       <button class="btn secondary sm" data-a="saveTemplateOpen">${icon("bookmark")} ${S.custom.tplId?"Sauver":"Enregistrer"}</button>
     </div>
-    <div class="btnrow"><button class="btn big" data-a="startCustom">${icon("play")} Commencer ma séance</button></div>
+    <div class="btnrow"><button class="btn ${sessionsToday().length||plannedTemplate()?"big":"secondary"}" data-a="startCustom">${icon("play")} Commencer ma séance</button></div>
     ${tail}`;
 }
 
@@ -3649,7 +3870,26 @@ function refreshFocusRegion(){
   if(strip){ const sl = (qs("#lsChips")||{}).scrollLeft||0; strip.innerHTML = liveStripHTML(S.draft); qs("#lsChips").scrollLeft = sl; centerStripChip(true); }
   stripBump = -1;
   const head = qs("#liveHead");
-  if(head) head.innerHTML = liveHeadHTML(S.draft);
+  if(head){
+    // la barre et le pourcentage partent de l'ancienne valeur pour que le progrès se voie
+    const oldW = qsa(".lp-seg i", head).map(i=>i.style.width), oldPct = parseInt((qs(".lh-pct b", head)||{}).textContent)||0;
+    head.innerHTML = liveHeadHTML(S.draft);
+    const segs = qsa(".lp-seg i", head);
+    if(oldW.length===segs.length && !reducedMotion()){
+      const target = segs.map(i=>i.style.width);
+      segs.forEach((i,k)=>{ i.style.transition = "none"; i.style.width = oldW[k]; });
+      void head.offsetWidth;
+      segs.forEach((i,k)=>{ i.style.transition = ""; i.style.width = target[k]; if(target[k]!==oldW[k]) i.parentElement.classList.add("grew"); });
+      const b = qs(".lh-pct b", head), newPct = parseInt(b.textContent)||0;
+      if(newPct!==oldPct){
+        b.classList.add("bump");
+        const t0 = performance.now();
+        (function step(t){ const p = Math.min(1,(t-t0)/600), e = 1-Math.pow(1-p,3);
+          b.firstChild.textContent = Math.round(oldPct+(newPct-oldPct)*e);
+          if(p<1) requestAnimationFrame(step); })(t0);
+      }
+    }
+  }
   if(typeof renderRestBar==="function") renderRestBar();
 }
 
@@ -3769,6 +4009,7 @@ function endSwipe(e){
   s.card.classList.remove("dragging");
   if(go){
     s.card.classList.add(go>0?"fly-l":"fly-r");
+    sfx("swipe");
     if(navigator.vibrate) try{ navigator.vibrate(8); }catch(err){}
     setTimeout(()=>{ liveFocusIdx += go; focusAnimDir = go>0?"r":"l"; refreshFocusRegion(); }, 170);
   } else {
@@ -3898,6 +4139,7 @@ Object.assign(ACT, {
     confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); liveFocusIdx=0; save(); renderViewAnimated("today"); } });
   },
   removeExo(d, el){
+    sfx("remove");
     if(S.draft.startedAt) closeSheet();
     const row = el && !S.draft.startedAt && el.closest(".row");
     const go = ()=>{
@@ -3956,6 +4198,7 @@ Object.assign(ACT, {
     changed();
   },
   customRemove(d, el){
+    sfx("remove");
     const row = el.closest(".row");
     const go = ()=>{ S.custom.exos.splice(+d.idx,1); changed(); };
     if(row){ row.classList.add("leaving"); setTimeout(go, 220); } else go();
@@ -4050,7 +4293,7 @@ Object.assign(ACT, {
     const v = Math.max(0,(old||0)+parseInt(d.d,10));
     ex.sets.forEach((s,i)=>{ if(i>=+d.si && !s.done && s.reps===old) s.reps = v; });
     st.reps = v;
-    valRoll = { f:"reps", d: parseInt(d.d,10)>0 ? "up" : "down" };
+    valRoll = { f:"reps", d: parseInt(d.d,10)>0 ? "up" : "down" }; sfx("step", parseInt(d.d,10)>0);
     save(); refreshFocusRegion();
   },
   stepWeight(d){
@@ -4058,7 +4301,7 @@ Object.assign(ACT, {
     const v = stepWeightValue(def, old||0, parseInt(d.d,10));
     ex.sets.forEach((s,i)=>{ if(i>=+d.si && !s.done && s.weight===old) s.weight = v; });
     st.weight = v;
-    valRoll = { f:"weight", d: parseInt(d.d,10)>0 ? "up" : "down" };
+    valRoll = { f:"weight", d: parseInt(d.d,10)>0 ? "up" : "down" }; sfx("step", parseInt(d.d,10)>0);
     save(); refreshFocusRegion();
   },
   editVal(d){
@@ -4091,6 +4334,8 @@ Object.assign(ACT, {
       floatText(bx, by-30, "💥 Record !", "pr");
     }
     st.done = true;
+    { const fin = ex.sets.every(s=>s.done), rest = S.draft.exos.some(e=>e.sets.some(s=>!s.done));
+      sfx(!rest ? "complete" : st.pr ? "pr" : fin ? "exo" : "set"); }
     if(navigator.vibrate) try{ navigator.vibrate(18); }catch(e){}
     justDone = { exi, si };
     stripBump = exi;
@@ -4133,7 +4378,7 @@ Object.assign(ACT, {
         <div class="nm">${esc(e.n)}</div>
         <div class="exo-tags"><span class="rtag r-${region}">${REGIONS[region].n}</span><span class="etag">${cat.em} ${esc(cat.n)}</span>${e.equip.includes("bench")?`<span class="etag">+ banc</span>`:""}</div>
       </div>
-      <div class="exo-muscle-chips">${e.muscles.map((m,i)=>`<span class="chip ${i===0?"on":""}">${i===0?"Principal : ":""}${MUSCLE_MAP[m].n}</span>`).join("")}</div>
+      <div class="exo-muscle-chips">${e.muscles.map((m,i)=>`<span class="chip mchip ${i===0?"main":""}">${MUSCLE_MAP[m].n}${i===0?" <small>principal</small>":""}</span>`).join("")}</div>
       ${stats}
       <div class="exo-facts">
         <div><b>${e.sets} × ${e.repsMin}-${e.repsMax}</b><span>${isTimed(e)?"secondes":"répétitions"} conseillées</span></div>
@@ -4219,18 +4464,18 @@ function renderHistory(){
       return `<button class="row tap stagger" style="--i:${Math.min(i++,12)}" data-a="openSessionDetail" data-id="${s.id}">
         ${sessionIcon(s)}
         <div class="grow"><div class="t">${esc(sessionTitle(s))}${prs?` <span class="pr-badge">💥 ${prs}</span>`:""}</div>
-        <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries · ${fmtKg(sessionVolume(s))}</div></div>
+        <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries${sessionVolume(s)?" · "+fmtKg(sessionVolume(s)):""}</div></div>
         <div class="val">${s.durationSec?fmtDuration(s.durationSec):""}</div><span class="chev">${icon("chev")}</span>
       </button>`;
     }).join("");
     return `<h2 class="sh">${MOIS_LONG[d.getMonth()].replace(/^./,c=>c.toUpperCase())} ${d.getFullYear()}</h2>
-      <div class="sh-sub">${m.list.length} séance${m.list.length>1?"s":""} · ${fmtKg(vol)}</div>
+      <div class="sh-sub">${m.list.length} séance${m.list.length>1?"s":""}${vol?" · "+fmtKg(vol):""}</div>
       <div class="group">${rows}</div>`;
   }).join("");
   const more = all.length - sessions.length;
   return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
     <h1 class="lt">Historique</h1>
-    <div class="sh-sub" style="margin-top:-4px">${all.length} séance${all.length>1?"s":""} au total · ${fmtKg(totalVolumeAllTime())} soulevés</div>
+    <div class="sh-sub" style="margin-top:-4px">${all.length} séance${all.length>1?"s":""} au total${totalVolumeAllTime()?" · "+fmtKg(totalVolumeAllTime())+" soulevés":""}</div>
     ${html}
     ${more>0?`<div class="btnrow"><button class="btn secondary" data-a="histMore">Afficher ${Math.min(more,25)} séance${Math.min(more,25)>1?"s":""} de plus <span class="muted-n">· ${more} restante${more>1?"s":""}</span></button></div>`:""}
   </div>`;
@@ -4255,8 +4500,8 @@ function sessionDetailHTML(s){
     <div class="stat-strip">
       <div class="stat-box"><div class="num">${s.durationSec?fmtDuration(s.durationSec):"–"}</div><div class="lbl">durée</div></div>
       <div class="stat-box"><div class="num">${sessionSetCount(s)}</div><div class="lbl">séries</div></div>
-      <div class="stat-box"><div class="num">${fmtKg(sessionVolume(s))}</div><div class="lbl">soulevés</div></div>
-      <div class="stat-box"><div class="num">${sessionPRCount(s)}</div><div class="lbl">records</div></div>
+      ${sessionVolume(s) ? `<div class="stat-box"><div class="num">${fmtKg(sessionVolume(s))}</div><div class="lbl">soulevés</div></div>` : `<div class="stat-box"><div class="num">${sessionReps(s)}</div><div class="lbl">répétitions</div></div>`}
+      ${sessionPRCount(s) ? `<div class="stat-box pr"><div class="num">${sessionPRCount(s)}</div><div class="lbl">record${sessionPRCount(s)>1?"s":""}</div></div>` : ""}
     </div>
     <div class="group" style="margin-top:14px">${rows||'<div style="padding:16px" class="s">Aucune série complétée.</div>'}</div>
     <div class="btnrow"><button class="btn secondary" data-a="redoSession" data-id="${s.id}">${icon("repeat")} Refaire cette séance</button></div>
@@ -4580,6 +4825,11 @@ function renderProfil(){
         <div class="grow"><div class="t">Apparence</div><div class="s">${S.settings.theme==="auto"?"Automatique":S.settings.theme==="dark"?"Sombre":"Clair"}</div></div>
         <span class="chev">${icon("chev")}</span>
       </button>
+      <div class="row">
+        <div class="ico" style="background:var(--blue)">🔊</div>
+        <div class="grow"><div class="t">Sons</div><div class="s">Retours sonores pendant la séance</div></div>
+        <button class="switch ${S.settings.sound!==false?"on":""}" aria-label="Sons" data-a="toggleSound"></button>
+      </div>
       <button class="row tap" style="width:100%" data-a="confirmReset">
         <div class="ico" style="background:var(--red)">🗑️</div>
         <div class="grow"><div class="t">Réinitialiser toutes les données</div></div>
@@ -4774,6 +5024,7 @@ Object.assign(ACT, {
     confirmSheet({ title:"Supprimer le programme importé ?", ok:"Supprimer", danger:true, onOk:()=>{ S.importedProgram=[]; save(); closeSheet(); changed(); } });
   },
 
+  toggleSound(d, el){ S.settings.sound = S.settings.sound===false; save(); el.classList.toggle("on", S.settings.sound); if(S.settings.sound) sfx("set"); },
   setTheme(d){ S.settings.theme = d.v; save(); applyTheme(); const b=qs(".sheet-body"); if(b) b.innerHTML = appearanceBodyHTML(); changed(); },
 
   confirmReset(){
@@ -4783,7 +5034,7 @@ Object.assign(ACT, {
 });
 VIEWS.profil = renderProfil;
 // ================= INITIALISATION =================
-const APP_VERSION = "1.6";
+const APP_VERSION = "1.7";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){

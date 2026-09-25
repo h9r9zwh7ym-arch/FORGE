@@ -55,6 +55,7 @@ function morphHeight(el, mutate, done){
 // ouvre (contenu déjà inséré) ou ferme (contenu retiré à la fin) un bloc .clp
 function animateCollapse(el, open, html){
   if(!el) return;
+  sfx(open ? "open" : "close");
   if(open){
     morphHeight(el, ()=>{ el.innerHTML = html||""; el.classList.remove("clp-in"); void el.offsetWidth; el.classList.add("clp-in"); },
       ()=>setTimeout(()=>el.classList.remove("clp-in"), 500));
@@ -118,8 +119,8 @@ function showLaunch(session){
     setTimeout(()=>el.remove(), 420);
   };
   el.addEventListener("click", leave);
-  if(reduce){ timers.push(setTimeout(leave, 900)); return; }
-  [0,550,1100].forEach(t=>timers.push(setTimeout(()=>haptic(12), t)));
-  timers.push(setTimeout(()=>haptic([20,40,30]), 1650));
+  if(reduce){ sfx("go"); timers.push(setTimeout(leave, 900)); return; }
+  [0,550,1100].forEach(t=>timers.push(setTimeout(()=>{ haptic(12); sfx("count"); }, t)));
+  timers.push(setTimeout(()=>{ haptic([20,40,30]); sfx("go"); }, 1650));
   timers.push(setTimeout(leave, 3000));
 }

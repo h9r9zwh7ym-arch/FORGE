@@ -258,6 +258,7 @@ function showCelebration(session, ups, xpBefore, xpAfter){
     animateCounts(qs(".cel"));
   }));
   setTimeout(()=>confettiBurst(null, innerHeight*0.3, ups.length||levelUp ? 150 : 90), 150);
+  setTimeout(()=>sfx(ups.length||levelUp ? "medal" : "exo"), 200);
 }
 
 Object.assign(ACT, {

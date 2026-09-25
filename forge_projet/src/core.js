@@ -13,7 +13,7 @@ function defaultState(){
     templates: [],         // modèles enregistrés : [{id, n, exos:[{exoId, sets}]}]
     importedProgram: [],
     medals: {},            // {familleId: {t: palier atteint 0-4, d: {1: iso, 2: iso…}}}
-    settings: { theme:"auto", unit:"kg", todayTab:"custom", name:"" },
+    settings: { theme:"auto", unit:"kg", todayTab:"custom", name:"", sound:true },
     meta: { createdAt: new Date().toISOString(), prCount:0 },
   };
 }

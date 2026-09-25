@@ -172,7 +172,7 @@ function proposalPaneHTML(draft){
       <button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter</button>
       ${imported?"":`<button class="btn secondary sm" data-a="regenSession">${icon("repeat")} Autre proposition</button>`}
     </div>
-    <div class="btnrow"><button class="btn big" data-a="startSession">${icon("play")} Commencer cette séance</button></div>`;
+    <div class="btnrow"><button class="btn ${heroShown?"secondary":"big"}" data-a="startSession">${icon("play")} Commencer cette séance</button></div>`;
 }
 
 // ---------- séances enregistrées & planning ----------
@@ -313,7 +313,7 @@ function customPaneHTML(){
       <button class="btn secondary sm" data-a="customFill">✨ Compléter</button>
       <button class="btn secondary sm" data-a="saveTemplateOpen">${icon("bookmark")} ${S.custom.tplId?"Sauver":"Enregistrer"}</button>
     </div>
-    <div class="btnrow"><button class="btn big" data-a="startCustom">${icon("play")} Commencer ma séance</button></div>
+    <div class="btnrow"><button class="btn ${sessionsToday().length||plannedTemplate()?"big":"secondary"}" data-a="startCustom">${icon("play")} Commencer ma séance</button></div>
     ${tail}`;
 }
 
@@ -587,7 +587,26 @@ function refreshFocusRegion(){
   if(strip){ const sl = (qs("#lsChips")||{}).scrollLeft||0; strip.innerHTML = liveStripHTML(S.draft); qs("#lsChips").scrollLeft = sl; centerStripChip(true); }
   stripBump = -1;
   const head = qs("#liveHead");
-  if(head) head.innerHTML = liveHeadHTML(S.draft);
+  if(head){
+    // la barre et le pourcentage partent de l'ancienne valeur pour que le progrès se voie
+    const oldW = qsa(".lp-seg i", head).map(i=>i.style.width), oldPct = parseInt((qs(".lh-pct b", head)||{}).textContent)||0;
+    head.innerHTML = liveHeadHTML(S.draft);
+    const segs = qsa(".lp-seg i", head);
+    if(oldW.length===segs.length && !reducedMotion()){
+      const target = segs.map(i=>i.style.width);
+      segs.forEach((i,k)=>{ i.style.transition = "none"; i.style.width = oldW[k]; });
+      void head.offsetWidth;
+      segs.forEach((i,k)=>{ i.style.transition = ""; i.style.width = target[k]; if(target[k]!==oldW[k]) i.parentElement.classList.add("grew"); });
+      const b = qs(".lh-pct b", head), newPct = parseInt(b.textContent)||0;
+      if(newPct!==oldPct){
+        b.classList.add("bump");
+        const t0 = performance.now();
+        (function step(t){ const p = Math.min(1,(t-t0)/600), e = 1-Math.pow(1-p,3);
+          b.firstChild.textContent = Math.round(oldPct+(newPct-oldPct)*e);
+          if(p<1) requestAnimationFrame(step); })(t0);
+      }
+    }
+  }
   if(typeof renderRestBar==="function") renderRestBar();
 }
 
@@ -707,6 +726,7 @@ function endSwipe(e){
   s.card.classList.remove("dragging");
   if(go){
     s.card.classList.add(go>0?"fly-l":"fly-r");
+    sfx("swipe");
     if(navigator.vibrate) try{ navigator.vibrate(8); }catch(err){}
     setTimeout(()=>{ liveFocusIdx += go; focusAnimDir = go>0?"r":"l"; refreshFocusRegion(); }, 170);
   } else {
@@ -836,6 +856,7 @@ Object.assign(ACT, {
     confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); liveFocusIdx=0; save(); renderViewAnimated("today"); } });
   },
   removeExo(d, el){
+    sfx("remove");
     if(S.draft.startedAt) closeSheet();
     const row = el && !S.draft.startedAt && el.closest(".row");
     const go = ()=>{
@@ -894,6 +915,7 @@ Object.assign(ACT, {
     changed();
   },
   customRemove(d, el){
+    sfx("remove");
     const row = el.closest(".row");
     const go = ()=>{ S.custom.exos.splice(+d.idx,1); changed(); };
     if(row){ row.classList.add("leaving"); setTimeout(go, 220); } else go();
@@ -988,7 +1010,7 @@ Object.assign(ACT, {
     const v = Math.max(0,(old||0)+parseInt(d.d,10));
     ex.sets.forEach((s,i)=>{ if(i>=+d.si && !s.done && s.reps===old) s.reps = v; });
     st.reps = v;
-    valRoll = { f:"reps", d: parseInt(d.d,10)>0 ? "up" : "down" };
+    valRoll = { f:"reps", d: parseInt(d.d,10)>0 ? "up" : "down" }; sfx("step", parseInt(d.d,10)>0);
     save(); refreshFocusRegion();
   },
   stepWeight(d){
@@ -996,7 +1018,7 @@ Object.assign(ACT, {
     const v = stepWeightValue(def, old||0, parseInt(d.d,10));
     ex.sets.forEach((s,i)=>{ if(i>=+d.si && !s.done && s.weight===old) s.weight = v; });
     st.weight = v;
-    valRoll = { f:"weight", d: parseInt(d.d,10)>0 ? "up" : "down" };
+    valRoll = { f:"weight", d: parseInt(d.d,10)>0 ? "up" : "down" }; sfx("step", parseInt(d.d,10)>0);
     save(); refreshFocusRegion();
   },
   editVal(d){
@@ -1029,6 +1051,8 @@ Object.assign(ACT, {
       floatText(bx, by-30, "💥 Record !", "pr");
     }
     st.done = true;
+    { const fin = ex.sets.every(s=>s.done), rest = S.draft.exos.some(e=>e.sets.some(s=>!s.done));
+      sfx(!rest ? "complete" : st.pr ? "pr" : fin ? "exo" : "set"); }
     if(navigator.vibrate) try{ navigator.vibrate(18); }catch(e){}
     justDone = { exi, si };
     stripBump = exi;
@@ -1071,7 +1095,7 @@ Object.assign(ACT, {
         <div class="nm">${esc(e.n)}</div>
         <div class="exo-tags"><span class="rtag r-${region}">${REGIONS[region].n}</span><span class="etag">${cat.em} ${esc(cat.n)}</span>${e.equip.includes("bench")?`<span class="etag">+ banc</span>`:""}</div>
       </div>
-      <div class="exo-muscle-chips">${e.muscles.map((m,i)=>`<span class="chip ${i===0?"on":""}">${i===0?"Principal : ":""}${MUSCLE_MAP[m].n}</span>`).join("")}</div>
+      <div class="exo-muscle-chips">${e.muscles.map((m,i)=>`<span class="chip mchip ${i===0?"main":""}">${MUSCLE_MAP[m].n}${i===0?" <small>principal</small>":""}</span>`).join("")}</div>
       ${stats}
       <div class="exo-facts">
         <div><b>${e.sets} × ${e.repsMin}-${e.repsMax}</b><span>${isTimed(e)?"secondes":"répétitions"} conseillées</span></div>

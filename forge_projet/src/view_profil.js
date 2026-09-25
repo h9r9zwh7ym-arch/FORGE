@@ -101,6 +101,11 @@ function renderProfil(){
         <div class="grow"><div class="t">Apparence</div><div class="s">${S.settings.theme==="auto"?"Automatique":S.settings.theme==="dark"?"Sombre":"Clair"}</div></div>
         <span class="chev">${icon("chev")}</span>
       </button>
+      <div class="row">
+        <div class="ico" style="background:var(--blue)">🔊</div>
+        <div class="grow"><div class="t">Sons</div><div class="s">Retours sonores pendant la séance</div></div>
+        <button class="switch ${S.settings.sound!==false?"on":""}" aria-label="Sons" data-a="toggleSound"></button>
+      </div>
       <button class="row tap" style="width:100%" data-a="confirmReset">
         <div class="ico" style="background:var(--red)">🗑️</div>
         <div class="grow"><div class="t">Réinitialiser toutes les données</div></div>
@@ -295,6 +300,7 @@ Object.assign(ACT, {
     confirmSheet({ title:"Supprimer le programme importé ?", ok:"Supprimer", danger:true, onOk:()=>{ S.importedProgram=[]; save(); closeSheet(); changed(); } });
   },
 
+  toggleSound(d, el){ S.settings.sound = S.settings.sound===false; save(); el.classList.toggle("on", S.settings.sound); if(S.settings.sound) sfx("set"); },
   setTheme(d){ S.settings.theme = d.v; save(); applyTheme(); const b=qs(".sheet-body"); if(b) b.innerHTML = appearanceBodyHTML(); changed(); },
 
   confirmReset(){

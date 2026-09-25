@@ -43,6 +43,12 @@ const PICTO_OF = {
   curl_biceps:"curl", curl_marteau:"curl", curl_concentre:"curl", curl_incline:"curl", curl_barre:"curl", curl_biceps_elastique:"curl", curl_poignets:"curl",
   extension_triceps_nuque:"triceps", kickback_triceps:"triceps", extension_triceps_allonge:"triceps", barre_front:"triceps", extension_triceps_elastique:"triceps",
   shrugs_halteres:"carry", marche_fermier:"carry", kb_fermier:"carry",
+  // v1.7
+  pompes_archer:"pushup", planche_commando:"plank", russian_twist:"crunch", flutter_kicks:"crunch", montees_genoux:"cardio", fentes_sautees:"lunge",
+  ytw_sol:"raise", marche_ours:"plank", rowing_appui_banc:"row", squat_bulgare_halteres:"lunge", curl_zottman:"curl", mollets_assis_haltere:"calf",
+  woodchopper_haltere:"overhead", front_squat_barre:"squat", fente_arriere_barre:"lunge", shrugs_barre:"carry", good_morning_barre:"hinge",
+  halo_kb:"overhead", fente_goblet_kb:"lunge", swing_kb_uni:"hinge", tirage_vertical_elastique:"hang", pallof_press:"plank",
+  souleve_elastique:"hinge", kickback_fessier_elastique:"bridge", tractions_negatives:"hang", releve_jambes_suspendu:"hang",
 };
 const PICTO_BY_PATTERN = { squat:"squat", hinge:"hinge", push:"pushup", pull:"row", lunge:"lunge", core:"plank", calf:"calf" };
 

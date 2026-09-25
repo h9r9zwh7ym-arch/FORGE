@@ -27,13 +27,14 @@ function tickRest(){
     if(navigator.vibrate) try{ navigator.vibrate([120,60,120]); }catch(e){}
     toast("⚡ C'est reparti — série suivante");
     if(typeof restReady!=="undefined") restReady = true;
+    sfx("restEnd");
     stopRestTimer();
     return;
   }
   // 3 dernières secondes : l'anneau bat et le téléphone vibre à chaque seconde
   const wrap = document.querySelector(".ring-wrap");
   if(wrap) wrap.classList.toggle("ending", remain<=3);
-  if(remain<=3 && remain!==restState.lastTick){ restState.lastTick = remain; if(navigator.vibrate) try{ navigator.vibrate(10); }catch(e){} }
+  if(remain<=3 && remain!==restState.lastTick){ restState.lastTick = remain; if(navigator.vibrate) try{ navigator.vibrate(10); }catch(e){} sfx("restTick"); }
   renderRestBar(remain);
   if(typeof updateFocusRing==="function") updateFocusRing(remain, restState.totalSec);
 }
