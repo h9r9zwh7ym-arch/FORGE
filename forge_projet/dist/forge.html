@@ -1073,6 +1073,54 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 .info-btn{color:var(--label2)!important;background:var(--fill2)!important}
 .info-btn:active{color:var(--tint)!important;transform:scale(.9)}
 .fc-info{color:var(--label2)}
+.sub-setting{transition:opacity .25s}
+.sub-setting.off{opacity:.4;pointer-events:none}
+
+/* ================= v1.8 : ergonomie, petits écrans, cibles tactiles ================= */
+/* titres de barre de navigation : jamais sous les boutons latéraux */
+.navbar .nb-title{max-width:calc(100% - 210px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* titre de section avec actions : le titre se tronque, les actions restent sur une ligne */
+h2.sh{gap:12px}
+h2.sh .sh-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h2.sh .sh-actions{flex:none;display:flex;gap:14px}
+/* cibles tactiles ≥ 44 px (liens texte, en-têtes repliables, boutons fantômes) */
+h2.sh .more{position:relative}
+h2.sh .more::after{content:"";position:absolute;inset:-12px -8px}
+.sec-h{min-height:44px}
+.btn.ghost{min-height:44px}
+.pick-check{position:relative}
+.pick-check::after{content:"";position:absolute;inset:-10px}
+/* accueil : salutation qui tient sur une ligne ou deux sans écraser l'écran */
+.home .lt{font-size:clamp(calc(27rem/17), 8.6vw, calc(34rem/17));overflow-wrap:anywhere}
+/* pastilles : valeur au-dessus, libellé dessous, lisibles dès 320 px */
+.spill{flex-direction:column;align-items:flex-start;gap:6px;padding:10px 11px}
+.spill .sp-ring,.spill .sp-ico,.spill .sp-lvl{width:26px;height:26px}
+.spill .sp-ico svg{width:15px;height:15px}
+.spill .sp-lvl{border-radius:8px;font-size:calc(13.5rem/17)}
+.spill .sp-txt{width:100%}
+.sp-txt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* aperçu de séance : noms sur deux lignes plutôt que tronqués */
+.ov-row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2}
+.ov-row .icon-btn{width:34px}
+/* cartes de séances enregistrées */
+@media (max-width:370px){
+  .tc-picts{display:none}
+  .focus-card{padding-left:14px;padding-right:14px}
+  .big-steppers{gap:8px}
+  .big-stepper{padding:10px 4px 12px}
+  .big-stepper .bs-row{gap:4px}
+  .big-stepper button{width:32px;height:32px}
+  .big-stepper .bs-val,.big-stepper button.bs-val{min-width:36px;font-size:calc(20rem/17)}
+  .cc-stats{gap:6px}
+  .cc-stats small{font-size:calc(10rem/17)}
+}
+.fc-last{text-wrap:balance}
+h2.sh .more.danger{color:var(--red)}
+h2.sh .more.strong{font-weight:700}
+/* textes flottants : pastille lisible par-dessus le contenu */
+.float-txt{background:var(--bg2);padding:6px 14px;border-radius:18px;box-shadow:0 8px 24px -8px rgba(0,0,0,.3),0 0 0 .5px var(--sep);font-size:calc(15rem/17)}
+.float-txt.pr,.float-txt.big{font-size:calc(17rem/17)}
+.hero-title{font-size:clamp(calc(22rem/17), 7.2vw, calc(27rem/17))}
 </style></head><body><div id="app"></div><nav class="tabbar" aria-label="Onglets"></nav><div id="restbar"></div><div id="overlay" role="dialog"></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="fileImport" accept="application/json,.json" style="display:none"><script>
 // ================= MATÉRIEL =================
 // Catalogue du matériel reconnu par le moteur de suggestion. Chaque exercice de la
@@ -1727,6 +1775,7 @@ const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"
 function fmtDate(iso, opt){
   const d = parseISO(iso);
   if(opt==="long") return `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`;
+  if(opt==="short") return `${JOURS[d.getDay()].slice(0,3)}. ${d.getDate()} ${MOIS[d.getMonth()]}`;
   return `${d.getDate()} ${MOIS[d.getMonth()]}`;
 }
 function fmtRelative(iso){
@@ -2663,15 +2712,32 @@ function whoosh(t, dur, from, to, gain){
   src.start(t0); src.stop(t0+dur+0.05);
 }
 
+// « toc » feutré façon clavier iOS : un souffle très bref filtré (le contact) et un
+// corps grave qui s'éteint en 40 ms. Légère variation de hauteur à chaque fois pour
+// que la répétition ne fatigue pas l'oreille.
+function tok(t, body, gain){
+  if(!NOISE){
+    NOISE = AC.createBuffer(1, AC.sampleRate*1, AC.sampleRate);
+    const d = NOISE.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+  }
+  const v = 1 + (Math.random()-0.5)*0.08, t0 = AC.currentTime + t, g0 = gain==null ? 1 : gain;
+  const src = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  src.buffer = NOISE; f.type = "bandpass"; f.frequency.value = 2600*v; f.Q.value = 0.9;
+  g.gain.setValueAtTime(0.16*g0, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0+0.014);
+  src.connect(f); f.connect(g); g.connect(SFX_OUT);
+  src.start(t0, Math.random()*0.5); src.stop(t0+0.03);
+  tone((body||190)*v, t, 0.045, { gain:0.22*g0, to:(body||190)*0.6*v, att:0.002 });
+}
+let lastTok = 0;
 // notes (Hz)
 const NT = { C5:523.25, D5:587.33, E5:659.25, G5:783.99, A5:880, C6:1046.5, D6:1174.7, E6:1318.5, G6:1568, A6:1760, C7:2093 };
 const SFX = {
-  tick(){ tone(1900, 0, 0.035, { gain:0.2, type:"triangle" }); },
-  step(up){ tone(up ? 1500 : 1150, 0, 0.05, { gain:0.24, type:"triangle", to: up ? 1750 : 950 }); },
-  open(){ tone(420, 0, 0.12, { gain:0.3, to:760 }); },
-  close(){ tone(700, 0, 0.1, { gain:0.26, to:380 }); },
-  seg(){ tone(1250, 0, 0.04, { gain:0.18, type:"triangle" }); },
-  swipe(){ whoosh(0, 0.22, 900, 2600, 0.35); },
+  tick(){ tok(0, 200, 0.8); },
+  step(up){ tok(0, up ? 230 : 175, 0.9); },
+  open(){ tone(260, 0, 0.09, { gain:0.14, to:470, att:0.004 }); tok(0, 210, 0.5); },
+  close(){ tone(430, 0, 0.08, { gain:0.12, to:240, att:0.004 }); tok(0, 170, 0.5); },
+  seg(){ tok(0, 200, 0.8); },
+  swipe(){ whoosh(0, 0.2, 700, 2200, 0.18); },
   set(){ bell(NT.E6, 0, 0.35, 0.16); bell(NT.A6, 0.075, 0.5, 0.14); },
   exo(){ [NT.C6, NT.E6, NT.G6, NT.C7].forEach((f,i)=>bell(f, i*0.07, 0.55, 0.13)); },
   pr(){ [NT.G6, NT.C7, NT.E6, NT.G6, NT.C7].forEach((f,i)=>tone(f*(1+Math.random()*0.01), i*0.05, 0.3, { gain:0.22, type:"triangle", pan:(i%2?.4:-.4) })); bell(NT.C6, 0, 0.8, 0.12); },
@@ -2683,19 +2749,25 @@ const SFX = {
   medal(){ [NT.G5, NT.C6, NT.E6, NT.G6].forEach((f,i)=>bell(f, i*0.09, 0.8, 0.12)); },
   count(){ tone(NT.A5, 0, 0.16, { gain:0.45, type:"triangle" }); tone(NT.A5*2, 0, 0.08, { gain:0.14 }); },
   go(){ whoosh(0, 0.5, 400, 4000, 0.16); [NT.C5, NT.G5, NT.C6, NT.E6].forEach((f,i)=>tone(f, 0.05+i*0.03, 0.9, { gain:0.1, type:"triangle", att:0.02 })); },
-  restTick(){ tone(NT.E6, 0, 0.08, { gain:0.3, type:"triangle" }); },
+  restTick(){ tone(NT.E5, 0, 0.12, { gain:0.28 }); tok(0, 330, 0.5); },
   restEnd(){ bell(NT.A5, 0, 1.1, 0.2); bell(NT.E6, 0.14, 1.1, 0.16); },
-  remove(){ tone(260, 0, 0.14, { gain:0.4, to:150 }); },
+  remove(){ tone(170, 0, 0.12, { gain:0.3, to:95, att:0.003 }); tok(0, 140, 0.7); },
 };
+const UI_SOUNDS = new Set(["tick","step","open","close","seg","swipe","remove"]);
 function sfx(name, arg){
   if(!soundOn() || !SFX[name]) return;
+  if(UI_SOUNDS.has(name)){
+    if(S.settings.uiSound===false) return;              // clics de l'interface coupés à part
+    const now = performance.now(); if(now-lastTok<60) return; lastTok = now; // jamais en rafale
+  }
   if(!AC || AC.state!=="running"){ if(!audioReady() || AC.state!=="running") return; }
   try{ SFX[name](arg); }catch(e){}
 }
 
-// petit « tic » pour les contrôles de sélection (segments, puces, interrupteurs, onglets, bandeau)
+// petit « toc » uniquement quand on change une sélection (segments, filtres, interrupteurs) :
+// ni les onglets, ni la navigation, ni les boutons ordinaires ne font de bruit.
 document.addEventListener("click", e=>{
-  const b = e.target.closest && e.target.closest(".seg button, .type-chip, .chip, .tabbtn, .ls-chip, .navbtn, .wp-day, .tpl-daypick button");
+  const b = e.target.closest && e.target.closest(".seg button:not(.on), .type-chip:not(.on), #pickerCats .chip, #pickerChips .chip, .switch, .tpl-daypick button, .chip[data-a^='toggle']");
   if(b && !b.disabled) sfx("seg");
 });
 // ================= EFFETS VISUELS =================
@@ -3329,7 +3401,7 @@ function statPillsHTML(){
     </button>
     <button class="spill ${streak>0?"hot":""}" data-a="tab" data-id="progress" aria-label="${streak} semaines d'affilée">
       <span class="sp-ico flame">${icon("flame")}</span>
-      <span class="sp-txt"><b data-count="${streak}">${streak}</b><small>sem. d'affilée</small></span>
+      <span class="sp-txt"><b><span data-count="${streak}">${streak}</span> sem.</b><small>d'affilée</small></span>
     </button>
     <button class="spill" data-a="tab" data-id="profil" aria-label="Niveau ${lv.level}">
       <span class="sp-lvl">${lv.level}</span>
@@ -3586,7 +3658,7 @@ function customPaneHTML(){
   const preview = { exos: c.map(e=>({ exoId:e.exoId, sets:new Array(e.sets).fill(0) })) };
   const regions = {}; c.forEach(e=>{ const d=EXO_MAP[e.exoId]; if(d) regions[regionOf(d)]=(regions[regionOf(d)]||0)+e.sets; });
   const balance = Object.keys(REGIONS).filter(r=>regions[r]).map(r=>`<span class="rb r-${r}" style="flex:${regions[r]}" title="${REGIONS[r].n} : ${regions[r]} séries"></span>`).join("");
-  return `<h2 class="sh">${esc(S.custom.name||"Ma séance")}<span class="sh-actions">${c.length>1?`<button class="more" data-a="toggleReorder">${reorderMode?"Terminé":"Réorganiser"}</button>`:""}<button class="more" data-a="customClear">Vider</button></span></h2>
+  return `<h2 class="sh"><span class="sh-t">${esc(S.custom.name||"Ma séance")}</span><span class="sh-actions">${reorderMode?`<button class="more danger" data-a="customClear">Vider</button><button class="more strong" data-a="toggleReorder">OK</button>`:`<button class="more" data-a="toggleReorder">Modifier</button>`}</span></h2>
     <div class="sh-sub">${c.length} exercice${c.length>1?"s":""} · ${sets} séries · ≈ ${estimateMinutes(preview)} min</div>
     <div class="region-bar" aria-hidden="true">${balance}</div>
     <div class="region-legend">${Object.keys(REGIONS).filter(r=>regions[r]).map(r=>`<span><i class="r-${r}"></i>${REGIONS[r].n}</span>`).join("")}</div>
@@ -3696,7 +3768,8 @@ function liveStripHTML(draft){
   const idx = Math.min(liveFocusIdx, draft.exos.length-1);
   const chips = draft.exos.map((e,i)=>{
     const def = EXO_MAP[e.exoId], n = e.sets.length, d = e.sets.filter(s=>s.done).length;
-    const cls = (i===idx ? "current" : "") + (d===n ? " done" : d ? " started" : " todo") + (i===stripBump ? " bump" : "");
+    const allDone = !draft.exos.some(x=>x.sets.some(s=>!s.done));
+    const cls = (i===idx && !allDone ? "current" : "") + (d===n ? " done" : d ? " started" : " todo") + (i===stripBump ? " bump" : "");
     return `<button class="ls-chip ${cls}" data-a="focusJump" data-idx="${i}" aria-label="${esc(def.n)} : ${d===n?"terminé":`${d} sur ${n} séries`}">
       <span class="ls-ring r-${regionOf(def)}" style="--p:${Math.round(d/n*100)}"><span>${d===n?icon("check"):pictoSVG(pictoKey(def))}</span></span>
       <span class="ls-name">${esc(def.n)}</span>
@@ -3955,7 +4028,7 @@ function openPlanDaySheet(day){
   const cur = S.templates.find(t=>(t.days||[]).includes(day));
   const label = JOURS[(day+1)%7];
   const rows = S.templates.map(t=>`<button class="row tap" data-a="planSet" data-d="${day}" data-id="${t.id}">
-      <div class="ico" style="background:${cur&&cur.id===t.id?"var(--green)":"var(--tint)"}">${cur&&cur.id===t.id?icon("check"):"📋"}</div>
+      ${cur&&cur.id===t.id ? `<span class="xico done">${icon("check")}</span>` : (EXO_MAP[(t.exos[0]||{}).exoId] ? `<span class="xico r-${tplRegion(t)}">${pictoSVG(pictoKey(EXO_MAP[t.exos[0].exoId]))}</span>` : `<span class="xico">${icon("bookmark")}</span>`)}
       <div class="grow"><div class="t">${esc(t.n)}</div><div class="s">${t.exos.length} exercices · ${t.exos.reduce((a,e)=>a+e.sets,0)} séries</div></div>
     </button>`).join("");
   openSheet(`<div class="sheet-hd"><span class="t">Le ${label}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
@@ -3963,7 +4036,7 @@ function openPlanDaySheet(day){
       ${S.templates.length ? `<p class="body" style="margin-bottom:12px">Quelle séance enregistrée veux-tu faire chaque ${label} ?</p><div class="group">${rows}</div>
         ${cur?`<div class="btnrow"><button class="btn ghost" data-a="planSet" data-d="${day}">Ne rien prévoir le ${label}</button></div>`:""}`
       : `<div class="empty-state" style="padding:24px 20px"><span class="em">📋</span>Tu n'as pas encore de séance enregistrée.</div>`}
-      <div class="btnrow"><button class="btn ${S.templates.length?"secondary":""}" data-a="planNew" data-d="${day}">${icon("plus")} Composer une nouvelle séance pour le ${label}</button></div>
+      <div class="btnrow"><button class="btn ${S.templates.length?"secondary":""}" data-a="planNew" data-d="${day}">${icon("plus")} Nouvelle séance pour le ${label}</button></div>
     </div>`);
 }
 // À l'ouverture (et quand on planifie le jour même) : charge la séance prévue aujourd'hui dans « Ma séance »
@@ -4320,6 +4393,9 @@ Object.assign(ACT, {
     if(si<0) return;
     const st = ex.sets[si];
     const [bx,by] = centerOf(".validate");
+    // les textes flottants partent des points de série (même place avant et après le repos)
+    const dotsR = (qs(".focus-card .set-dots")||{getBoundingClientRect:()=>null}).getBoundingClientRect();
+    const fx0 = dotsR ? dotsR.left+dotsR.width/2 : bx, fy0 = dotsR ? dotsR.top-8 : by-30;
     // record : meilleur que l'historique ET que les séries déjà validées aujourd'hui
     const prevToday = ex.sets.filter(s=>s.done);
     const bestTodayW = Math.max(0,...prevToday.map(s=>s.weight||0));
@@ -4329,9 +4405,8 @@ Object.assign(ACT, {
     if((w||r) && beatsToday && isNewPR(ex.exoId, w, r)){
       st.pr = true;
       S.meta.prCount = (S.meta.prCount||0)+1;
-      toast("💥 Nouveau record sur "+def.n+" !");
       confettiBurst(bx, by, 60);
-      floatText(bx, by-30, "💥 Record !", "pr");
+      floatText(fx0, fy0, "💥 Record !", "pr");
     }
     st.done = true;
     { const fin = ex.sets.every(s=>s.done), rest = S.draft.exos.some(e=>e.sets.some(s=>!s.done));
@@ -4339,7 +4414,7 @@ Object.assign(ACT, {
     if(navigator.vibrate) try{ navigator.vibrate(18); }catch(e){}
     justDone = { exi, si };
     stripBump = exi;
-    if(!st.pr && !exoFinished0(ex)) floatText(bx, by-26, `✓ Série ${si+1}`);
+    if(!st.pr && !exoFinished0(ex)) floatText(fx0, fy0, `✓ Série ${si+1}`);
     const exoFinished = !ex.sets.some(s=>!s.done);
     const ni = nextUndone(exi);
     if(ni>=0) startRestTimer(def.restSec, def.n, exoFinished ? ni : exi);
@@ -4464,7 +4539,7 @@ function renderHistory(){
       return `<button class="row tap stagger" style="--i:${Math.min(i++,12)}" data-a="openSessionDetail" data-id="${s.id}">
         ${sessionIcon(s)}
         <div class="grow"><div class="t">${esc(sessionTitle(s))}${prs?` <span class="pr-badge">💥 ${prs}</span>`:""}</div>
-        <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries${sessionVolume(s)?" · "+fmtKg(sessionVolume(s)):""}</div></div>
+        <div class="s">${esc(fmtDate(s.date,"short"))} · ${sessionSetCount(s)} séries${sessionVolume(s)?" · "+fmtKg(sessionVolume(s)):""}</div></div>
         <div class="val">${s.durationSec?fmtDuration(s.durationSec):""}</div><span class="chev">${icon("chev")}</span>
       </button>`;
     }).join("");
@@ -4557,7 +4632,7 @@ function recentPRs(n){
 }
 
 function renderProgress(){
-  const seg = segHTML("progress", [["overview","Vue d'ensemble"],["exos","Exercices"],["medals","Médailles"]], progressTab, "progressTab");
+  const seg = segHTML("progress", [["overview","Résumé"],["exos","Exercices"],["medals","Médailles"]], progressTab, "progressTab");
   const pane = progressTab==="exos" ? exosPaneHTML() : progressTab==="medals" ? medalsPaneHTML() : overviewPaneHTML();
   return `<div class="navbar"><div class="nb-title">Progrès</div></div><div class="content">
     <h1 class="lt">Progrès</h1>${seg}<div class="seg-pane">${pane}</div></div>`;
@@ -4754,7 +4829,7 @@ function profileStatsHTML(){
   const rows = [
     ["🏋️","Séances terminées", fmtNum(S.sessions.length), `${sessionsInYear()} cette année`],
     ["🔥","Semaines d'affilée", currentStreakWeeks(), `record : ${maxStreakWeeksEver()}`],
-    ["⭐","Exercice favori", fav?esc(fav.def.n):"–", fav?`${fav.n} séance${fav.n>1?"s":""}`:""],
+    ["⭐","Exercice favori", fav?`${fav.n}×`:"–", fav?esc(fav.def.n):""],
     ["📆","Jour préféré", wd?JOURS[(wd.i+1)%7]:"–", moment?`plutôt ${moment}`:""],
     ["⏱️","Durée moyenne", fmtDuration(avg), `${fmtDec(totalDurationSec()/3600)} h au total`],
     ["🏆","Meilleure semaine", bw?`${bw.n} séance${bw.n>1?"s":""}`:"–", bw?`semaine du ${fmtDate(bw.wk)}`:""],
@@ -4827,8 +4902,13 @@ function renderProfil(){
       </button>
       <div class="row">
         <div class="ico" style="background:var(--blue)">🔊</div>
-        <div class="grow"><div class="t">Sons</div><div class="s">Retours sonores pendant la séance</div></div>
+        <div class="grow"><div class="t">Sons</div><div class="s">Séries, records, repos, lancement</div></div>
         <button class="switch ${S.settings.sound!==false?"on":""}" aria-label="Sons" data-a="toggleSound"></button>
+      </div>
+      <div class="row sub-setting ${S.settings.sound===false?"off":""}">
+        <div class="ico" style="background:var(--fill);color:var(--label2)">👆</div>
+        <div class="grow"><div class="t">Clics de l'interface</div><div class="s">Petit « toc » sur les sélections et les +/−</div></div>
+        <button class="switch ${S.settings.uiSound!==false?"on":""}" aria-label="Clics de l'interface" data-a="toggleUiSound"></button>
       </div>
       <button class="row tap" style="width:100%" data-a="confirmReset">
         <div class="ico" style="background:var(--red)">🗑️</div>
@@ -5024,7 +5104,12 @@ Object.assign(ACT, {
     confirmSheet({ title:"Supprimer le programme importé ?", ok:"Supprimer", danger:true, onOk:()=>{ S.importedProgram=[]; save(); closeSheet(); changed(); } });
   },
 
-  toggleSound(d, el){ S.settings.sound = S.settings.sound===false; save(); el.classList.toggle("on", S.settings.sound); if(S.settings.sound) sfx("set"); },
+  toggleSound(d, el){
+    S.settings.sound = S.settings.sound===false; save(); el.classList.toggle("on", S.settings.sound);
+    const sub = qs(".sub-setting"); if(sub) sub.classList.toggle("off", !S.settings.sound);
+    if(S.settings.sound) sfx("set");
+  },
+  toggleUiSound(d, el){ S.settings.uiSound = S.settings.uiSound===false; save(); el.classList.toggle("on", S.settings.uiSound); if(S.settings.uiSound) setTimeout(()=>sfx("tick"), 80); },
   setTheme(d){ S.settings.theme = d.v; save(); applyTheme(); const b=qs(".sheet-body"); if(b) b.innerHTML = appearanceBodyHTML(); changed(); },
 
   confirmReset(){
@@ -5034,7 +5119,7 @@ Object.assign(ACT, {
 });
 VIEWS.profil = renderProfil;
 // ================= INITIALISATION =================
-const APP_VERSION = "1.7";
+const APP_VERSION = "1.8";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){

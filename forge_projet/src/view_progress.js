@@ -26,7 +26,7 @@ function recentPRs(n){
 }
 
 function renderProgress(){
-  const seg = segHTML("progress", [["overview","Vue d'ensemble"],["exos","Exercices"],["medals","Médailles"]], progressTab, "progressTab");
+  const seg = segHTML("progress", [["overview","Résumé"],["exos","Exercices"],["medals","Médailles"]], progressTab, "progressTab");
   const pane = progressTab==="exos" ? exosPaneHTML() : progressTab==="medals" ? medalsPaneHTML() : overviewPaneHTML();
   return `<div class="navbar"><div class="nb-title">Progrès</div></div><div class="content">
     <h1 class="lt">Progrès</h1>${seg}<div class="seg-pane">${pane}</div></div>`;

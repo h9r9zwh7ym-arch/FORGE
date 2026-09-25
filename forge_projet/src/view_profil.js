@@ -30,7 +30,7 @@ function profileStatsHTML(){
   const rows = [
     ["🏋️","Séances terminées", fmtNum(S.sessions.length), `${sessionsInYear()} cette année`],
     ["🔥","Semaines d'affilée", currentStreakWeeks(), `record : ${maxStreakWeeksEver()}`],
-    ["⭐","Exercice favori", fav?esc(fav.def.n):"–", fav?`${fav.n} séance${fav.n>1?"s":""}`:""],
+    ["⭐","Exercice favori", fav?`${fav.n}×`:"–", fav?esc(fav.def.n):""],
     ["📆","Jour préféré", wd?JOURS[(wd.i+1)%7]:"–", moment?`plutôt ${moment}`:""],
     ["⏱️","Durée moyenne", fmtDuration(avg), `${fmtDec(totalDurationSec()/3600)} h au total`],
     ["🏆","Meilleure semaine", bw?`${bw.n} séance${bw.n>1?"s":""}`:"–", bw?`semaine du ${fmtDate(bw.wk)}`:""],
@@ -103,8 +103,13 @@ function renderProfil(){
       </button>
       <div class="row">
         <div class="ico" style="background:var(--blue)">🔊</div>
-        <div class="grow"><div class="t">Sons</div><div class="s">Retours sonores pendant la séance</div></div>
+        <div class="grow"><div class="t">Sons</div><div class="s">Séries, records, repos, lancement</div></div>
         <button class="switch ${S.settings.sound!==false?"on":""}" aria-label="Sons" data-a="toggleSound"></button>
+      </div>
+      <div class="row sub-setting ${S.settings.sound===false?"off":""}">
+        <div class="ico" style="background:var(--fill);color:var(--label2)">👆</div>
+        <div class="grow"><div class="t">Clics de l'interface</div><div class="s">Petit « toc » sur les sélections et les +/−</div></div>
+        <button class="switch ${S.settings.uiSound!==false?"on":""}" aria-label="Clics de l'interface" data-a="toggleUiSound"></button>
       </div>
       <button class="row tap" style="width:100%" data-a="confirmReset">
         <div class="ico" style="background:var(--red)">🗑️</div>
@@ -300,7 +305,12 @@ Object.assign(ACT, {
     confirmSheet({ title:"Supprimer le programme importé ?", ok:"Supprimer", danger:true, onOk:()=>{ S.importedProgram=[]; save(); closeSheet(); changed(); } });
   },
 
-  toggleSound(d, el){ S.settings.sound = S.settings.sound===false; save(); el.classList.toggle("on", S.settings.sound); if(S.settings.sound) sfx("set"); },
+  toggleSound(d, el){
+    S.settings.sound = S.settings.sound===false; save(); el.classList.toggle("on", S.settings.sound);
+    const sub = qs(".sub-setting"); if(sub) sub.classList.toggle("off", !S.settings.sound);
+    if(S.settings.sound) sfx("set");
+  },
+  toggleUiSound(d, el){ S.settings.uiSound = S.settings.uiSound===false; save(); el.classList.toggle("on", S.settings.uiSound); if(S.settings.uiSound) setTimeout(()=>sfx("tick"), 80); },
   setTheme(d){ S.settings.theme = d.v; save(); applyTheme(); const b=qs(".sheet-body"); if(b) b.innerHTML = appearanceBodyHTML(); changed(); },
 
   confirmReset(){

@@ -46,7 +46,7 @@ function statPillsHTML(){
     </button>
     <button class="spill ${streak>0?"hot":""}" data-a="tab" data-id="progress" aria-label="${streak} semaines d'affilée">
       <span class="sp-ico flame">${icon("flame")}</span>
-      <span class="sp-txt"><b data-count="${streak}">${streak}</b><small>sem. d'affilée</small></span>
+      <span class="sp-txt"><b><span data-count="${streak}">${streak}</span> sem.</b><small>d'affilée</small></span>
     </button>
     <button class="spill" data-a="tab" data-id="profil" aria-label="Niveau ${lv.level}">
       <span class="sp-lvl">${lv.level}</span>
@@ -303,7 +303,7 @@ function customPaneHTML(){
   const preview = { exos: c.map(e=>({ exoId:e.exoId, sets:new Array(e.sets).fill(0) })) };
   const regions = {}; c.forEach(e=>{ const d=EXO_MAP[e.exoId]; if(d) regions[regionOf(d)]=(regions[regionOf(d)]||0)+e.sets; });
   const balance = Object.keys(REGIONS).filter(r=>regions[r]).map(r=>`<span class="rb r-${r}" style="flex:${regions[r]}" title="${REGIONS[r].n} : ${regions[r]} séries"></span>`).join("");
-  return `<h2 class="sh">${esc(S.custom.name||"Ma séance")}<span class="sh-actions">${c.length>1?`<button class="more" data-a="toggleReorder">${reorderMode?"Terminé":"Réorganiser"}</button>`:""}<button class="more" data-a="customClear">Vider</button></span></h2>
+  return `<h2 class="sh"><span class="sh-t">${esc(S.custom.name||"Ma séance")}</span><span class="sh-actions">${reorderMode?`<button class="more danger" data-a="customClear">Vider</button><button class="more strong" data-a="toggleReorder">OK</button>`:`<button class="more" data-a="toggleReorder">Modifier</button>`}</span></h2>
     <div class="sh-sub">${c.length} exercice${c.length>1?"s":""} · ${sets} séries · ≈ ${estimateMinutes(preview)} min</div>
     <div class="region-bar" aria-hidden="true">${balance}</div>
     <div class="region-legend">${Object.keys(REGIONS).filter(r=>regions[r]).map(r=>`<span><i class="r-${r}"></i>${REGIONS[r].n}</span>`).join("")}</div>
@@ -413,7 +413,8 @@ function liveStripHTML(draft){
   const idx = Math.min(liveFocusIdx, draft.exos.length-1);
   const chips = draft.exos.map((e,i)=>{
     const def = EXO_MAP[e.exoId], n = e.sets.length, d = e.sets.filter(s=>s.done).length;
-    const cls = (i===idx ? "current" : "") + (d===n ? " done" : d ? " started" : " todo") + (i===stripBump ? " bump" : "");
+    const allDone = !draft.exos.some(x=>x.sets.some(s=>!s.done));
+    const cls = (i===idx && !allDone ? "current" : "") + (d===n ? " done" : d ? " started" : " todo") + (i===stripBump ? " bump" : "");
     return `<button class="ls-chip ${cls}" data-a="focusJump" data-idx="${i}" aria-label="${esc(def.n)} : ${d===n?"terminé":`${d} sur ${n} séries`}">
       <span class="ls-ring r-${regionOf(def)}" style="--p:${Math.round(d/n*100)}"><span>${d===n?icon("check"):pictoSVG(pictoKey(def))}</span></span>
       <span class="ls-name">${esc(def.n)}</span>
@@ -672,7 +673,7 @@ function openPlanDaySheet(day){
   const cur = S.templates.find(t=>(t.days||[]).includes(day));
   const label = JOURS[(day+1)%7];
   const rows = S.templates.map(t=>`<button class="row tap" data-a="planSet" data-d="${day}" data-id="${t.id}">
-      <div class="ico" style="background:${cur&&cur.id===t.id?"var(--green)":"var(--tint)"}">${cur&&cur.id===t.id?icon("check"):"📋"}</div>
+      ${cur&&cur.id===t.id ? `<span class="xico done">${icon("check")}</span>` : (EXO_MAP[(t.exos[0]||{}).exoId] ? `<span class="xico r-${tplRegion(t)}">${pictoSVG(pictoKey(EXO_MAP[t.exos[0].exoId]))}</span>` : `<span class="xico">${icon("bookmark")}</span>`)}
       <div class="grow"><div class="t">${esc(t.n)}</div><div class="s">${t.exos.length} exercices · ${t.exos.reduce((a,e)=>a+e.sets,0)} séries</div></div>
     </button>`).join("");
   openSheet(`<div class="sheet-hd"><span class="t">Le ${label}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
@@ -680,7 +681,7 @@ function openPlanDaySheet(day){
       ${S.templates.length ? `<p class="body" style="margin-bottom:12px">Quelle séance enregistrée veux-tu faire chaque ${label} ?</p><div class="group">${rows}</div>
         ${cur?`<div class="btnrow"><button class="btn ghost" data-a="planSet" data-d="${day}">Ne rien prévoir le ${label}</button></div>`:""}`
       : `<div class="empty-state" style="padding:24px 20px"><span class="em">📋</span>Tu n'as pas encore de séance enregistrée.</div>`}
-      <div class="btnrow"><button class="btn ${S.templates.length?"secondary":""}" data-a="planNew" data-d="${day}">${icon("plus")} Composer une nouvelle séance pour le ${label}</button></div>
+      <div class="btnrow"><button class="btn ${S.templates.length?"secondary":""}" data-a="planNew" data-d="${day}">${icon("plus")} Nouvelle séance pour le ${label}</button></div>
     </div>`);
 }
 // À l'ouverture (et quand on planifie le jour même) : charge la séance prévue aujourd'hui dans « Ma séance »
@@ -1037,6 +1038,9 @@ Object.assign(ACT, {
     if(si<0) return;
     const st = ex.sets[si];
     const [bx,by] = centerOf(".validate");
+    // les textes flottants partent des points de série (même place avant et après le repos)
+    const dotsR = (qs(".focus-card .set-dots")||{getBoundingClientRect:()=>null}).getBoundingClientRect();
+    const fx0 = dotsR ? dotsR.left+dotsR.width/2 : bx, fy0 = dotsR ? dotsR.top-8 : by-30;
     // record : meilleur que l'historique ET que les séries déjà validées aujourd'hui
     const prevToday = ex.sets.filter(s=>s.done);
     const bestTodayW = Math.max(0,...prevToday.map(s=>s.weight||0));
@@ -1046,9 +1050,8 @@ Object.assign(ACT, {
     if((w||r) && beatsToday && isNewPR(ex.exoId, w, r)){
       st.pr = true;
       S.meta.prCount = (S.meta.prCount||0)+1;
-      toast("💥 Nouveau record sur "+def.n+" !");
       confettiBurst(bx, by, 60);
-      floatText(bx, by-30, "💥 Record !", "pr");
+      floatText(fx0, fy0, "💥 Record !", "pr");
     }
     st.done = true;
     { const fin = ex.sets.every(s=>s.done), rest = S.draft.exos.some(e=>e.sets.some(s=>!s.done));
@@ -1056,7 +1059,7 @@ Object.assign(ACT, {
     if(navigator.vibrate) try{ navigator.vibrate(18); }catch(e){}
     justDone = { exi, si };
     stripBump = exi;
-    if(!st.pr && !exoFinished0(ex)) floatText(bx, by-26, `✓ Série ${si+1}`);
+    if(!st.pr && !exoFinished0(ex)) floatText(fx0, fy0, `✓ Série ${si+1}`);
     const exoFinished = !ex.sets.some(s=>!s.done);
     const ni = nextUndone(exi);
     if(ni>=0) startRestTimer(def.restSec, def.n, exoFinished ? ni : exi);

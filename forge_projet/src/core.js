@@ -117,6 +117,7 @@ const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"
 function fmtDate(iso, opt){
   const d = parseISO(iso);
   if(opt==="long") return `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`;
+  if(opt==="short") return `${JOURS[d.getDay()].slice(0,3)}. ${d.getDate()} ${MOIS[d.getMonth()]}`;
   return `${d.getDate()} ${MOIS[d.getMonth()]}`;
 }
 function fmtRelative(iso){
