@@ -1,0 +1,1786 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)"><title>Forge</title><style>
+:root{
+  --bg:#F2F2F7; --bg2:#FFFFFF; --bg3:#F7F7FA; --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.07);
+  --label:#000; --label2:rgba(60,60,67,.76); --label3:rgba(60,60,67,.32); --sep:rgba(60,60,67,.22);
+  --tint:#D8480F; --tint-bg:rgba(216,72,15,.1); --on-tint:#fff;
+  --ember:#FF7A1A; --ember2:#FFB300;
+  --green:#1E7B34; --red:#D70015; --orange:#B25000; --blue:#0066CC; --purple:#7A3FC4;
+  --bar:rgba(248,248,250,.82); --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  --serif:ui-serif,"New York","Iowan Old Style","Palatino",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --rounded:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,sans-serif;
+  color-scheme:light dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#000; --bg2:#1C1C1E; --bg3:#242426; --fill:rgba(140,140,148,.24); --fill2:rgba(140,140,148,.13);
+    --label:#fff; --label2:rgba(235,235,245,.65); --label3:rgba(235,235,245,.3); --sep:rgba(130,130,138,.38);
+    --tint:#FF8A3D; --tint-bg:rgba(255,138,61,.15); --on-tint:#1A0D02;
+    --ember:#FF9A3D; --ember2:#FFC53D;
+    --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --blue:#409CFF; --purple:#BF80FF;
+    --bar:rgba(20,20,22,.8); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#000; --bg2:#1C1C1E; --bg3:#242426; --fill:rgba(140,140,148,.24); --fill2:rgba(140,140,148,.13);
+    --label:#fff; --label2:rgba(235,235,245,.65); --label3:rgba(235,235,245,.3); --sep:rgba(130,130,138,.38);
+    --tint:#FF8A3D; --tint-bg:rgba(255,138,61,.15); --on-tint:#1A0D02;
+    --ember:#FF9A3D; --ember2:#FFC53D;
+    --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --blue:#409CFF; --purple:#BF80FF;
+    --bar:rgba(20,20,22,.8); --shadow:none;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;font-size:17px;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--label);font-family:var(--sans);font-size:calc(17rem / 17);line-height:1.35;-webkit-font-smoothing:antialiased;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+a{color:var(--tint)}
+:focus-visible{outline:2px solid var(--tint);outline-offset:2px;border-radius:6px}
+#app{position:relative;height:100%}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(180px + env(safe-area-inset-bottom,0px));display:none;overscroll-behavior-y:contain}
+.view.active{display:block}
+.content{max-width:640px;margin:0 auto}
+
+/* navbar */
+.navbar{position:sticky;top:0;z-index:20;height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.navbar .nb-title{font-weight:600;font-size:calc(17rem / 17);opacity:0;transition:opacity .2s}
+.navbar .nb-right{position:absolute;right:8px;top:0;height:44px;display:flex;align-items:center;gap:2px}
+.navbar .nb-left{position:absolute;left:8px;top:0;height:44px;display:flex;align-items:center}
+.view.scrolled .navbar{background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 .5px 0 var(--sep)}
+.view.scrolled .navbar .nb-title{opacity:1}
+.icon-btn{width:36px;height:36px;border-radius:18px;display:grid;place-items:center;color:var(--tint)}
+.icon-btn svg{width:22px;height:22px}
+.icon-btn.filled{background:var(--fill)}
+.icon-btn:active{opacity:.5}
+
+.eyebrow{padding:0 20px;color:var(--label2);font-size:calc(15rem / 17);font-weight:600;margin-top:-4px}
+.lt{font-family:var(--serif);font-weight:700;font-size:calc(34rem / 17);letter-spacing:-.01em;line-height:1.1;padding:2px 20px 10px;margin:0}
+h2.sh{font-size:calc(20rem / 17);font-weight:700;margin:26px 20px 10px;display:flex;align-items:baseline;justify-content:space-between;letter-spacing:-.01em}
+h2.sh .more{font-size:calc(15rem / 17);font-weight:400;color:var(--tint)}
+.sh-sub{color:var(--label2);font-size:calc(15rem / 17);margin:-6px 20px 10px}
+p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
+.hr-note{font-size:calc(13rem / 17);color:var(--label3);margin:8px 20px 0;line-height:1.35}
+
+/* grouped lists */
+.group{background:var(--bg2);border-radius:14px;margin:0 16px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;min-height:46px;padding:10px 16px;position:relative;width:100%;text-align:left}
+.row+.row::before{content:"";position:absolute;top:0;right:0;left:var(--inset,16px);height:.5px;background:var(--sep)}
+.row.tap:active{background:var(--fill2)}
+.row .grow{flex:1;min-width:0}
+.row .t{font-size:calc(17rem / 17);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{font-size:calc(14rem / 17);color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.row .val{color:var(--label2);font-size:calc(17rem / 17);white-space:nowrap;flex:none}
+.chev{width:8px;height:13px;color:var(--label3);flex:none}
+.row .ico{width:29px;height:29px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff}
+
+/* cards & buttons */
+.card{background:var(--bg2);border-radius:18px;margin:0 16px;padding:16px;box-shadow:var(--shadow)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:14px;padding:0 20px;font-size:calc(17rem / 17);font-weight:600;background:var(--tint);color:var(--on-tint);width:100%}
+.btn:active{opacity:.75}
+.btn.secondary{background:var(--fill);color:var(--tint)}
+.btn.ghost{background:transparent;color:var(--tint);height:auto}
+.btn.danger{background:var(--red);color:#fff}
+.btn.sm{height:38px;font-size:calc(15rem / 17);border-radius:11px;width:auto}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.btnrow{display:flex;gap:10px;margin:14px 16px 0}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 13px;border-radius:16px;background:var(--fill);font-size:calc(14rem / 17);font-weight:500;color:var(--label)}
+.chip.on{background:var(--tint);color:var(--on-tint)}
+.chip.excl{background:rgba(215,0,21,.12);color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px}
+
+/* tabbar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 -.5px 0 var(--sep);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 5px;color:var(--label3)}
+.tabbtn svg{width:25px;height:25px}
+.tabbtn .tl{font-size:calc(10rem / 17);font-weight:500}
+.tabbtn.on{color:var(--tint)}
+.tabbtn:active{opacity:.6}
+
+/* overlay + sheets */
+#overlay{position:fixed;inset:0;z-index:50;display:none}
+#overlay.open{display:block}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.4);opacity:0;transition:opacity .25s}
+#overlay.show .scrim{opacity:1}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:88vh;background:var(--bg);border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;overflow:hidden}
+#overlay.show .sheet{transform:translateY(0)}
+.sheet-grab{width:36px;height:5px;border-radius:3px;background:var(--label3);margin:8px auto 2px;flex:none}
+.sheet-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 12px;flex:none}
+.sheet-hd .t{font-size:calc(17rem / 17);font-weight:700}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.center-modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%) scale(.92);width:min(320px,86vw);background:var(--bg2);border-radius:20px;padding:22px 20px;text-align:center;opacity:0;transition:transform .28s cubic-bezier(.32,.72,0,1),opacity .2s}
+#overlay.show .center-modal{transform:translate(-50%,-50%) scale(1);opacity:1}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(10px);z-index:60;background:var(--bar);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);color:var(--label);padding:10px 18px;border-radius:14px;font-size:calc(15rem / 17);font-weight:600;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* forms */
+.field{background:var(--bg2);border-radius:12px;margin:0 16px;padding:0 14px}
+.field label{display:block;font-size:calc(13rem / 17);color:var(--label2);padding-top:8px}
+.field input, .field select{width:100%;border:0;background:transparent;padding:4px 0 10px;font-size:calc(17rem / 17)}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper button{width:32px;height:32px;border-radius:16px;background:var(--fill);font-size:20px;font-weight:600;display:grid;place-items:center;color:var(--tint)}
+.stepper button:active{background:var(--tint);color:var(--on-tint)}
+.stepper .val{min-width:44px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+
+/* today: séance */
+.set-card{background:var(--bg2);border-radius:16px;margin:10px 16px 0;overflow:hidden}
+.set-hd{display:flex;align-items:center;gap:10px;padding:13px 14px 9px}
+.set-hd .ico{width:34px;height:34px;border-radius:10px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;flex:none}
+.set-hd .nm{font-weight:700;font-size:calc(16rem / 17);flex:1;min-width:0}
+.set-hd .mg{font-size:calc(12.5rem / 17);color:var(--label2)}
+.set-row{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center;padding:6px 14px;font-variant-numeric:tabular-nums}
+.set-row.hd{color:var(--label3);font-size:calc(12rem / 17);font-weight:600;padding-bottom:2px}
+.set-row input{width:100%;text-align:center;background:var(--fill2);border-radius:9px;height:34px;border:0;font-size:calc(15rem / 17)}
+.checkbtn{width:30px;height:30px;border-radius:15px;border:1.5px solid var(--sep);display:grid;place-items:center;color:transparent}
+.checkbtn.done{background:var(--green);border-color:var(--green);color:#fff}
+.set-actions{display:flex;gap:8px;padding:8px 14px 14px}
+.set-actions button{flex:1;height:36px;border-radius:10px;background:var(--fill2);font-size:calc(13.5rem / 17);font-weight:600;color:var(--label2)}
+.set-actions button:active{opacity:.6}
+.exo-note{margin:0 14px 12px;padding:9px 11px;background:var(--fill2);border-radius:10px;font-size:calc(13rem / 17);color:var(--label2);line-height:1.4}
+
+/* timer */
+#restbar{position:absolute;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:25;background:var(--tint);color:var(--on-tint);border-radius:16px;padding:12px 16px;display:none;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#restbar.show{display:flex}
+#restbar .rt-time{font-variant-numeric:tabular-nums;font-weight:700;font-size:calc(22rem / 17);min-width:56px}
+#restbar .rt-label{flex:1;font-weight:600;font-size:calc(14rem / 17)}
+#restbar button{background:rgba(255,255,255,.22);border-radius:10px;padding:7px 12px;font-weight:600;font-size:calc(13rem / 17);color:var(--on-tint)}
+
+/* progress charts */
+.chart-wrap{margin:10px 16px 0;background:var(--bg2);border-radius:16px;padding:14px 10px 6px}
+.chart-wrap svg{display:block;width:100%;height:auto}
+.pr-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(178,80,0,.14);color:var(--orange);border-radius:8px;padding:2px 8px;font-size:calc(12rem / 17);font-weight:700}
+
+/* trophies */
+.tro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px}
+.tro{background:var(--bg2);border-radius:16px;padding:14px 8px;text-align:center}
+.tro .em{font-size:30px;line-height:1;filter:grayscale(1) opacity(.25)}
+.tro.on .em{filter:none}
+.tro .tn{font-size:calc(12rem / 17);font-weight:600;margin-top:6px;color:var(--label2)}
+.tro.on .tn{color:var(--label)}
+
+/* celebration */
+.celebrate-ring{width:88px;height:88px;border-radius:50%;background:var(--tint-bg);display:grid;place-items:center;margin:6px auto 14px;color:var(--tint)}
+.celebrate-ring svg{width:46px;height:46px}
+@keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.celebrate-ring{animation:pop .5s cubic-bezier(.32,1.4,.4,1)}
+@media (prefers-reduced-motion:reduce){.celebrate-ring{animation:none}}
+
+/* empty state */
+.empty-state{padding:50px 30px;text-align:center;color:var(--label2)}
+.empty-state .em{font-size:40px;display:block;margin-bottom:10px}
+
+/* streak strip */
+.stat-strip{display:flex;gap:10px;padding:0 16px}
+.stat-box{flex:1;background:var(--bg2);border-radius:14px;padding:12px 10px;text-align:center}
+.stat-box .num{font-size:calc(22rem / 17);font-weight:700;font-variant-numeric:tabular-nums}
+.stat-box .lbl{font-size:calc(11.5rem / 17);color:var(--label2);margin-top:1px}
+
+.switch{width:51px;height:31px;border-radius:16px;background:var(--fill);position:relative;flex:none;transition:background .2s}
+.switch.on{background:var(--green)}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch.on::after{transform:translateX(20px)}
+</style></head><body><div id="app"></div><nav class="tabbar" aria-label="Onglets"></nav><div id="restbar"></div><div id="overlay" role="dialog"></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="fileImport" accept="application/json,.json" style="display:none"><script>
+// ================= MATÉRIEL =================
+// Catalogue du matériel reconnu par le moteur de suggestion. Chaque exercice de la
+// bibliothèque référence un sous-ensemble de ces identifiants. `loadable` signifie que
+// l'utilisateur peut renseigner les charges réellement possédées (utilisé pour la
+// progression de charge). `always` signifie que l'équipement est toujours disponible
+// (poids du corps) et n'a donc pas de case à cocher.
+const EQUIP_TYPES = [
+  { id:"bodyweight", n:"Poids du corps", em:"🤸", always:true },
+  { id:"dumbbells",  n:"Haltères",        em:"🏋️", loadable:true, unit:"kg", hint:"Renseigne les paires que tu possèdes (ex. 8 kg, 12 kg)." },
+  { id:"barbell",    n:"Barre + disques", em:"🏋️‍♂️", loadable:true, unit:"kg", hint:"Poids total que tu peux charger (barre comprise)." },
+  { id:"kettlebell", n:"Kettlebell",      em:"🔔", loadable:true, unit:"kg", hint:"Renseigne les kettlebells que tu possèdes." },
+  { id:"bench",      n:"Banc",            em:"🛋️" },
+  { id:"pullup_bar", n:"Barre de traction", em:"🚪" },
+  { id:"bands",      n:"Élastiques",      em:"➰", loadable:true, unit:"niveau", hint:"Renseigne les résistances que tu possèdes (léger, moyen, fort)." },
+  { id:"mat",        n:"Tapis de sol",    em:"🧘" },
+];
+const EQUIP_MAP = {};
+EQUIP_TYPES.forEach(e=>EQUIP_MAP[e.id]=e);
+
+// Incréments de charge par défaut utilisés par le moteur de progression quand
+// l'équipement n'a pas de liste de poids explicite (ex. barre non détaillée).
+const DEFAULT_INCREMENT = { barbell:2.5, dumbbells:1, kettlebell:2, bands:1 };
+
+function defaultEquipment(){
+  return {
+    owned:{ bodyweight:true, dumbbells:false, barbell:false, kettlebell:false, bench:false, pullup_bar:false, bands:false, mat:false },
+    weights:{ dumbbells:[], barbell:[], kettlebell:[], bands:[] }, // ex. dumbbells:[8,12], bands:["léger","moyen"]
+    custom:[] // [{id,n}] équipements libres, informatifs (extensibles au fil du temps)
+  };
+}
+
+function hasEquip(eq, list){
+  if(!list || !list.length) return true;
+  return list.every(id=>id==="bodyweight" || eq.owned[id]);
+}
+// ================= EXERCICES =================
+// Bibliothèque d'exercices de musculation. Les consignes d'exécution et de sécurité
+// reprennent les repères techniques standards enseignés en préparation physique
+// (alignement articulaire, dos neutre, amplitude contrôlée, respiration à l'effort) —
+// à visée générale, ne remplace pas l'avis d'un professionnel de santé ou d'un coach
+// pour un problème physique particulier.
+const MUSCLES = [
+  { id:"pect", n:"Pectoraux" }, { id:"dos", n:"Dos" }, { id:"epaules", n:"Épaules" },
+  { id:"biceps", n:"Biceps" }, { id:"triceps", n:"Triceps" }, { id:"avantbras", n:"Avant-bras" },
+  { id:"quadriceps", n:"Quadriceps" }, { id:"ischios", n:"Ischio-jambiers" }, { id:"fessiers", n:"Fessiers" },
+  { id:"mollets", n:"Mollets" }, { id:"abdos", n:"Abdominaux" }, { id:"cardio", n:"Cardio / gainage dynamique" },
+];
+const MUSCLE_MAP = {}; MUSCLES.forEach(m=>MUSCLE_MAP[m.id]=m);
+
+// [id, nom, [muscles: primaire d'abord], [équipement requis], pattern, unilatéral,
+//  {sets,repsMin,repsMax,restSec}, [consignes], sécurité]
+const EXO_RAW = [
+["pompes","Pompes",["pect","triceps","epaules"],["bodyweight"],"push",false,{sets:3,repsMin:8,repsMax:15,restSec:75},
+  ["Mains sous les épaules, corps aligné tête-bassin-talons.","Descends en gardant les coudes à ~45° du corps, poitrine proche du sol.","Pousse en expirant sans casser l'alignement du bassin."],
+  "Si le bas du dos s'affaisse, pose les genoux au sol (variante régressive) plutôt que de forcer la forme."],
+["pompes_genoux","Pompes sur les genoux",["pect","triceps","epaules"],["bodyweight"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Genoux au sol, corps aligné épaules-genoux.","Descends poitrine proche du sol, coudes à ~45°.","Pousse en expirant."],
+  "Bonne alternative pour progresser vers la pompe classique sans compenser avec le bas du dos."],
+["pompes_surelevees","Pompes surélevées (mains sur banc)",["pect","triceps","epaules"],["bodyweight","bench"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Mains posées sur le banc, corps aligné.","Descends la poitrine vers le banc, coudes semi-serrés.","Pousse en expirant."],
+  "Version plus facile que la pompe au sol : utile en régression."],
+["pompes_declinees","Pompes déclinées (pieds sur banc)",["pect","epaules","triceps"],["bodyweight","bench"],"push",false,{sets:3,repsMin:6,repsMax:12,restSec:75},
+  ["Pieds sur le banc, mains au sol sous les épaules.","Descends poitrine vers le sol en gardant le gainage.","Pousse en expirant."],
+  "Plus exigeant pour les épaules : progresse depuis la pompe classique avant cette variante."],
+["dips_banc","Dips sur banc",["triceps","epaules","pect"],["bodyweight","bench"],"push",false,{sets:3,repsMin:8,repsMax:15,restSec:60},
+  ["Mains sur le bord du banc, jambes tendues ou fléchies, bassin près du banc.","Descends en fléchissant les coudes vers l'arrière, sans dépasser 90°.","Remonte en poussant sur les paumes."],
+  "Ne descends pas au-delà d'un angle de coude confortable : une flexion excessive stresse l'épaule."],
+["squat_pdc","Squat au poids du corps",["quadriceps","fessiers"],["bodyweight"],"squat",false,{sets:3,repsMin:12,repsMax:20,restSec:60},
+  ["Pieds largeur d'épaules, orteils légèrement ouverts.","Descends hanches en arrière et vers le bas, dos neutre, genoux dans l'axe des pieds.","Remonte en poussant le sol en expirant."],
+  "Arrête la descente si les talons décollent ou si le bas du dos s'arrondit fortement."],
+["squat_bulgare_pdc","Squat bulgare (pied arrière surélevé)",["quadriceps","fessiers"],["bodyweight","bench"],"lunge",true,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Pied arrière posé sur le banc, pied avant à bonne distance pour un genou avant proche de 90°.","Descends à la verticale, genou avant aligné avec le pied.","Remonte en poussant sur le talon avant."],
+  "Reste proche d'un support au début : exercice exigeant en équilibre."],
+["fentes_avant","Fentes avant",["quadriceps","fessiers"],["bodyweight"],"lunge",true,{sets:3,repsMin:10,repsMax:14,restSec:60},
+  ["Grand pas en avant, descends jusqu'à ce que les deux genoux soient proches de 90°.","Genou avant aligné avec le pied, buste droit.","Repousse sur le talon avant pour revenir."],
+  "Le genou avant ne doit pas dépasser largement la pointe du pied de façon instable."],
+["fentes_arriere","Fentes arrière",["quadriceps","fessiers"],["bodyweight"],"lunge",true,{sets:3,repsMin:10,repsMax:14,restSec:60},
+  ["Grand pas en arrière, descends le genou arrière vers le sol sans le poser durement.","Buste droit, poids sur la jambe avant.","Repousse sur le talon avant."],
+  "Variante souvent plus confortable pour les genoux sensibles que la fente avant."],
+["fentes_marchees","Fentes marchées",["quadriceps","fessiers"],["bodyweight"],"lunge",true,{sets:3,repsMin:10,repsMax:16,restSec:75},
+  ["Avance en fente, genou avant à ~90°, puis enchaîne le pas suivant.","Garde le buste droit et le gainage actif.","Alterne les jambes à chaque pas."],
+  "Prévoir assez d'espace ; ralentis si l'équilibre devient précaire."],
+["pont_fessier","Pont fessier",["fessiers","ischios"],["bodyweight"],"hinge",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Allongé, genoux fléchis, pieds à plat proches du bassin.","Pousse les hanches vers le haut en serrant les fessiers, corps aligné genoux-hanches-épaules.","Redescends contrôlé sans reposer complètement."],
+  "Évite de cambrer excessivement le bas du dos en haut du mouvement."],
+["pont_fessier_uni","Pont fessier unilatéral",["fessiers","ischios"],["bodyweight"],"hinge",true,{sets:3,repsMin:8,repsMax:12,restSec:45},
+  ["Une jambe tendue en l'air, l'autre pied au sol.","Pousse les hanches vers le haut en gardant le bassin de niveau.","Redescends contrôlé."],
+  "Si le bassin bascule d'un côté, réduis l'amplitude."],
+["planche","Planche (gainage)",["abdos"],["bodyweight"],"core",false,{sets:3,repsMin:20,repsMax:45,restSec:45},
+  ["Avant-bras au sol sous les épaules, corps aligné tête-talons.","Serre abdos et fessiers, ne laisse pas le bassin tomber ni monter.","Respire normalement pendant le maintien (durée en secondes)."],
+  "Arrête si le bas du dos se creuse : réduis la durée plutôt que de perdre la position."],
+["planche_laterale","Planche latérale",["abdos"],["bodyweight"],"core",true,{sets:3,repsMin:15,repsMax:30,restSec:45},
+  ["Appui sur un avant-bras, corps aligné de la tête aux pieds.","Hanche décollée du sol, gainage latéral actif.","Maintiens la position (durée en secondes) puis change de côté."],
+  "Empile bien les épaules et les hanches pour ne pas tourner le buste."],
+["superman","Superman",["dos","fessiers"],["bodyweight"],"core",false,{sets:3,repsMin:10,repsMax:15,restSec:45},
+  ["Allongé sur le ventre, bras tendus devant.","Soulève simultanément bras, poitrine et jambes de quelques centimètres.","Redescends contrôlé."],
+  "Mouvement d'amplitude modérée : ne cherche pas à monter très haut, privilégie le contrôle."],
+["mountain_climbers","Mountain climbers",["abdos","cardio"],["bodyweight"],"core",false,{sets:3,repsMin:20,repsMax:30,restSec:45},
+  ["Position de planche haute, mains sous les épaules.","Ramène un genou vers la poitrine puis alterne rapidement.","Garde le bassin stable, sans le faire remonter."],
+  "Ralentis si le bas du dos bouge beaucoup : la stabilité du bassin prime sur la vitesse."],
+["crunch","Crunch abdominaux",["abdos"],["bodyweight"],"core",false,{sets:3,repsMin:15,repsMax:25,restSec:45},
+  ["Allongé, genoux fléchis, mains légèrement derrière la tête sans tirer sur la nuque.","Enroule le buste vers les genoux en expirant.","Redescends contrôlé sans reposer brutalement."],
+  "Ne tire pas sur la tête avec les mains ; le mouvement vient des abdominaux."],
+["releve_jambes","Relevé de jambes",["abdos"],["bodyweight"],"core",false,{sets:3,repsMin:10,repsMax:15,restSec:45},
+  ["Allongé, jambes tendues, bas du dos au contact du sol.","Descends les jambes tant que le bas du dos reste plaqué au sol.","Remonte contrôlé."],
+  "Plie les genoux pour réduire le levier si le bas du dos décolle du sol."],
+["burpees","Burpees",["cardio","quadriceps","pect"],["bodyweight"],"core",false,{sets:3,repsMin:8,repsMax:15,restSec:60},
+  ["Depuis debout, descends en squat, pose les mains, envoie les pieds en planche.","Fais une pompe (optionnelle), ramène les pieds, saute vers le haut.","Enchaîne à un rythme régulier plutôt que maximal d'emblée."],
+  "Exercice cardiovasculaire exigeant : ralentis la cadence en cas d'essoufflement excessif."],
+["jumping_jacks","Jumping jacks",["cardio"],["bodyweight"],"core",false,{sets:3,repsMin:20,repsMax:40,restSec:30},
+  ["Départ pieds joints, bras le long du corps.","Saute en écartant simultanément jambes et bras au-dessus de la tête.","Reviens à la position de départ, enchaîne à rythme régulier."],
+  "Bon échauffement cardio ; réduis l'amplitude si les articulations des chevilles/genoux sont sensibles."],
+["bird_dog","Bird-dog",["abdos","dos"],["bodyweight"],"core",true,{sets:3,repsMin:8,repsMax:12,restSec:45},
+  ["À quatre pattes, dos neutre.","Tends simultanément un bras et la jambe opposée à l'horizontale.","Reviens contrôlé, alterne les côtés."],
+  "Garde le bassin stable : évite de le faire tourner pendant l'extension."],
+["mollets_pdc","Mollets debout (poids du corps)",["mollets"],["bodyweight"],"calf",false,{sets:3,repsMin:15,repsMax:25,restSec:45},
+  ["Debout, pieds à plat, éventuellement en appui sur un support pour l'équilibre.","Monte sur la pointe des pieds le plus haut possible.","Redescends contrôlé sans rebondir."],
+  "Mouvement lent et contrôlé plutôt que rebondi, pour bien solliciter le mollet."],
+["chaise_murale","Chaise contre le mur",["quadriceps"],["bodyweight"],"squat",false,{sets:3,repsMin:20,repsMax:45,restSec:45},
+  ["Dos au mur, descends jusqu'à cuisses proches de l'horizontale, genoux à 90°.","Maintiens la position (durée en secondes), genoux alignés avec les pieds.","Remonte en poussant sur les talons."],
+  "Arrête si une douleur au genou apparaît (différente de la fatigue musculaire normale)."],
+["pompe_pike","Pompe pike",["epaules","triceps"],["bodyweight"],"push",false,{sets:3,repsMin:6,repsMax:12,restSec:75},
+  ["Position en V inversé, mains au sol, hanches hautes.","Descends la tête vers le sol en fléchissant les coudes.","Repousse pour revenir en position haute."],
+  "Bonne préparation au développé militaire sans charge ; progresse graduellement en amplitude."],
+["tractions","Tractions (pronation)",["dos","biceps"],["bodyweight","pullup_bar"],"pull",false,{sets:3,repsMin:4,repsMax:10,restSec:90},
+  ["Suspendu, mains un peu plus larges que les épaules, paumes vers l'avant.","Tire en amenant le menton au-dessus de la barre, coudes vers le bas.","Redescends contrôlé jusqu'à extension complète des bras."],
+  "Évite les à-coups (kipping non contrôlé) qui stressent l'épaule ; privilégie un mouvement strict."],
+["tractions_suppination","Tractions (supination)",["biceps","dos"],["bodyweight","pullup_bar"],"pull",false,{sets:3,repsMin:4,repsMax:10,restSec:90},
+  ["Suspendu, paumes vers soi, mains largeur d'épaules.","Tire en amenant le menton au-dessus de la barre.","Redescends contrôlé jusqu'à extension complète."],
+  "Sollicite davantage les biceps ; même prudence que la traction classique sur les à-coups."],
+["suspension_barre","Suspension à la barre",["avantbras","dos"],["bodyweight","pullup_bar"],"pull",false,{sets:3,repsMin:20,repsMax:40,restSec:60},
+  ["Suspendu à la barre, épaules légèrement engagées (pas totalement relâchées).","Maintiens la position (durée en secondes).","Redescends en douceur."],
+  "Bon exercice de renforcement des avant-bras et de décompression du dos, à intensité douce."],
+["dc_haltere","Développé couché haltères",["pect","triceps","epaules"],["dumbbells","bench"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Allongé sur le banc, haltères au niveau de la poitrine, coudes à ~45°.","Pousse les haltères vers le haut sans les entrechoquer, extension quasi complète.","Redescends contrôlé jusqu'à un étirement confortable de la poitrine."],
+  "Garde toujours le contrôle de la charge, surtout en fin de série ; utilise un poids que tu peux reposer en sécurité."],
+["dc_incline_haltere","Développé incliné haltères",["pect","epaules","triceps"],["dumbbells","bench"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Banc incliné à 30-45°, haltères au niveau du haut de la poitrine.","Pousse vers le haut en gardant les omoplates serrées contre le banc.","Redescends contrôlé."],
+  "Une inclinaison trop forte (>45°) sollicite davantage l'épaule que le haut des pectoraux."],
+["ecarte_couche","Écarté couché haltères",["pect"],["dumbbells","bench"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:75},
+  ["Allongé, haltères au-dessus de la poitrine, légère flexion des coudes maintenue.","Ouvre les bras en arc de cercle jusqu'à un étirement confortable.","Ramène les haltères en contractant les pectoraux."],
+  "Ne descends pas plus bas que ce que l'épaule tolère sans tension excessive à l'avant."],
+["rowing_uni_haltere","Rowing haltère unilatéral",["dos","biceps"],["dumbbells","bench"],"pull",true,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Un genou et une main en appui sur le banc, dos plat et parallèle au sol.","Tire l'haltère vers la hanche en amenant le coude vers l'arrière.","Redescends contrôlé jusqu'à extension complète du bras."],
+  "Garde le dos plat pendant tout le mouvement, sans le tordre pour tirer la charge."],
+["rowing_deux_halteres","Rowing buste penché (deux haltères)",["dos","biceps"],["dumbbells"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Buste penché en avant, dos plat, genoux légèrement fléchis, haltères pendants.","Tire les haltères vers les hanches, coudes vers l'arrière.","Redescends contrôlé."],
+  "Garde le dos neutre tout du long ; si tu ne peux pas maintenir cet angle, redresse un peu le buste."],
+["dev_epaules_haltere","Développé épaules haltères",["epaules","triceps"],["dumbbells"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Assis ou debout, haltères au niveau des épaules, paumes vers l'avant.","Pousse vers le haut sans cambrer excessivement le bas du dos.","Redescends contrôlé jusqu'aux épaules."],
+  "Garde le gainage actif pour éviter de compenser avec le bas du dos, surtout debout."],
+["elevations_laterales","Élévations latérales",["epaules"],["dumbbells"],"push",false,{sets:3,repsMin:12,repsMax:15,restSec:60},
+  ["Debout, haltères le long du corps, légère flexion des coudes.","Lève les bras sur les côtés jusqu'à hauteur d'épaule.","Redescends contrôlé sans élan."],
+  "Évite de monter au-dessus de la hauteur d'épaule avec une charge lourde : cela stresse l'articulation."],
+["elevations_frontales","Élévations frontales",["epaules"],["dumbbells"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Debout, haltères devant les cuisses.","Lève un bras (ou les deux) tendu jusqu'à hauteur d'épaule.","Redescends contrôlé."],
+  "Ne cambre pas le dos pour gagner de l'amplitude : garde le buste stable."],
+["oiseau_haltere","Oiseau (élévation arrière)",["epaules","dos"],["dumbbells"],"pull",false,{sets:3,repsMin:12,repsMax:15,restSec:60},
+  ["Buste penché en avant, dos plat, haltères pendants devant.","Écarte les bras sur les côtés en serrant les omoplates.","Redescends contrôlé."],
+  "Utilise une charge légère : c'est un mouvement d'isolation qui tolère peu de triche."],
+["curl_biceps","Curl biceps haltères",["biceps"],["dumbbells"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Debout, haltères le long du corps, coudes proches du buste.","Fléchis les coudes pour monter les haltères, sans balancer le buste.","Redescends contrôlé jusqu'à extension complète."],
+  "Évite l'élan du buste pour « tricher » la fin de série : réduis la charge plutôt."],
+["curl_marteau","Curl marteau",["biceps","avantbras"],["dumbbells"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Debout, haltères en prise neutre (paumes face à face).","Fléchis les coudes en gardant les poignets neutres.","Redescends contrôlé."],
+  "Sollicite aussi l'avant-bras ; garde un tempo contrôlé pour éviter les à-coups au poignet."],
+["extension_triceps_nuque","Extension triceps nuque",["triceps"],["dumbbells"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Assis ou debout, un haltère tenu à deux mains au-dessus de la tête.","Descends l'haltère derrière la tête en fléchissant les coudes, coudes fixes.","Remonte en étendant les bras sans les verrouiller brutalement."],
+  "Garde les coudes proches de la tête ; ne descends pas si tu perds le contrôle de la charge."],
+["kickback_triceps","Kickback triceps",["triceps"],["dumbbells","bench"],"push",true,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Buste penché, un genou et une main en appui sur le banc, bras haut parallèle au sol.","Étends l'avant-bras vers l'arrière, coude fixe.","Reviens contrôlé."],
+  "Mouvement d'isolation léger : privilégie la maîtrise du geste à la charge."],
+["squat_gobelet","Squat gobelet (goblet squat)",["quadriceps","fessiers"],["dumbbells"],"squat",false,{sets:3,repsMin:10,repsMax:15,restSec:90},
+  ["Tiens un haltère à deux mains contre la poitrine.","Descends hanches en arrière et vers le bas, dos neutre, coudes entre les genoux.","Remonte en poussant le sol."],
+  "Excellent exercice d'apprentissage du squat : privilégie la profondeur atteignable sans arrondir le dos."],
+["fentes_halteres","Fentes haltères",["quadriceps","fessiers"],["dumbbells"],"lunge",true,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Haltères le long du corps, grand pas en avant ou en arrière.","Descends jusqu'à un angle proche de 90° au genou avant.","Repousse sur le talon avant pour revenir."],
+  "Commence avec une charge légère pour valider l'équilibre avant d'augmenter le poids."],
+["rdl_halteres","Soulevé de terre jambes tendues (haltères)",["ischios","fessiers"],["dumbbells"],"hinge",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Haltères devant les cuisses, genoux légèrement fléchis, dos neutre.","Bascule le bassin en arrière en laissant descendre les haltères le long des jambes.","Remonte en poussant les hanches vers l'avant, sans arrondir le dos."],
+  "Le dos doit rester neutre du début à la fin ; arrête la descente dès que tu sens le dos s'arrondir."],
+["rdl_uni_haltere","Soulevé de terre roumain unilatéral",["ischios","fessiers"],["dumbbells"],"hinge",true,{sets:3,repsMin:6,repsMax:10,restSec:75},
+  ["Sur une jambe, haltère du côté opposé, dos neutre.","Bascule le buste vers l'avant en levant la jambe libre vers l'arrière.","Reviens contrôlé en gardant le bassin de niveau."],
+  "Exercice d'équilibre exigeant : commence à charge très légère voire à vide."],
+["mollets_halteres","Mollets debout (haltères)",["mollets"],["dumbbells"],"calf",false,{sets:3,repsMin:15,repsMax:20,restSec:45},
+  ["Haltères le long du corps, pieds à plat.","Monte sur la pointe des pieds le plus haut possible.","Redescends contrôlé sans rebondir."],
+  "Mouvement lent, amplitude complète, sans rebond pour maximiser le travail du mollet."],
+["shrugs_halteres","Shrugs (trapèzes) haltères",["dos"],["dumbbells"],"pull",false,{sets:3,repsMin:12,repsMax:15,restSec:60},
+  ["Debout, haltères le long du corps.","Monte les épaules vers les oreilles sans rouler les épaules.","Redescends contrôlé."],
+  "Évite de rouler les épaules en cercle avec une charge lourde : monte-descends verticalement."],
+["thruster_haltere","Thruster haltères",["quadriceps","epaules","fessiers"],["dumbbells"],"squat",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Haltères au niveau des épaules, descends en squat complet.","Remonte en poussant sur les jambes et enchaîne un développé épaules.","Redescends les haltères aux épaules avant la répétition suivante."],
+  "Exercice combiné exigeant en cardio : commence avec une charge modérée pour garder la forme."],
+["squat_barre","Squat barre (back squat)",["quadriceps","fessiers"],["barbell"],"squat",false,{sets:4,repsMin:5,repsMax:10,restSec:120},
+  ["Barre posée sur le haut du dos (trapèzes), pieds largeur d'épaules.","Descends hanches en arrière et vers le bas, dos neutre, genoux dans l'axe des pieds.","Remonte en poussant le sol, sans perdre l'alignement du dos."],
+  "Utilise un cadre de sécurité ou des supports réglés à hauteur de squat si tu t'entraînes seul avec une charge proche du maximum."],
+["dc_barre","Développé couché barre",["pect","triceps","epaules"],["barbell","bench"],"push",false,{sets:4,repsMin:5,repsMax:10,restSec:120},
+  ["Allongé, prise un peu plus large que les épaules, barre au niveau de la poitrine.","Descends la barre contrôlée jusqu'à toucher légèrement la poitrine.","Pousse vers le haut en expirant, sans rebondir sur la poitrine."],
+  "Entraîne-toi avec un partenaire ou des butées de sécurité pour les charges proches du maximum ; ne bloque jamais les coudes brutalement."],
+["deadlift_barre","Soulevé de terre (deadlift)",["ischios","fessiers","dos"],["barbell"],"hinge",false,{sets:4,repsMin:4,repsMax:8,restSec:150},
+  ["Barre proche des tibias, dos neutre, poitrine haute, prise juste à l'extérieur des jambes.","Pousse le sol avec les jambes en gardant la barre proche du corps jusqu'à l'extension complète des hanches.","Redescends en inversant le mouvement, dos toujours neutre."],
+  "Le soulevé de terre est technique : commence avec une charge légère pour ancrer la position de dos neutre avant de charger davantage."],
+["militaire_barre","Développé militaire barre",["epaules","triceps"],["barbell"],"push",false,{sets:3,repsMin:6,repsMax:10,restSec:120},
+  ["Debout, barre au niveau des clavicules, prise un peu plus large que les épaules.","Pousse la barre au-dessus de la tête en gainant fort, sans cambrer excessivement.","Redescends contrôlé jusqu'aux clavicules."],
+  "Garde les abdos et fessiers contractés pour protéger le bas du dos pendant la poussée."],
+["rowing_barre","Rowing barre buste penché",["dos","biceps"],["barbell"],"pull",false,{sets:3,repsMin:6,repsMax:10,restSec:90},
+  ["Buste penché à ~45°, dos neutre, barre pendante bras tendus.","Tire la barre vers le bas du buste, coudes vers l'arrière.","Redescends contrôlé sans perdre l'angle du dos."],
+  "Si tu ne peux pas garder le dos neutre à cet angle, redresse légèrement le buste ou réduis la charge."],
+["hip_thrust_barre","Hip thrust barre",["fessiers","ischios"],["barbell","bench"],"hinge",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Haut du dos calé sur le banc, barre sur les hanches (protège avec une serviette/pad).","Pousse les hanches vers le haut jusqu'à extension complète, menton rentré.","Redescends contrôlé sans reposer brutalement."],
+  "Positionne la barre confortablement sur les hanches avant de charger lourd pour éviter l'inconfort."],
+["swing_kb","Swing kettlebell",["fessiers","ischios","cardio"],["kettlebell"],"hinge",false,{sets:3,repsMin:12,repsMax:20,restSec:75},
+  ["Pieds largeur d'épaules, kettlebell tenue à deux mains devant.","Bascule le bassin en arrière (hinge, pas un squat) puis pousse les hanches vers l'avant pour projeter la kettlebell à hauteur de poitrine.","Laisse la kettlebell redescendre entre les jambes en contrôlant le mouvement."],
+  "Le mouvement part des hanches, pas des bras ni du bas du dos : arrête si tu sens le dos travailler plus que les hanches."],
+["goblet_squat_kb","Goblet squat kettlebell",["quadriceps","fessiers"],["kettlebell"],"squat",false,{sets:3,repsMin:10,repsMax:15,restSec:90},
+  ["Kettlebell tenue contre la poitrine par les cornes.","Descends hanches en arrière et vers le bas, dos neutre.","Remonte en poussant le sol."],
+  "Même repère de sécurité que le goblet squat haltère : privilégie la profondeur atteignable sans arrondir le dos."],
+["deadlift_kb","Soulevé de terre kettlebell",["ischios","fessiers"],["kettlebell"],"hinge",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Kettlebell entre les pieds, dos neutre, genoux légèrement fléchis.","Pousse le sol avec les jambes en gardant la kettlebell proche du corps.","Redescends contrôlé, dos toujours neutre."],
+  "Charge légère au départ pour ancrer la technique de hinge avant d'augmenter le poids."],
+["rowing_uni_kb","Rowing kettlebell unilatéral",["dos","biceps"],["kettlebell","bench"],"pull",true,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Un genou et une main en appui sur le banc, dos plat.","Tire la kettlebell vers la hanche, coude vers l'arrière.","Redescends contrôlé."],
+  "Garde le dos plat pendant tout le mouvement."],
+["kb_overhead_press","Développé kettlebell",["epaules","triceps"],["kettlebell"],"push",true,{sets:3,repsMin:6,repsMax:10,restSec:90},
+  ["Kettlebell en position de rack contre l'avant-bras/épaule.","Pousse vers le haut jusqu'à extension complète du bras.","Redescends contrôlé jusqu'au rack."],
+  "Garde le gainage actif ; travaille un bras à la fois pour bien contrôler la trajectoire."],
+["tirage_elastique","Tirage élastique horizontal",["dos","biceps"],["bands"],"pull",false,{sets:3,repsMin:12,repsMax:20,restSec:60},
+  ["Élastique fixé à hauteur de poitrine ou tenu tendu devant soi, bras tendus.","Tire les mains vers les côtes en serrant les omoplates.","Reviens contrôlé jusqu'à extension complète."],
+  "Choisis une résistance qui permet de garder le buste immobile pendant toute la série."],
+["ecarte_elastique","Écarté élastique (pull-apart)",["epaules","dos"],["bands"],"pull",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Élastique tenu à deux mains devant soi, bras tendus.","Écarte les mains en ouvrant les bras jusqu'à ce que l'élastique touche la poitrine.","Reviens contrôlé."],
+  "Excellent exercice de santé d'épaule ; privilégie un tempo lent et contrôlé."],
+["squat_elastique","Squat élastique",["quadriceps","fessiers"],["bands"],"squat",false,{sets:3,repsMin:12,repsMax:20,restSec:60},
+  ["Élastique sous les pieds, tenu au niveau des épaules ou fixé sous les pieds selon le modèle.","Descends en squat, dos neutre, genoux dans l'axe des pieds.","Remonte en poussant le sol contre la résistance."],
+  "Garde la même vigilance sur l'alignement des genoux que pour un squat classique."],
+["extension_triceps_elastique","Extension triceps élastique",["triceps"],["bands"],"push",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Élastique fixé en hauteur, coude fléchi près de la tête.","Étends l'avant-bras vers le bas, coude fixe.","Reviens contrôlé."],
+  "Garde le coude immobile tout du long pour bien isoler le triceps."],
+["curl_biceps_elastique","Curl biceps élastique",["biceps"],["bands"],"pull",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Élastique sous les pieds, coudes proches du buste.","Fléchis les coudes pour amener les mains vers les épaules.","Reviens contrôlé."],
+  "Évite de balancer le buste pour compenser en fin de série."],
+["band_walk","Marche latérale élastique",["fessiers"],["bands"],"squat",true,{sets:3,repsMin:10,repsMax:15,restSec:45},
+  ["Élastique placé au-dessus des genoux ou des chevilles, légère flexion des genoux.","Fais des pas latéraux en gardant la tension dans l'élastique.","Garde les hanches de niveau, sans te pencher."],
+  "Reste en position mi-squat basse tout du long pour maximiser le travail des fessiers moyens."],
+];
+
+const EXOS = EXO_RAW.map(([id,n,muscles,equip,pattern,uni,def,cues,safety])=>({
+  id,n,muscles,equip,pattern,uni,
+  sets:def.sets,repsMin:def.repsMin,repsMax:def.repsMax,restSec:def.restSec,
+  cues,safety
+}));
+const EXO_MAP = {}; EXOS.forEach(e=>EXO_MAP[e.id]=e);
+// ================= ÉTAT & STOCKAGE =================
+const STORAGE_KEY = "forge.v1";
+
+function defaultState(){
+  return {
+    v:1,
+    equipment: defaultEquipment(),
+    prefs: { excluded:[], included:[] },
+    goals: { overall:"hypertrophie", emphasis:{}, daysPerWeek:3, sessionLength:"moyen" },
+    sessions: [],
+    draft: null,
+    importedProgram: [],
+    trophies: {},
+    settings: { theme:"auto", unit:"kg", onboarded:false, restSoundOff:false },
+    meta: { createdAt: new Date().toISOString(), prCount:0 },
+  };
+}
+
+let S = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    const d = defaultState();
+    // fusion superficielle pour tolérer l'ajout de nouveaux champs entre versions
+    const merged = Object.assign({}, d, parsed);
+    merged.equipment = Object.assign({}, d.equipment, parsed.equipment||{});
+    merged.equipment.owned = Object.assign({}, d.equipment.owned, (parsed.equipment||{}).owned||{});
+    merged.equipment.weights = Object.assign({}, d.equipment.weights, (parsed.equipment||{}).weights||{});
+    merged.prefs = Object.assign({}, d.prefs, parsed.prefs||{});
+    merged.goals = Object.assign({}, d.goals, parsed.goals||{});
+    merged.settings = Object.assign({}, d.settings, parsed.settings||{});
+    merged.meta = Object.assign({}, d.meta, parsed.meta||{});
+    merged.sessions = parsed.sessions||[];
+    merged.trophies = parsed.trophies||{};
+    merged.importedProgram = parsed.importedProgram||[];
+    return merged;
+  }catch(e){ return defaultState(); }
+}
+
+let saveTimer=null;
+function save(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+// ---------- utilitaires ----------
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function clone(x){ return JSON.parse(JSON.stringify(x)); }
+function round1(x){ return Math.round(x*10)/10; }
+
+function parseISO(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function daysBetween(a,b){ return Math.round((parseISO(b)-parseISO(a))/86400000); }
+function weekKey(iso){
+  const d = parseISO(iso);
+  const day = (d.getDay()+6)%7; // lundi=0
+  d.setDate(d.getDate()-day);
+  return d.toISOString().slice(0,10);
+}
+const MOIS = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+function fmtDate(iso, opt){
+  const d = parseISO(iso);
+  if(opt==="long") return `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`;
+  return `${d.getDate()} ${MOIS[d.getMonth()]}`;
+}
+function fmtRelative(iso){
+  const n = daysBetween(iso, todayISO());
+  if(n===0) return "aujourd'hui";
+  if(n===1) return "hier";
+  if(n<7) return `il y a ${n} j`;
+  if(n<14) return "il y a 1 sem.";
+  if(n<31) return `il y a ${Math.floor(n/7)} sem.`;
+  return fmtDate(iso);
+}
+
+// ---------- exercices disponibles ----------
+function isExcluded(id){ return S.prefs.excluded.includes(id); }
+function isIncluded(id){ return S.prefs.included.includes(id); }
+function availableExos(){
+  return EXOS.filter(e=>hasEquip(S.equipment, e.equip) && !isExcluded(e.id));
+}
+function allEquipOwned(){
+  return EQUIP_TYPES.filter(e=>e.always || S.equipment.owned[e.id]).map(e=>e.id);
+}
+
+// ---------- historique : agrégats ----------
+function lastPerformance(exoId){
+  for(let i=S.sessions.length-1;i>=0;i--){
+    const s = S.sessions[i];
+    const ex = s.exos.find(x=>x.exoId===exoId);
+    if(ex && ex.sets.some(st=>st.done)) return {session:s, exo:ex};
+  }
+  return null;
+}
+function daysSinceTrained(muscleId){
+  for(let i=S.sessions.length-1;i>=0;i--){
+    const s = S.sessions[i];
+    const trained = s.exos.some(ex=>{
+      const def = EXO_MAP[ex.exoId];
+      return def && def.muscles.includes(muscleId) && ex.sets.some(st=>st.done);
+    });
+    if(trained) return daysBetween(s.date, todayISO());
+  }
+  return 999;
+}
+function setVolume(st){ return (st.done? (st.reps||0)*(st.weight||0) : 0); }
+function sessionVolume(s){
+  return s.exos.reduce((t,ex)=>t+ex.sets.reduce((tt,st)=>tt+setVolume(st),0),0);
+}
+function sessionSetCount(s){
+  return s.exos.reduce((t,ex)=>t+ex.sets.filter(st=>st.done).length,0);
+}
+function totalVolumeAllTime(){
+  return S.sessions.reduce((t,s)=>t+sessionVolume(s),0);
+}
+function estimated1RM(weight,reps){
+  if(!weight||!reps) return weight||0;
+  return weight*(1+reps/30); // formule d'Epley
+}
+function exoPRs(exoId){
+  let maxWeight=0, maxVolumeSession=0, best1rm=0;
+  S.sessions.forEach(s=>{
+    const ex = s.exos.find(x=>x.exoId===exoId);
+    if(!ex) return;
+    let vol=0;
+    ex.sets.forEach(st=>{
+      if(!st.done) return;
+      vol += (st.reps||0)*(st.weight||0);
+      if((st.weight||0)>maxWeight) maxWeight=st.weight;
+      const e = estimated1RM(st.weight,st.reps);
+      if(e>best1rm) best1rm=e;
+    });
+    if(vol>maxVolumeSession) maxVolumeSession=vol;
+  });
+  return { maxWeight, maxVolumeSession, best1rm:round1(best1rm) };
+}
+function isNewPR(exoId, weight, reps){
+  const pr = exoPRs(exoId);
+  return weight>pr.maxWeight || estimated1RM(weight,reps)>pr.best1rm;
+}
+
+// semaines consécutives avec au moins une séance
+function currentStreakWeeks(){
+  if(!S.sessions.length) return 0;
+  const weeks = new Set(S.sessions.map(s=>weekKey(s.date)));
+  let streak=0;
+  let cursor = weekKey(todayISO());
+  while(weeks.has(cursor)){
+    streak++;
+    const d = parseISO(cursor); d.setDate(d.getDate()-7);
+    cursor = d.toISOString().slice(0,10);
+  }
+  // tolère la semaine en cours pas encore entamée : ne casse pas si la dernière séance date de la semaine passée uniquement
+  if(streak===0){
+    const d = parseISO(weekKey(todayISO())); d.setDate(d.getDate()-7);
+    const prevWeek = d.toISOString().slice(0,10);
+    if(weeks.has(prevWeek)){
+      let s=1, c=prevWeek;
+      while(true){
+        const dd = parseISO(c); dd.setDate(dd.getDate()-7);
+        c = dd.toISOString().slice(0,10);
+        if(weeks.has(c)) s++; else break;
+      }
+      return 0; // la semaine en cours n'a rien : le streak est rompu pour "actuel", affiché séparément si besoin
+    }
+  }
+  return streak;
+}
+function sessionsInMonth(){
+  const now=new Date(); const ym = now.toISOString().slice(0,7);
+  return S.sessions.filter(s=>s.date.slice(0,7)===ym).length;
+}
+function sessionsInYear(){
+  const y = new Date().getFullYear().toString();
+  return S.sessions.filter(s=>s.date.slice(0,4)===y).length;
+}
+function weeklyAverage(weeks){
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-weeks*7);
+  const n = S.sessions.filter(s=>parseISO(s.date)>=cutoff).length;
+  return round1(n/weeks);
+}
+// ================= MOTEUR DE SUGGESTION (100% local, aucun appel réseau) =================
+const PATTERN_CYCLE = ["squat","hinge","push","pull","lunge","core","calf"];
+const SESSION_SIZE = { court:4, moyen:6, long:8 };
+
+function normName(s){
+  return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+}
+
+// score d'un groupe musculaire : plus il a été délaissé récemment, plus il est prioritaire
+function muscleScore(muscleId){
+  const days = daysSinceTrained(muscleId);
+  const emph = S.goals.emphasis[muscleId] || "normal";
+  let w = emph==="prioriser" ? 1.6 : emph==="eviter" ? 0.25 : 1;
+  let score = Math.min(days,10) * w;
+  if(days<2) score *= 0.2; // récupération : fortement déprioritisé si travaillé hier ou aujourd'hui
+  return score;
+}
+
+function recencyPenalty(exoId){
+  // pénalise un exercice utilisé dans les 2 dernières séances, pour varier
+  let penalty = 0;
+  for(let i=S.sessions.length-1, n=0; i>=0 && n<2; i--, n++){
+    if(S.sessions[i].exos.some(e=>e.exoId===exoId)) penalty += 2.5;
+  }
+  return penalty;
+}
+
+function scoreExo(exo){
+  const primary = exo.muscles[0];
+  let score = muscleScore(primary);
+  exo.muscles.slice(1).forEach(m=>score += muscleScore(m)*0.3);
+  if(isIncluded(exo.id)) score += 3;
+  score -= recencyPenalty(exo.id);
+  return score;
+}
+
+function repRangeForGoal(exo){
+  const goal = S.goals.overall;
+  const mid = Math.round((exo.repsMin+exo.repsMax)/2);
+  if(goal==="force") return [exo.repsMin, mid];
+  if(goal==="endurance") return [mid, exo.repsMax+4];
+  return [exo.repsMin, exo.repsMax];
+}
+
+function loadableTypeOf(exo){
+  return exo.equip.find(id=>EQUIP_MAP[id] && EQUIP_MAP[id].loadable);
+}
+
+function nextWeight(exo, current){
+  const type = loadableTypeOf(exo);
+  if(!type) return null;
+  const owned = (S.equipment.weights[type]||[]).slice().sort((a,b)=>a-b);
+  if(owned.length){
+    const higher = owned.find(w=>w>current+0.001);
+    return higher!==undefined ? higher : owned[owned.length-1];
+  }
+  const inc = DEFAULT_INCREMENT[type]||2.5;
+  return round1(current+inc);
+}
+
+function suggestForExo(exo){
+  const [rMin,rMax] = repRangeForGoal(exo);
+  const last = lastPerformance(exo.id);
+  const type = loadableTypeOf(exo);
+  let weight = null;
+  if(type){
+    const owned = (S.equipment.weights[type]||[]).slice().sort((a,b)=>a-b);
+    weight = owned.length ? owned[0] : (DEFAULT_INCREMENT[type]||2.5);
+  }
+  let targetReps=[rMin,rMax], note=null;
+
+  if(last){
+    const doneSets = last.exo.sets.filter(st=>st.done);
+    if(doneSets.length){
+      const avgRpe = doneSets.reduce((t,s)=>t+(s.rpe||7),0)/doneSets.length;
+      const hitTop = doneSets.every(s=>(s.reps||0) >= (last.exo.targetReps? last.exo.targetReps[1] : rMax));
+      const missed = doneSets.some(s=>(s.reps||0) < Math.max(1,(last.exo.targetReps? last.exo.targetReps[0]:rMin)-1));
+      const lastWeight = doneSets[0].weight||0;
+      if(type){
+        if(hitTop && avgRpe<=7.5 && !missed){
+          weight = nextWeight(exo, lastWeight);
+          note = "Charge augmentée : tu as atteint le haut de la fourchette la dernière fois.";
+        } else if(missed || avgRpe>=9){
+          weight = lastWeight;
+          targetReps = [rMin, Math.max(rMin, rMax-2)];
+          note = "On garde la même charge pour consolider la forme.";
+        } else {
+          weight = lastWeight;
+        }
+      } else {
+        // poids du corps : progression par les répétitions
+        if(hitTop && avgRpe<=7.5) note = "Essaie d'ajouter des répétitions par rapport à la dernière fois.";
+      }
+    }
+  }
+  return { targetReps, weight, note };
+}
+
+function buildSetsFor(exo, suggestion){
+  const sets = [];
+  for(let i=0;i<exo.sets;i++){
+    sets.push({ reps:null, weight:suggestion.weight, done:false, rpe:null });
+  }
+  return sets;
+}
+
+function pickExosForSession(n){
+  const pool = availableExos();
+  const chosen = [];
+  const usedIds = new Set();
+  let bucketI = 0, guard=0;
+  while(chosen.length<n && guard<200){
+    guard++;
+    const pattern = PATTERN_CYCLE[bucketI % PATTERN_CYCLE.length];
+    bucketI++;
+    const candidates = pool.filter(e=>e.pattern===pattern && !usedIds.has(e.id));
+    if(candidates.length){
+      candidates.sort((a,b)=>scoreExo(b)-scoreExo(a));
+      chosen.push(candidates[0]);
+      usedIds.add(candidates[0].id);
+    }
+    if(bucketI>PATTERN_CYCLE.length*3) break;
+  }
+  if(chosen.length<n){
+    const rest = pool.filter(e=>!usedIds.has(e.id)).sort((a,b)=>scoreExo(b)-scoreExo(a));
+    for(const e of rest){ if(chosen.length>=n) break; chosen.push(e); usedIds.add(e.id); }
+  }
+  return chosen;
+}
+
+function generateEngineSession(){
+  const n = SESSION_SIZE[S.goals.sessionLength] || 6;
+  const exos = pickExosForSession(n);
+  return {
+    id: uid(), date: todayISO(), source:"engine", startedAt:null, completedAt:null, feeling:null,
+    exos: exos.map(exo=>{
+      const sug = suggestForExo(exo);
+      return { exoId:exo.id, targetSets:exo.sets, targetReps:sug.targetReps, note:sug.note, sets:buildSetsFor(exo,sug) };
+    })
+  };
+}
+
+function resolveExoRef(ref){
+  if(ref.id && EXO_MAP[ref.id]) return EXO_MAP[ref.id];
+  const target = normName(ref.nom||ref.name||ref.id||"");
+  if(!target) return null;
+  let found = EXOS.find(e=>normName(e.n)===target || normName(e.id)===target);
+  if(found) return found;
+  found = EXOS.find(e=>normName(e.n).includes(target) || target.includes(normName(e.n)));
+  return found||null;
+}
+
+function buildSessionFromImported(prog){
+  const warnings = [];
+  const exos = [];
+  (prog.exercices||prog.exercises||[]).forEach(ref=>{
+    const exo = resolveExoRef(ref);
+    if(!exo){ warnings.push(`Exercice non reconnu : "${ref.nom||ref.name||ref.id||"?"}" (ignoré).`); return; }
+    const setsN = ref.series||ref.sets||exo.sets;
+    let reps = [exo.repsMin, exo.repsMax];
+    if(typeof ref.reps==="string" && ref.reps.includes("-")){
+      const [a,b] = ref.reps.split("-").map(x=>parseInt(x,10));
+      if(!isNaN(a)&&!isNaN(b)) reps=[a,b];
+    } else if(typeof ref.reps==="number"){ reps=[ref.reps,ref.reps]; }
+    const weight = (ref.poids!=null?ref.poids:ref.weight!=null?ref.weight:null);
+    const sets = [];
+    for(let i=0;i<setsN;i++) sets.push({reps:null,weight,done:false,rpe:null});
+    exos.push({ exoId:exo.id, targetSets:setsN, targetReps:reps, note:null, sets });
+  });
+  return { id:uid(), date:todayISO(), source:"imported", startedAt:null, completedAt:null, feeling:null,
+    name: prog.nom||prog.name||null, exos, warnings };
+}
+
+function getOrCreateDraft(){
+  if(S.draft && S.draft.date===todayISO()) return S.draft;
+  if(S.draft && S.draft.date!==todayISO() && !S.draft.completedAt){
+    // séance d'un jour précédent jamais terminée : on la garde disponible mais on en propose une nouvelle
+  }
+  if(S.importedProgram && S.importedProgram.length){
+    S.draft = buildSessionFromImported(S.importedProgram[0]);
+  } else {
+    S.draft = generateEngineSession();
+  }
+  save();
+  return S.draft;
+}
+
+function regenerateDraft(){
+  S.draft = S.importedProgram && S.importedProgram.length ? buildSessionFromImported(S.importedProgram[0]) : generateEngineSession();
+  save();
+  return S.draft;
+}
+
+// ---------- export / import IA externe ----------
+function buildExportPrompt(){
+  const eq = S.equipment;
+  const ownedList = EQUIP_TYPES.filter(e=>e.always||eq.owned[e.id]).map(e=>{
+    if(e.loadable && (eq.weights[e.id]||[]).length) return `${e.n} (${eq.weights[e.id].join(", ")} ${e.unit})`;
+    return e.n;
+  });
+  const emphasisLines = Object.entries(S.goals.emphasis).filter(([,v])=>v!=="normal")
+    .map(([m,v])=>`${MUSCLE_MAP[m]?.n||m} : ${v==="prioriser"?"à prioriser":"à éviter/limiter"}`);
+  const excluded = S.prefs.excluded.map(id=>EXO_MAP[id]?.n).filter(Boolean);
+  const included = S.prefs.included.map(id=>EXO_MAP[id]?.n).filter(Boolean);
+  const recent = S.sessions.slice(-8).map(s=>{
+    const lines = s.exos.map(ex=>{
+      const def = EXO_MAP[ex.exoId]; if(!def) return null;
+      const done = ex.sets.filter(st=>st.done);
+      if(!done.length) return null;
+      const detail = done.map(st=>`${st.reps||"?"}x${st.weight!=null?st.weight+"kg":"pdc"}`).join(", ");
+      return `  - ${def.n} : ${detail}`;
+    }).filter(Boolean).join("\n");
+    return `${fmtDate(s.date)} (ressenti ${s.feeling||"?"}/5)\n${lines}`;
+  }).join("\n");
+
+  return `Voici mon profil d'entraînement (app Forge). Peux-tu me proposer un programme de musculation adapté ?
+
+MATÉRIEL DISPONIBLE :
+${ownedList.map(x=>"- "+x).join("\n")||"- (aucun renseigné)"}
+
+OBJECTIF PRINCIPAL : ${S.goals.overall}
+FRÉQUENCE VISÉE : ${S.goals.daysPerWeek} séances / semaine
+${emphasisLines.length? "GROUPES MUSCULAIRES CIBLÉS :\n"+emphasisLines.map(x=>"- "+x).join("\n") : ""}
+${excluded.length? "EXERCICES EXCLUS (blessure, préférence) :\n"+excluded.map(x=>"- "+x).join("\n") : ""}
+${included.length? "EXERCICES À PRIVILÉGIER :\n"+included.map(x=>"- "+x).join("\n") : ""}
+
+HISTORIQUE RÉCENT :
+${recent||"(aucune séance enregistrée pour l'instant)"}
+
+RÉPONSE ATTENDUE : réponds UNIQUEMENT avec un fichier JSON respectant exactement ce format (les noms d'exercices doivent être en français, proches de la terminologie usuelle) :
+{
+  "sessions": [
+    { "nom": "Séance 1", "exercices": [
+      { "nom": "Squat barre", "series": 4, "reps": "6-8", "poids": 60 },
+      { "nom": "Développé couché haltères", "series": 3, "reps": "8-12" }
+    ] }
+  ]
+}
+Le champ "poids" est facultatif (Forge peut le calculer automatiquement). Propose entre 2 et 4 séances.`;
+}
+
+function importProgramJSON(text){
+  let data;
+  try{ data = JSON.parse(text); }catch(e){ return { ok:false, error:"Le fichier n'est pas un JSON valide." }; }
+  const sessions = data.sessions || (Array.isArray(data)?data:null);
+  if(!sessions || !Array.isArray(sessions) || !sessions.length){
+    return { ok:false, error:"Format inattendu : aucune clé \"sessions\" trouvée." };
+  }
+  const warnings = [];
+  sessions.forEach(s=>{
+    const built = buildSessionFromImported(s);
+    if(built.warnings) warnings.push(...built.warnings);
+  });
+  S.importedProgram = sessions;
+  if(S.draft && S.draft.date===todayISO() && !S.draft.startedAt){
+    S.draft = buildSessionFromImported(S.importedProgram[0]);
+  }
+  save();
+  return { ok:true, count:sessions.length, warnings };
+}
+// ================= INTERFACE : coquille =================
+const TABS = [
+  { id:"today",    n:"Aujourd'hui", icon:"home" },
+  { id:"history",  n:"Historique",  icon:"clock" },
+  { id:"progress", n:"Progrès",     icon:"chart" },
+  { id:"profil",   n:"Profil",      icon:"user" },
+];
+
+const ICONS = {
+  home:'<path d="M3 11.5 12 4l9 7.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+  clock:'<circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 7.5V12l3.2 2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  chart:'<path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  user:'<circle cx="12" cy="8" r="3.6" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+  check:'<path d="M5 13l4.5 4.5L19 8" stroke="currentColor" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  chev:'<path d="M2 1l5 5.5L2 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  plus:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M7 6H4a3 3 0 0 0 3 5M17 6h3a3 3 0 0 1-3 5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M12 14v3M9 20h6M9.5 17h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+  flame:'<path d="M12 3s4 3.5 4 7.5a4 4 0 1 1-8 0c0-1 .4-1.8 1-2.5-.1 1 .3 1.6.9 1.9C9.6 7 10.5 5 12 3Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
+  edit:'<path d="M4 20l.9-3.6L16.4 5 19 7.6 7.6 19 4 20Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
+  timer:'<circle cx="12" cy="13" r="7.5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 9.5V13l2.5 1.5M9.5 2.5h5M12 2.5v2.6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+  swap:'<path d="M6 8h11l-3-3M18 16H7l3 3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  trash:'<path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+};
+function icon(name){ return `<svg viewBox="0 0 24 24">${ICONS[name]||""}</svg>`; }
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function qs(sel,root){ return (root||document).querySelector(sel); }
+function qsa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+// ---------- tabbar ----------
+function buildShell(){
+  qs("#app").innerHTML = TABS.map(t=>`<div class="view" id="v-${t.id}"></div>`).join("");
+  qs(".tabbar").innerHTML = TABS.map(t=>`<button class="tabbtn" data-a="tab" data-id="${t.id}">${icon(t.icon)}<span class="tl">${t.n}</span></button>`).join("");
+  qsa(".view").forEach(v=>v.addEventListener("scroll",()=>{
+    v.classList.toggle("scrolled", v.scrollTop>4);
+  }));
+}
+
+let currentTab = "today";
+function switchTab(id){
+  currentTab = id;
+  qsa(".tabbtn").forEach(b=>b.classList.toggle("on", b.dataset.id===id));
+  qsa(".view").forEach(v=>v.classList.toggle("active", v.id==="v-"+id));
+  renderView(id);
+  qs("#v-"+id).scrollTop = qs("#v-"+id)._keepScroll||0;
+}
+
+const VIEWS = {};
+function renderView(id){
+  const el = qs("#v-"+id);
+  if(!el || !VIEWS[id]) return;
+  const scrollTop = el.scrollTop;
+  el.innerHTML = VIEWS[id]();
+  el.classList.toggle("scrolled", scrollTop>4);
+  el.scrollTop = scrollTop;
+}
+function changed(){
+  save();
+  const sheetOpen = qs("#overlay").classList.contains("open");
+  if(!sheetOpen) renderView(currentTab);
+  else dirtyOnClose = true;
+}
+let dirtyOnClose = false;
+
+// ---------- sheets / overlay ----------
+function openSheet(html, opts){
+  opts = opts||{};
+  const ov = qs("#overlay");
+  ov.innerHTML = `<div class="scrim" data-a="closesheet"></div><div class="sheet" role="dialog">${opts.noGrab?"":'<div class="sheet-grab"></div>'}${html}</div>`;
+  ov.classList.add("open");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add("show")));
+  ov.dataset.kind = "sheet";
+}
+function openModal(html){
+  const ov = qs("#overlay");
+  ov.innerHTML = `<div class="scrim" data-a="closesheet"></div><div class="center-modal" role="dialog">${html}</div>`;
+  ov.classList.add("open");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add("show")));
+  ov.dataset.kind = "modal";
+}
+function closeSheet(){
+  const ov = qs("#overlay");
+  if(!ov.classList.contains("open")) return;
+  ov.classList.remove("show");
+  setTimeout(()=>{ ov.classList.remove("open"); ov.innerHTML=""; if(dirtyOnClose){ dirtyOnClose=false; renderView(currentTab); } },300);
+}
+function confirmSheet({title,html,ok,onOk,danger}){
+  openModal(`<div style="font-weight:700;font-size:calc(17rem/17);margin-bottom:6px">${esc(title)}</div>
+    <div style="color:var(--label2);font-size:calc(14.5rem/17);line-height:1.4;margin-bottom:18px">${html||""}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn ${danger?"danger":""}" data-a="confirmYes">${esc(ok||"OK")}</button>
+      <button class="btn ghost" data-a="closesheet" style="height:40px">Annuler</button>
+    </div>`);
+  qs("#overlay")._onYes = onOk;
+}
+
+// ---------- toast ----------
+let toastTimer=null;
+function toast(msg){
+  const t = qs("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+// ---------- délégation d'actions ----------
+const ACT = {
+  tab(d){ switchTab(d.id); },
+  closesheet(){ closeSheet(); },
+  confirmYes(){ const fn = qs("#overlay")._onYes; closeSheet(); if(fn) fn(); },
+  noop(){},
+};
+
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-a]");
+  if(!el) return;
+  const name = el.dataset.a;
+  if(ACT[name]) ACT[name](el.dataset, el);
+});
+document.addEventListener("change", e=>{
+  const el = e.target.closest("[data-c]");
+  if(!el) return;
+  const name = el.dataset.c;
+  if(ACT[name]) ACT[name](el.dataset, el);
+});
+// ================= TIMER DE REPOS =================
+let restState = null; // {endAt, totalSec, label}
+let restInterval = null;
+
+function startRestTimer(sec, label){
+  restState = { endAt: Date.now()+sec*1000, totalSec:sec, label:label||"Repos" };
+  renderRestBar();
+  clearInterval(restInterval);
+  restInterval = setInterval(tickRest, 250);
+}
+function adjustRestTimer(delta){
+  if(!restState) return;
+  restState.endAt += delta*1000;
+  tickRest();
+}
+function stopRestTimer(){
+  restState = null;
+  clearInterval(restInterval);
+  const bar = qs("#restbar");
+  if(bar) bar.classList.remove("show");
+}
+function tickRest(){
+  if(!restState) return;
+  const remain = Math.round((restState.endAt-Date.now())/1000);
+  if(remain<=0){
+    if(navigator.vibrate) try{ navigator.vibrate([120,60,120]); }catch(e){}
+    toast("Repos terminé — série suivante");
+    stopRestTimer();
+    return;
+  }
+  renderRestBar(remain);
+}
+function fmtMMSS(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${m}:${s<10?"0":""}${s}`;
+}
+function renderRestBar(remainOverride){
+  const bar = qs("#restbar");
+  if(!bar || !restState) return;
+  const remain = remainOverride!=null? remainOverride : Math.max(0,Math.round((restState.endAt-Date.now())/1000));
+  bar.classList.add("show");
+  bar.innerHTML = `<div class="rt-time">${fmtMMSS(remain)}</div><div class="rt-label">${esc(restState.label)}</div>
+    <button data-a="restAdjust" data-d="-15">−15</button><button data-a="restAdjust" data-d="15">+15</button><button data-a="restSkip">Passer</button>`;
+}
+Object.assign(ACT, {
+  restAdjust(d){ adjustRestTimer(parseInt(d.d,10)); },
+  restSkip(){ stopRestTimer(); },
+});
+// ================= GRAPHIQUES SVG (sans dépendance) =================
+function lineChartSVG(values, height){
+  height = height||110;
+  if(!values.length) return '<div class="empty-state" style="padding:24px 10px"><span class="em">📈</span>Pas encore assez de données.</div>';
+  const W=300, H=height, P=16;
+  const ys = values.map(v=>v.y);
+  let max=Math.max(...ys), min=Math.min(...ys,0);
+  if(max===min) max = min+1;
+  const range = max-min;
+  const stepX = values.length>1 ? (W-2*P)/(values.length-1) : 0;
+  const pts = values.map((v,i)=>{
+    const x = values.length>1 ? P+i*stepX : W/2;
+    const y = H-P-((v.y-min)/range)*(H-2*P);
+    return [x,y];
+  });
+  const path = pts.map((p,i)=>(i===0?"M":"L")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  const area = pts.length>1 ? path+` L${pts[pts.length-1][0].toFixed(1)},${H-P} L${pts[0][0].toFixed(1)},${H-P} Z` : "";
+  const dots = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="currentColor"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="color:var(--tint)">
+    ${area?`<path d="${area}" fill="currentColor" opacity=".12" stroke="none"/>`:""}
+    ${pts.length>1?`<path d="${path}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`:""}
+    ${dots}</svg>`;
+}
+
+function barListSVG(items){
+  // items: [{label, value, max}]
+  if(!items.length) return "";
+  return items.map(it=>{
+    const pct = it.max? Math.min(100, Math.round(it.value/it.max*100)) : 0;
+    return `<div style="padding:8px 16px">
+      <div style="display:flex;justify-content:space-between;font-size:calc(13.5rem/17);margin-bottom:4px"><span>${esc(it.label)}</span><span style="color:var(--label2)">${it.value}</span></div>
+      <div style="height:8px;border-radius:4px;background:var(--fill)"><div style="height:8px;border-radius:4px;width:${pct}%;background:var(--tint)"></div></div>
+    </div>`;
+  }).join("");
+}
+// ================= GAMIFICATION =================
+function maxStreakWeeksEver(){
+  if(!S.sessions.length) return 0;
+  const weeks = Array.from(new Set(S.sessions.map(s=>weekKey(s.date)))).sort();
+  let best=1, cur=1;
+  for(let i=1;i<weeks.length;i++){
+    const d = parseISO(weeks[i-1]); d.setDate(d.getDate()+7);
+    const expected = d.toISOString().slice(0,10);
+    if(expected===weeks[i]) cur++; else cur=1;
+    if(cur>best) best=cur;
+  }
+  return best;
+}
+function masteredExosCount(){
+  const counts = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{
+    if(ex.sets.some(st=>st.done)) counts[ex.exoId]=(counts[ex.exoId]||0)+1;
+  }));
+  return Object.values(counts).filter(c=>c>=8).length;
+}
+
+const TROPHIES = [
+  { id:"first_session", n:"Premier forgeage", em:"🔥", desc:"Termine ta première séance.", cond:()=>S.sessions.length>=1 },
+  { id:"sessions_10",  n:"Sur la lancée",  em:"🏗️", desc:"10 séances complétées.", cond:()=>S.sessions.length>=10 },
+  { id:"sessions_50",  n:"Habitué·e de la forge", em:"⚒️", desc:"50 séances complétées.", cond:()=>S.sessions.length>=50 },
+  { id:"sessions_100", n:"Forgeron·ne", em:"🛠️", desc:"100 séances complétées.", cond:()=>S.sessions.length>=100 },
+  { id:"streak_4",  n:"Régularité",     em:"📅", desc:"4 semaines d'affilée avec au moins une séance.", cond:()=>maxStreakWeeksEver()>=4 },
+  { id:"streak_12", n:"Rythme de croisière", em:"🗓️", desc:"12 semaines d'affilée.", cond:()=>maxStreakWeeksEver()>=12 },
+  { id:"streak_26", n:"Acier trempé",   em:"⚙️", desc:"26 semaines d'affilée.", cond:()=>maxStreakWeeksEver()>=26 },
+  { id:"pr_first",  n:"Nouveau record", em:"💥", desc:"Bats ton premier record personnel.", cond:()=>(S.meta.prCount||0)>=1 },
+  { id:"pr_10",     n:"Chasseur·euse de records", em:"🏆", desc:"10 records personnels battus.", cond:()=>(S.meta.prCount||0)>=10 },
+  { id:"volume_1000",  n:"Premiers coups de marteau", em:"🔨", desc:"1000 kg cumulés soulevés.", cond:()=>totalVolumeAllTime()>=1000 },
+  { id:"volume_10000", n:"Poids lourd",  em:"🪨", desc:"10 000 kg cumulés soulevés.", cond:()=>totalVolumeAllTime()>=10000 },
+  { id:"volume_50000", n:"Force de la forge", em:"⛰️", desc:"50 000 kg cumulés soulevés.", cond:()=>totalVolumeAllTime()>=50000 },
+  { id:"mastery_1",  n:"Exercice maîtrisé", em:"🎯", desc:"Un exercice pratiqué 8 fois ou plus.", cond:()=>masteredExosCount()>=1 },
+  { id:"mastery_5",  n:"Panoplie complète", em:"🧰", desc:"5 exercices maîtrisés.", cond:()=>masteredExosCount()>=5 },
+  { id:"mastery_10", n:"Polyvalence totale", em:"⭐", desc:"10 exercices maîtrisés.", cond:()=>masteredExosCount()>=10 },
+];
+const TROPHY_MAP = {}; TROPHIES.forEach(t=>TROPHY_MAP[t.id]=t);
+
+function checkTrophies(){
+  const unlocked = [];
+  TROPHIES.forEach(t=>{
+    if(!S.trophies[t.id] && t.cond()){
+      S.trophies[t.id] = new Date().toISOString();
+      unlocked.push(t);
+    }
+  });
+  if(unlocked.length) save();
+  return unlocked;
+}
+
+function showCelebration(session, newTrophies){
+  const vol = Math.round(sessionVolume(session));
+  const sets = sessionSetCount(session);
+  const troHTML = newTrophies.length ? `<h2 class="sh" style="margin-top:22px">Trophée${newTrophies.length>1?"s":""} débloqué${newTrophies.length>1?"s":""}</h2>
+    <div class="tro-grid">${newTrophies.map(t=>`<div class="tro on"><div class="em">${t.em}</div><div class="tn">${esc(t.n)}</div></div>`).join("")}</div>` : "";
+  openModal(`<div class="celebrate-ring">${icon("check")}</div>
+    <div style="font-weight:700;font-size:calc(19rem/17)">Séance terminée !</div>
+    <div style="color:var(--label2);font-size:calc(14.5rem/17);margin-top:4px">${fmtDuration(session.durationSec)} · ${sets} séries · ${vol} kg déplacés</div>
+    <button class="btn" style="margin-top:18px" data-a="closesheet">Continuer</button>`);
+  if(newTrophies.length){
+    setTimeout(()=>{
+      qs(".center-modal").insertAdjacentHTML("beforeend", troHTML);
+    }, 50);
+  }
+}
+// ================= VUE : AUJOURD'HUI =================
+const PATTERN_EMOJI = { squat:"🏋️", hinge:"⚙️", push:"⬆️", pull:"⬇️", lunge:"🚶", core:"🔲", calf:"🦶" };
+
+function fmtDuration(sec){
+  if(sec<60) return `${sec} s`;
+  const m = Math.round(sec/60);
+  if(m<60) return `${m} min`;
+  return `${Math.floor(m/60)} h ${String(m%60).padStart(2,"0")}`;
+}
+function repsLabel(range){ return range[0]===range[1] ? `${range[0]}` : `${range[0]}-${range[1]}`; }
+
+function renderToday(){
+  const draft = getOrCreateDraft();
+  return draft.startedAt ? renderTodayLive(draft) : renderTodayPreview(draft);
+}
+
+function sourceChip(draft){
+  if(draft.source==="imported") return `<span class="chip on">Programme importé${draft.name?" · "+esc(draft.name):""}</span>`;
+  return "";
+}
+
+function renderTodayPreview(draft){
+  if(!draft.exos.length){
+    return `<div class="navbar"><div class="nb-title">Aujourd'hui</div></div><div class="content">
+      <h1 class="lt">Aujourd'hui</h1>
+      <div class="empty-state"><span class="em">🧰</span>Aucun exercice ne correspond à ton matériel actuel.<br>Renseigne ton équipement dans l'onglet Profil.</div>
+    </div>`;
+  }
+  const rows = draft.exos.map((ex,i)=>{
+    const def = EXO_MAP[ex.exoId];
+    return `<div class="row">
+      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${def.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")} — ${ex.targetSets} × ${repsLabel(ex.targetReps)}</div></div>
+      <button class="icon-btn" data-a="swapExoOpen" data-idx="${i}">${icon("swap")}</button>
+      <button class="icon-btn" data-a="removeExo" data-idx="${i}">${icon("close")}</button>
+    </div>`;
+  }).join("");
+  return `<div class="navbar"><div class="nb-title">Aujourd'hui</div></div><div class="content">
+    <div class="eyebrow">${fmtDate(todayISO(),"long")}</div>
+    <h1 class="lt">Séance du jour</h1>
+    ${draft.source==="imported"?`<div class="chips" style="margin-bottom:12px">${sourceChip(draft)}</div>`:""}
+    <div class="group">${rows}</div>
+    <div class="btnrow"><button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter</button>${draft.source==="engine"?`<button class="btn secondary sm" data-a="regenSession">${icon("swap")} Autre séance</button>`:`<button class="btn secondary sm" data-a="dropImported">${icon("swap")} Suggestion auto</button>`}</div>
+    <div class="btnrow"><button class="btn" data-a="startSession">Commencer la séance</button></div>
+    <p class="hr-note" style="margin:16px 20px 0">La séance reste modifiable avant et pendant l'entraînement : retire, remplace ou ajoute un exercice à tout moment.</p>
+  </div>`;
+}
+
+function renderTodayLive(draft){
+  const totalSets = draft.exos.reduce((t,e)=>t+e.sets.length,0);
+  const doneSets = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>s.done).length,0);
+  const elapsed = Math.round((Date.now()-Date.parse(draft.startedAt))/1000);
+  const cards = draft.exos.map((ex,i)=>renderExoCard(ex,i)).join("");
+  return `<div class="navbar"><div class="nb-title">Séance en cours</div><div class="nb-right"><button class="icon-btn" data-a="abandonSession">${icon("trash")}</button></div></div>
+  <div class="content">
+    <div class="eyebrow">${fmtDuration(elapsed)} · ${doneSets}/${totalSets} séries</div>
+    <h1 class="lt">Séance en cours</h1>
+    ${cards}
+    <div class="btnrow"><button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter un exercice</button></div>
+    <div class="btnrow"><button class="btn" data-a="finishSession">Terminer la séance</button></div>
+  </div>`;
+}
+
+function renderExoCard(ex,i){
+  const def = EXO_MAP[ex.exoId];
+  const rows = ex.sets.map((st,j)=>`<div class="set-row">
+      <button class="checkbtn ${st.done?"done":""}" data-a="toggleSet" data-exi="${i}" data-si="${j}">${st.done?icon("check"):""}</button>
+      <input type="number" inputmode="numeric" placeholder="reps" value="${st.reps??""}" data-c="setReps" data-exi="${i}" data-si="${j}">
+      <input type="number" inputmode="decimal" placeholder="${def.equip.includes('bodyweight')&&def.equip.length===1?"pdc":"kg"}" value="${st.weight??""}" data-c="setWeight" data-exi="${i}" data-si="${j}">
+      <button class="icon-btn" style="color:var(--label3)" data-a="removeSet" data-exi="${i}" data-si="${j}">${icon("close")}</button>
+    </div>`).join("");
+  return `<div class="set-card">
+    <div class="set-hd">
+      <div class="ico">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      <div class="grow"><div class="nm">${esc(def.n)}</div><div class="mg">${def.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")} — objectif ${repsLabel(ex.targetReps)} reps</div></div>
+      <button class="icon-btn" data-a="showExoInfo" data-id="${def.id}">ℹ️</button>
+    </div>
+    ${ex.note?`<div class="exo-note">${esc(ex.note)}</div>`:""}
+    <div class="set-row hd"><span></span><span>Reps</span><span>Charge</span><span></span></div>
+    ${rows}
+    <div class="set-actions">
+      <button data-a="addSet" data-exi="${i}">+ série</button>
+      <button data-a="swapExoOpen" data-idx="${i}">Remplacer</button>
+      <button data-a="removeExo" data-idx="${i}">Retirer</button>
+    </div>
+  </div>`;
+}
+
+function exoPickerSheet(title, onPick, excludeIds){
+  const excl = new Set(excludeIds||[]);
+  const pool = availableExos().filter(e=>!excl.has(e.id));
+  const byPattern = {};
+  pool.forEach(e=>{ (byPattern[e.pattern]=byPattern[e.pattern]||[]).push(e); });
+  const html = Object.keys(byPattern).map(p=>{
+    const rows = byPattern[p].map(e=>`<button class="row tap" data-a="pickExo" data-id="${e.id}" style="width:100%">
+      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[p]}</div>
+      <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}</div></div>
+    </button>`).join("");
+    return `<div class="group" style="margin-top:14px">${rows}</div>`;
+  }).join("") || `<div class="empty-state">Aucun exercice disponible avec ton matériel actuel.</div>`;
+  openSheet(`<div class="sheet-hd"><span class="t">${esc(title)}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${html}</div>`);
+  qs("#overlay")._onPick = onPick;
+}
+
+Object.assign(ACT, {
+  startSession(){ S.draft.startedAt = new Date().toISOString(); changed(); },
+  regenSession(){
+    confirmSheet({ title:"Générer une autre séance ?", html:"La proposition actuelle sera remplacée.", ok:"Générer", onOk:()=>{ regenerateDraft(); changed(); } });
+  },
+  dropImported(){
+    confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); save(); changed(); } });
+  },
+  removeExo(d){ S.draft.exos.splice(+d.idx,1); changed(); },
+  addExoOpen(){
+    exoPickerSheet("Ajouter un exercice", (id)=>{
+      const exo = EXO_MAP[id]; const sug = suggestForExo(exo);
+      S.draft.exos.push({ exoId:id, targetSets:exo.sets, targetReps:sug.targetReps, note:sug.note, sets:buildSetsFor(exo,sug) });
+      closeSheet(); changed();
+    }, S.draft.exos.map(e=>e.exoId));
+  },
+  swapExoOpen(d){
+    const idx = +d.idx;
+    exoPickerSheet("Remplacer par", (id)=>{
+      const exo = EXO_MAP[id]; const sug = suggestForExo(exo);
+      S.draft.exos[idx] = { exoId:id, targetSets:exo.sets, targetReps:sug.targetReps, note:sug.note, sets:buildSetsFor(exo,sug) };
+      closeSheet(); changed();
+    }, S.draft.exos.map(e=>e.exoId));
+  },
+  pickExo(d){ const fn = qs("#overlay")._onPick; if(fn) fn(d.id); },
+  toggleSet(d){
+    const exi=+d.exi, si=+d.si;
+    const ex = S.draft.exos[exi], st = ex.sets[si], def = EXO_MAP[ex.exoId];
+    if(!st.done){
+      if(st.reps==null) st.reps = Math.round((ex.targetReps[0]+ex.targetReps[1])/2);
+      st.done = true;
+      if(isNewPR(ex.exoId, st.weight||0, st.reps||0) && (st.weight||st.reps)){ toast("💥 Nouveau record sur "+def.n+" !"); S.meta.prCount = (S.meta.prCount||0)+1; }
+      startRestTimer(def.restSec, def.n);
+    } else { st.done = false; }
+    changed();
+  },
+  setReps(d,el){ S.draft.exos[+d.exi].sets[+d.si].reps = el.value===""?null:parseFloat(el.value); save(); },
+  setWeight(d,el){ S.draft.exos[+d.exi].sets[+d.si].weight = el.value===""?null:parseFloat(el.value); save(); },
+  addSet(d){
+    const ex = S.draft.exos[+d.exi];
+    const last = ex.sets[ex.sets.length-1];
+    ex.sets.push({ reps:null, weight:last?last.weight:null, done:false, rpe:null });
+    ex.targetSets = ex.sets.length;
+    changed();
+  },
+  removeSet(d){
+    const ex = S.draft.exos[+d.exi];
+    if(ex.sets.length>1){ ex.sets.splice(+d.si,1); ex.targetSets = ex.sets.length; changed(); }
+  },
+  showExoInfo(d){
+    const e = EXO_MAP[d.id];
+    openSheet(`<div class="sheet-hd"><span class="t">${esc(e.n)}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+      <div class="sheet-body"><p class="body">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}</p>
+      <h2 class="sh" style="margin-top:18px">Exécution</h2>
+      <div class="group"><div style="padding:12px 16px">${e.cues.map(c=>`<div style="padding:6px 0">• ${esc(c)}</div>`).join("")}</div></div>
+      <h2 class="sh">Sécurité</h2><p class="body">${esc(e.safety)}</p></div>`);
+  },
+  finishSession(){
+    openSheet(`<div class="sheet-hd"><span class="t">Comment te sens-tu ?</span></div>
+      <div class="sheet-body" style="padding:8px 16px 20px">
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        ${["😣","😕","🙂","💪","🔥"].map((em,i)=>`<button class="btn secondary" style="flex-direction:column;height:70px" data-a="setFeelingAndFinish" data-f="${i+1}"><span style="font-size:26px">${em}</span></button>`).join("")}
+      </div></div>`, {noGrab:false});
+  },
+  setFeelingAndFinish(d){
+    const draft = S.draft;
+    draft.completedAt = new Date().toISOString();
+    draft.feeling = +d.f;
+    draft.durationSec = Math.round((Date.parse(draft.completedAt)-Date.parse(draft.startedAt))/1000);
+    S.sessions.push(clone(draft));
+    if(draft.source==="imported" && S.importedProgram.length) S.importedProgram.shift();
+    S.draft = null;
+    stopRestTimer();
+    save();
+    closeSheet();
+    const newTrophies = checkTrophies();
+    setTimeout(()=>showCelebration(draft, newTrophies), 320);
+  },
+  abandonSession(){
+    confirmSheet({ title:"Abandonner la séance ?", html:"La progression de cette séance sera perdue.", ok:"Abandonner", danger:true,
+      onOk:()=>{ S.draft=null; stopRestTimer(); changed(); } });
+  },
+});
+VIEWS.today = renderToday;
+// ================= VUE : HISTORIQUE =================
+const FEELING_EMOJI = {1:"😣",2:"😕",3:"🙂",4:"💪",5:"🔥"};
+
+function renderHistory(){
+  const sessions = S.sessions.slice().reverse();
+  if(!sessions.length){
+    return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
+      <h1 class="lt">Historique</h1>
+      <div class="empty-state"><span class="em">📋</span>Aucune séance enregistrée pour l'instant.<br>Termine ta première séance pour la voir ici.</div>
+    </div>`;
+  }
+  let lastMonth=null, html="";
+  sessions.forEach(s=>{
+    const d = parseISO(s.date);
+    const monthKey = `${d.getFullYear()}-${d.getMonth()}`;
+    if(monthKey!==lastMonth){
+      html += `<h2 class="sh">${MOIS[d.getMonth()]} ${d.getFullYear()}</h2><div class="group">`;
+      if(lastMonth!==null) html = html.replace(/<div class="group">$/,'</div><div class="group">');
+      lastMonth = monthKey;
+    }
+    const vol = sessionVolume(s), sets = sessionSetCount(s);
+    html += `<button class="row tap" style="width:100%" data-a="openSessionDetail" data-id="${s.id}">
+      <div class="ico" style="background:var(--tint)">${FEELING_EMOJI[s.feeling]||"🏋️"}</div>
+      <div class="grow"><div class="t">${esc(fmtDate(s.date,"long"))}</div><div class="s">${s.exos.length} exercices · ${sets} séries · ${Math.round(vol)} kg déplacés</div></div>
+      <div class="val">${s.durationSec?fmtDuration(s.durationSec):""}</div><span class="chev">${icon("chev")}</span>
+    </button>`;
+  });
+  html += "</div>";
+  return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
+    <h1 class="lt">Historique</h1>${html}</div>`;
+}
+
+function sessionDetailHTML(s){
+  const rows = s.exos.map(ex=>{
+    const def = EXO_MAP[ex.exoId];
+    if(!def) return "";
+    const sets = ex.sets.filter(st=>st.done);
+    if(!sets.length) return "";
+    return `<div class="row" style="align-items:flex-start">
+      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      <div class="grow"><div class="t">${esc(def.n)}</div>
+      <div class="s">${sets.map(st=>`${st.reps||"?"}${st.weight!=null?" × "+st.weight+" kg":""}`).join(" · ")}</div></div>
+    </div>`;
+  }).join("");
+  return `<div class="sheet-hd"><span class="t">${esc(fmtDate(s.date,"long"))}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+    <div class="sheet-body">
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num">${s.durationSec?fmtDuration(s.durationSec):"–"}</div><div class="lbl">Durée</div></div>
+      <div class="stat-box"><div class="num">${Math.round(sessionVolume(s))}</div><div class="lbl">kg déplacés</div></div>
+      <div class="stat-box"><div class="num">${FEELING_EMOJI[s.feeling]||"–"}</div><div class="lbl">Ressenti</div></div>
+    </div>
+    <div class="group" style="margin-top:14px">${rows||'<div style="padding:16px" class="s">Aucune série complétée.</div>'}</div>
+    </div>`;
+}
+
+Object.assign(ACT, {
+  openSessionDetail(d){
+    const s = S.sessions.find(x=>x.id===d.id);
+    if(s) openSheet(sessionDetailHTML(s));
+  },
+});
+VIEWS.history = renderHistory;
+// ================= VUE : PROGRÈS =================
+function trainedExoIds(){
+  const ids = new Set();
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) ids.add(ex.exoId); }));
+  return Array.from(ids);
+}
+
+function muscleVolume14d(){
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
+  const counts = {};
+  S.sessions.filter(s=>parseISO(s.date)>=cutoff).forEach(s=>s.exos.forEach(ex=>{
+    const def = EXO_MAP[ex.exoId]; if(!def) return;
+    const n = ex.sets.filter(st=>st.done).length;
+    if(!n) return;
+    counts[def.muscles[0]] = (counts[def.muscles[0]]||0)+n;
+  }));
+  const max = Math.max(1,...Object.values(counts));
+  return MUSCLES.filter(m=>m.id!=="cardio").map(m=>({label:m.n, value:counts[m.id]||0, max})).sort((a,b)=>b.value-a.value).filter(x=>x.value>0);
+}
+
+function renderProgress(){
+  const ids = trainedExoIds();
+  const exoRows = ids.map(id=>{
+    const def = EXO_MAP[id]; if(!def) return "";
+    const pr = exoPRs(id);
+    return `<button class="row tap" style="width:100%" data-a="openExoChart" data-id="${id}">
+      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${MUSCLE_MAP[def.muscles[0]].n}</div></div>
+      ${pr.maxWeight? `<span class="pr-badge">PR ${pr.maxWeight} kg</span>`:""}<span class="chev">${icon("chev")}</span>
+    </button>`;
+  }).join("");
+
+  const bal = muscleVolume14d();
+  const troGrid = TROPHIES.map(t=>{
+    const on = !!S.trophies[t.id];
+    return `<button class="tro ${on?"on":""}" data-a="showTrophy" data-id="${t.id}"><div class="em">${t.em}</div><div class="tn">${esc(t.n)}</div></button>`;
+  }).join("");
+
+  return `<div class="navbar"><div class="nb-title">Progrès</div></div><div class="content">
+    <h1 class="lt">Progrès</h1>
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num">${currentStreakWeeks()}</div><div class="lbl">sem. d'affilée</div></div>
+      <div class="stat-box"><div class="num">${sessionsInMonth()}</div><div class="lbl">séances / mois</div></div>
+      <div class="stat-box"><div class="num">${sessionsInYear()}</div><div class="lbl">séances / an</div></div>
+      <div class="stat-box"><div class="num">${weeklyAverage(8)}</div><div class="lbl">/ sem. (8 sem.)</div></div>
+    </div>
+
+    <h2 class="sh">Trophées</h2>
+    <div class="tro-grid">${troGrid}</div>
+
+    ${bal.length?`<h2 class="sh">Équilibre 14 derniers jours</h2><div class="group">${barListSVG(bal)}</div>`:""}
+
+    <h2 class="sh">Exercices</h2>
+    ${exoRows? `<div class="group">${exoRows}</div>` : `<div class="empty-state"><span class="em">📈</span>Termine des séances pour voir ta progression exercice par exercice.</div>`}
+  </div>`;
+}
+
+function exoChartSheet(id){
+  const def = EXO_MAP[id];
+  const points = [];
+  S.sessions.forEach(s=>{
+    const ex = s.exos.find(x=>x.exoId===id);
+    if(!ex) return;
+    const done = ex.sets.filter(st=>st.done);
+    if(!done.length) return;
+    const bestWeight = Math.max(...done.map(st=>st.weight||0));
+    const vol = done.reduce((t,st)=>t+(st.reps||0)*(st.weight||0),0);
+    points.push({date:s.date, weight:bestWeight, vol});
+  });
+  const pr = exoPRs(id);
+  const weightChart = lineChartSVG(points.map(p=>({y:p.weight})));
+  const volChart = lineChartSVG(points.map(p=>({y:p.vol})));
+  openSheet(`<div class="sheet-hd"><span class="t">${esc(def.n)}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+    <div class="sheet-body">
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num">${pr.maxWeight||"–"}</div><div class="lbl">PR charge (kg)</div></div>
+      <div class="stat-box"><div class="num">${pr.best1rm||"–"}</div><div class="lbl">1RM estimé</div></div>
+      <div class="stat-box"><div class="num">${Math.round(pr.maxVolumeSession)||"–"}</div><div class="lbl">PR volume séance</div></div>
+    </div>
+    <h2 class="sh">Charge maximale par séance</h2>
+    <div class="chart-wrap">${weightChart}</div>
+    <h2 class="sh">Volume par séance</h2>
+    <div class="chart-wrap">${volChart}</div>
+    </div>`);
+}
+
+Object.assign(ACT, {
+  openExoChart(d){ exoChartSheet(d.id); },
+  showTrophy(d){
+    const t = TROPHY_MAP[d.id]; const on = !!S.trophies[t.id];
+    openModal(`<div style="font-size:40px">${t.em}</div><div style="font-weight:700;font-size:calc(17rem/17);margin-top:8px">${esc(t.n)}</div>
+      <div style="color:var(--label2);font-size:calc(14rem/17);margin-top:4px">${esc(t.desc)}</div>
+      ${on?`<div class="hr-note" style="margin-top:10px">Débloqué le ${esc(fmtDate(S.trophies[t.id].slice(0,10),"long"))}</div>`:`<div class="hr-note" style="margin-top:10px">Pas encore débloqué</div>`}
+      <button class="btn secondary" style="margin-top:16px" data-a="closesheet">Fermer</button>`);
+  },
+});
+VIEWS.progress = renderProgress;
+// ================= VUE : PROFIL =================
+const GOAL_LABELS = { force:"Force", hypertrophie:"Prise de masse", endurance:"Endurance" };
+const LEN_LABELS = { court:"Courte (≈20 min)", moyen:"Moyenne (≈35 min)", long:"Longue (≈50 min)" };
+
+function ownedEquipCount(){ return EQUIP_TYPES.filter(e=>!e.always && S.equipment.owned[e.id]).length; }
+
+function renderProfil(){
+  return `<div class="navbar"><div class="nb-title">Profil</div></div><div class="content">
+    <h1 class="lt">Profil</h1>
+
+    <h2 class="sh">Entraînement</h2>
+    <div class="group">
+      <button class="row tap" style="width:100%" data-a="openEquip">
+        <div class="ico" style="background:var(--tint)">🧰</div>
+        <div class="grow"><div class="t">Matériel</div><div class="s">${ownedEquipCount()} équipement${ownedEquipCount()>1?"s":""} renseigné${ownedEquipCount()>1?"s":""}</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+      <button class="row tap" style="width:100%" data-a="openGoals">
+        <div class="ico" style="background:var(--tint)">🎯</div>
+        <div class="grow"><div class="t">Objectifs</div><div class="s">${GOAL_LABELS[S.goals.overall]} · ${S.goals.daysPerWeek}×/sem.</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+      <button class="row tap" style="width:100%" data-a="openExoPrefs">
+        <div class="ico" style="background:var(--tint)">📋</div>
+        <div class="grow"><div class="t">Exercices inclus / exclus</div><div class="s">${S.prefs.excluded.length} exclu${S.prefs.excluded.length>1?"s":""} · ${S.prefs.included.length} privilégié${S.prefs.included.length>1?"s":""}</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+    </div>
+
+    <h2 class="sh">Suggestion par IA externe</h2>
+    <div class="group">
+      <button class="row tap" style="width:100%" data-a="openExportImport">
+        <div class="ico" style="background:var(--tint)">🤖</div>
+        <div class="grow"><div class="t">Exporter / importer un programme</div><div class="s">${S.importedProgram.length? S.importedProgram.length+" séance(s) importée(s) en attente" : "Aucun programme importé"}</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+    </div>
+
+    <h2 class="sh">Réglages</h2>
+    <div class="group">
+      <button class="row tap" style="width:100%" data-a="openAppearance">
+        <div class="ico" style="background:var(--tint)">🌗</div>
+        <div class="grow"><div class="t">Apparence</div><div class="s">${S.settings.theme==="auto"?"Automatique":S.settings.theme==="dark"?"Sombre":"Clair"}</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+      <button class="row tap" style="width:100%" data-a="confirmReset">
+        <div class="ico" style="background:var(--red)">🗑️</div>
+        <div class="grow"><div class="t">Réinitialiser toutes les données</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+      <button class="row tap" style="width:100%" data-a="openAbout">
+        <div class="ico" style="background:var(--tint)">ℹ️</div>
+        <div class="grow"><div class="t">À propos</div></div>
+        <span class="chev">${icon("chev")}</span>
+      </button>
+    </div>
+    <p class="hr-note" style="margin:16px 20px 40px">Forge v${APP_VERSION} — toutes les données restent stockées localement sur cet appareil.</p>
+  </div>`;
+}
+
+// ---------- Matériel ----------
+function equipBodyHTML(){
+  const rows = EQUIP_TYPES.filter(e=>!e.always).map(e=>{
+    const on = S.equipment.owned[e.id];
+    return `<div class="row">
+      <div class="ico" style="background:var(--fill);color:inherit;font-size:16px">${e.em}</div>
+      <div class="grow"><div class="t">${esc(e.n)}</div></div>
+      <button class="switch ${on?"on":""}" data-a="toggleEquip" data-id="${e.id}"></button>
+    </div>`;
+  }).join("");
+  const weightEditors = EQUIP_TYPES.filter(e=>e.loadable && S.equipment.owned[e.id]).map(e=>{
+    const list = (S.equipment.weights[e.id]||[]).slice().sort((a,b)=>a-b);
+    const chips = list.map(w=>`<span class="chip on">${w} ${e.unit} <button data-a="removeWeight" data-id="${e.id}" data-w="${w}" style="margin-left:4px">${icon("close")}</button></span>`).join("");
+    return `<div class="card" style="margin-top:12px">
+      <div style="font-weight:700;margin-bottom:2px">${esc(e.n)}</div>
+      <div class="hr-note" style="margin:0 0 10px">${esc(e.hint||"")}</div>
+      <div class="chips" style="padding:0 0 10px">${chips||'<span class="hr-note">Aucun poids renseigné</span>'}</div>
+      <div style="display:flex;gap:8px">
+        <input type="number" inputmode="decimal" placeholder="${e.unit}" id="wadd-${e.id}" style="flex:1;background:var(--fill2);border:0;border-radius:10px;padding:0 12px;height:38px">
+        <button class="btn sm" data-a="addWeight" data-id="${e.id}">Ajouter</button>
+      </div>
+    </div>`;
+  }).join("");
+  const customs = S.equipment.custom.map(c=>`<div class="row"><div class="ico" style="background:var(--fill)">🔧</div><div class="grow"><div class="t">${esc(c.n)}</div></div><button class="icon-btn" data-a="removeCustom" data-id="${c.id}">${icon("close")}</button></div>`).join("");
+  return `<div class="group">${rows}</div>${weightEditors}
+    <h2 class="sh">Autre équipement</h2>
+    <div class="hr-note" style="margin-top:-6px">Informatif — ajoute librement ce que tu possèdes (banc réglable, TRX…). N'affecte pas encore la suggestion automatique.</div>
+    <div class="group" style="margin-top:10px">${customs}
+      <div class="row"><input placeholder="Nom de l'équipement" id="customEquipName" style="flex:1;border:0;background:transparent;height:100%;font-size:calc(17rem/17)"><button class="btn sm" data-a="addCustomEquip">Ajouter</button></div>
+    </div>`;
+}
+function openEquip(){
+  openSheet(`<div class="sheet-hd"><span class="t">Matériel</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${equipBodyHTML()}</div>`);
+}
+function refreshEquip(){ const b=qs(".sheet-body"); if(b) b.innerHTML = equipBodyHTML(); }
+
+// ---------- Objectifs ----------
+function goalsBodyHTML(){
+  const overallChips = Object.keys(GOAL_LABELS).map(k=>`<button class="chip ${S.goals.overall===k?"on":""}" data-a="setGoalOverall" data-v="${k}">${GOAL_LABELS[k]}</button>`).join("");
+  const lenChips = Object.keys(LEN_LABELS).map(k=>`<button class="chip ${S.goals.sessionLength===k?"on":""}" data-a="setSessionLength" data-v="${k}">${LEN_LABELS[k]}</button>`).join("");
+  const emphasisRows = MUSCLES.filter(m=>m.id!=="cardio").map(m=>{
+    const v = S.goals.emphasis[m.id]||"normal";
+    return `<div class="row">
+      <div class="grow t">${esc(m.n)}</div>
+      <button class="chip ${v==="prioriser"?"on":""}" data-a="cycleEmphasis" data-id="${m.id}">${v==="prioriser"?"Prioriser":v==="eviter"?"À éviter":"Normal"}</button>
+    </div>`;
+  }).join("");
+  return `<h2 class="sh" style="margin-top:6px">Objectif principal</h2><div class="chips">${overallChips}</div>
+    <h2 class="sh">Fréquence visée</h2>
+    <div class="field" style="padding:10px 14px"><div class="stepper">
+      <button data-a="stepDays" data-d="-1">−</button><div class="val">${S.goals.daysPerWeek}×/sem.</div><button data-a="stepDays" data-d="1">+</button>
+    </div></div>
+    <h2 class="sh">Durée de séance</h2><div class="chips">${lenChips}</div>
+    <h2 class="sh">Groupes musculaires</h2>
+    <p class="hr-note" style="margin-top:-6px">Touche un groupe pour faire défiler : normal → à prioriser → à éviter.</p>
+    <div class="group" style="margin-top:10px">${emphasisRows}</div>`;
+}
+function openGoals(){
+  openSheet(`<div class="sheet-hd"><span class="t">Objectifs</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${goalsBodyHTML()}</div>`);
+}
+function refreshGoals(){ const b=qs(".sheet-body"); if(b) b.innerHTML = goalsBodyHTML(); }
+
+// ---------- Exercices inclus / exclus ----------
+function exoPrefsBodyHTML(){
+  const byPattern = {};
+  EXOS.forEach(e=>{ (byPattern[e.pattern]=byPattern[e.pattern]||[]).push(e); });
+  return Object.keys(byPattern).map(p=>{
+    const rows = byPattern[p].map(e=>{
+      const excl = isExcluded(e.id), incl = isIncluded(e.id);
+      return `<div class="row">
+        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}</div></div>
+        <button class="chip ${incl?"on":""}" data-a="toggleIncluded" data-id="${e.id}">★</button>
+        <button class="chip ${excl?"excl":""}" data-a="toggleExcluded" data-id="${e.id}">Exclure</button>
+      </div>`;
+    }).join("");
+    return `<h2 class="sh">${esc(PATTERN_LABEL[p]||p)}</h2><div class="group">${rows}</div>`;
+  }).join("");
+}
+const PATTERN_LABEL = { squat:"Squat", hinge:"Hanche", push:"Poussée", pull:"Tirage", lunge:"Fentes", core:"Gainage", calf:"Mollets" };
+function openExoPrefs(){
+  openSheet(`<div class="sheet-hd"><span class="t">Exercices</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${exoPrefsBodyHTML()}</div>`);
+}
+function refreshExoPrefs(){ const b=qs(".sheet-body"); if(b) b.innerHTML = exoPrefsBodyHTML(); }
+
+// ---------- Export / import IA ----------
+function exportImportBodyHTML(){
+  const importedRows = S.importedProgram.map((s,i)=>`<div class="row"><div class="grow t">${esc(s.nom||s.name||("Séance "+(i+1)))}</div>${i===0?'<span class="chip on">Prochaine</span>':""}</div>`).join("");
+  return `<p class="body">Génère un prompt résumant ton profil (matériel, objectifs, historique) à coller dans l'IA de ton choix. Elle te répondra avec un programme au format JSON que tu peux ensuite importer ici.</p>
+    <div class="btnrow" style="margin-top:16px"><button class="btn" data-a="copyPrompt">Copier le prompt</button></div>
+    <div class="field" style="margin-top:12px"><textarea readonly rows="6" style="width:100%;border:0;background:transparent;font-size:calc(13rem/17);padding:10px 0;resize:vertical">${esc(buildExportPrompt())}</textarea></div>
+    <div class="btnrow"><button class="btn secondary" data-a="triggerImport">Importer le fichier JSON reçu</button></div>
+    ${S.importedProgram.length? `<h2 class="sh">Programme importé</h2><div class="group">${importedRows}</div><div class="btnrow"><button class="btn ghost" data-a="clearImported">Supprimer le programme importé</button></div>`:""}`;
+}
+function openExportImport(){
+  openSheet(`<div class="sheet-hd"><span class="t">Suggestion par IA</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${exportImportBodyHTML()}</div>`);
+}
+
+// ---------- Apparence ----------
+function appearanceBodyHTML(){
+  const opts = [["auto","Auto"],["light","Clair"],["dark","Sombre"]];
+  return `<div class="chips" style="padding-top:4px">${opts.map(([v,l])=>`<button class="chip ${S.settings.theme===v?"on":""}" data-a="setTheme" data-v="${v}">${l}</button>`).join("")}</div>`;
+}
+function openAppearance(){
+  openSheet(`<div class="sheet-hd"><span class="t">Apparence</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${appearanceBodyHTML()}</div>`);
+}
+
+// ---------- À propos ----------
+function openAbout(){
+  openSheet(`<div class="sheet-hd"><span class="t">À propos</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+    <div class="sheet-body">
+    <p class="body" style="margin-top:4px">Forge est une app de suivi de musculation pensée pour un usage solo sur iPhone. Elle propose une séance chaque jour à partir de ton matériel, de tes objectifs et de ton historique, grâce à un moteur de règles 100% local — aucune donnée n'est envoyée sur un serveur.</p>
+    <h2 class="sh">Version</h2><p class="body">Forge v${APP_VERSION}</p>
+    <h2 class="sh">Données</h2><p class="body">Toutes les données (séances, matériel, objectifs, trophées) restent stockées uniquement sur cet appareil, dans le stockage local du navigateur. Aucun compte, aucun serveur.</p>
+    <h2 class="sh">Avertissement</h2><p class="body">Les consignes d'exécution proposées sont des repères techniques généraux. Elles ne remplacent pas l'avis d'un professionnel de santé ou d'un coach pour toute question médicale ou en cas de douleur.</p>
+    <h2 class="sh">Copyright</h2><p class="body">${COPYRIGHT}</p>
+    </div>`);
+}
+
+Object.assign(ACT, {
+  openEquip, openGoals, openExoPrefs, openExportImport, openAppearance, openAbout,
+  toggleEquip(d){ S.equipment.owned[d.id] = !S.equipment.owned[d.id]; save(); refreshEquip(); },
+  addWeight(d){
+    const input = qs("#wadd-"+d.id); const v = parseFloat(input.value);
+    if(!isNaN(v) && v>0){ S.equipment.weights[d.id] = Array.from(new Set([...(S.equipment.weights[d.id]||[]), v])); save(); }
+    refreshEquip();
+  },
+  removeWeight(d){
+    S.equipment.weights[d.id] = (S.equipment.weights[d.id]||[]).filter(w=>w!==parseFloat(d.w));
+    save(); refreshEquip();
+  },
+  addCustomEquip(){
+    const input = qs("#customEquipName"); const v = (input.value||"").trim();
+    if(v){ S.equipment.custom.push({id:uid(),n:v}); save(); }
+    refreshEquip();
+  },
+  removeCustom(d){ S.equipment.custom = S.equipment.custom.filter(c=>c.id!==d.id); save(); refreshEquip(); },
+
+  setGoalOverall(d){ S.goals.overall = d.v; save(); refreshGoals(); },
+  setSessionLength(d){ S.goals.sessionLength = d.v; save(); refreshGoals(); },
+  stepDays(d){ S.goals.daysPerWeek = Math.max(2,Math.min(6, S.goals.daysPerWeek+parseInt(d.d,10))); save(); refreshGoals(); },
+  cycleEmphasis(d){
+    const cur = S.goals.emphasis[d.id]||"normal";
+    S.goals.emphasis[d.id] = cur==="normal"?"prioriser":cur==="prioriser"?"eviter":"normal";
+    save(); refreshGoals();
+  },
+
+  toggleExcluded(d){
+    const i = S.prefs.excluded.indexOf(d.id);
+    if(i>=0) S.prefs.excluded.splice(i,1); else { S.prefs.excluded.push(d.id); S.prefs.included = S.prefs.included.filter(x=>x!==d.id); }
+    save(); refreshExoPrefs();
+  },
+  toggleIncluded(d){
+    const i = S.prefs.included.indexOf(d.id);
+    if(i>=0) S.prefs.included.splice(i,1); else { S.prefs.included.push(d.id); S.prefs.excluded = S.prefs.excluded.filter(x=>x!==d.id); }
+    save(); refreshExoPrefs();
+  },
+
+  copyPrompt(){
+    const text = buildExportPrompt();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>toast("Prompt copié !")).catch(()=>toast("Copie impossible — sélectionne le texte manuellement"));
+    } else toast("Sélectionne le texte ci-dessous pour le copier");
+  },
+  triggerImport(){ const f = qs("#fileImport"); if(f) f.click(); },
+  clearImported(){
+    confirmSheet({ title:"Supprimer le programme importé ?", ok:"Supprimer", danger:true, onOk:()=>{ S.importedProgram=[]; save(); closeSheet(); changed(); } });
+  },
+
+  setTheme(d){ S.settings.theme = d.v; save(); applyTheme(); const b=qs(".sheet-body"); if(b) b.innerHTML = appearanceBodyHTML(); changed(); },
+
+  confirmReset(){
+    confirmSheet({ title:"Réinitialiser toutes les données ?", html:"Cette action est irréversible : séances, matériel, objectifs et trophées seront définitivement supprimés.", ok:"Tout supprimer", danger:true,
+      onOk:()=>{ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+  },
+});
+VIEWS.profil = renderProfil;
+// ================= INITIALISATION =================
+const APP_VERSION = "1.0";
+const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
+
+function applyTheme(){
+  const t = S.settings.theme;
+  if(t==="light") document.documentElement.setAttribute("data-theme","light");
+  else if(t==="dark") document.documentElement.setAttribute("data-theme","dark");
+  else document.documentElement.removeAttribute("data-theme");
+}
+
+function init(){
+  buildShell();
+  applyTheme();
+  switchTab("today");
+
+  const fi = qs("#fileImport");
+  if(fi){
+    fi.addEventListener("change", async (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const text = await file.text();
+      const res = importProgramJSON(text);
+      fi.value = "";
+      if(res.ok){
+        toast(`Programme importé : ${res.count} séance(s)`);
+        changed();
+        if(res.warnings && res.warnings.length){
+          setTimeout(()=>openModal(`<div style="font-weight:700">Avertissements</div>
+            <div class="hr-note" style="margin-top:8px;text-align:left">${res.warnings.map(esc).join("<br>")}</div>
+            <button class="btn secondary" style="margin-top:14px" data-a="closesheet">OK</button>`), 380);
+        }
+      } else {
+        openModal(`<div style="font-weight:700;color:var(--red)">Import impossible</div>
+          <div class="hr-note" style="margin-top:8px">${esc(res.error)}</div>
+          <button class="btn secondary" style="margin-top:14px" data-a="closesheet">OK</button>`);
+      }
+    });
+  }
+}
+
+init();
+</script></body></html>
