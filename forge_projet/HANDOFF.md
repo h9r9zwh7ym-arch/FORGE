@@ -8,7 +8,7 @@ Tu reprends **Forge**, une app web de suivi de musculation pour iPhone, dévelop
 - Usage **solo sur iPhone (Safari)**. Cible réelle = Safari/WebKit, même si le développement peut se tester sous Chromium.
 - **Véracité des informations d'exercice** : toute consigne d'exécution ou de sécurité ajoutée doit s'appuyer sur des repères techniques reconnus (alignement articulaire, dos neutre, amplitude contrôlée...). Ne jamais inventer une consigne dangereuse. En cas de doute, reste conservateur et renvoie vers un professionnel.
 - **100% local** : aucun backend, aucun compte, aucun appel réseau. Tout est stocké dans `localStorage` (clé `forge.v1`).
-- **Numérotation des versions** : version actuelle **1.1**. Incrémente `APP_VERSION` (`src/init.js`) à chaque livraison notable.
+- **Numérotation des versions** : version actuelle **1.2**. Incrémente `APP_VERSION` (`src/init.js`) à chaque livraison notable.
 - Copyright affiché dans « À propos » : `© <année> Yannick Wahler. Tous droits réservés.` (constante `COPYRIGHT`, `src/init.js`).
 - Cahier des charges d'origine : voir la conversation initiale (résumé ci-dessous, section 6).
 
@@ -42,10 +42,14 @@ init.js
 - **`engine.js`** : moteur de suggestion 100% local. `getOrCreateDraft()` génère ou récupère la séance du jour. `generateEngineSession()` fait la rotation des groupes musculaires + progression de charge. `buildExportPrompt()` / `importProgramJSON()` gèrent l'aller-retour avec une IA externe (voir section 5).
 - **`ui_shell.js`** : tabbar, sheets/modals, toast, délégation d'actions par `data-a="nom"` → `ACT.nom(dataset, élément)` (clic) et `data-c="nom"` (changement d'un input).
 - **Vues** (`view_*.js`) : chacune expose une fonction assignée à `VIEWS.<id>` et ajoute ses handlers à `ACT` via `Object.assign(ACT, {...})`. **Convention importante, comme dans Zeste** : si tu ajoutes un module après un autre, tu peux enrichir `ACT` par `Object.assign`, ou redéfinir une fonction existante (la déclaration la plus tardive gagne, hissage JS). Avant de modifier une fonction, vérifie qu'elle n'est pas redéfinie ailleurs.
-- **État** (`S`, voir `core.js: defaultState()`) : `equipment`, `prefs` (exclus/privilégiés), `goals`, `sessions` (historique complet), `draft` (séance du jour, éditable), `importedProgram` (file d'attente de séances importées), `trophies`, `settings`, `meta`.
+- **État** (`S`, voir `core.js: defaultState()`) : `equipment`, `prefs` (exclus/privilégiés), `goals`, `sessions` (historique complet), `draft` (séance du jour, éditable), `custom` (« Ma séance » en cours de composition : `{exos:[{exoId,sets}], name}`), `templates` (modèles enregistrés), `importedProgram` (file d'attente de séances importées), `medals` (`{famille: {t: palier 0-4, d: {palier: date ISO}}}`), `settings` (dont `todayMode` : `proposal`/`custom`), `meta` (dont `prCount`). L'ancien champ `trophies` (v1.0-1.1) est supprimé au chargement.
 - **Rendu** : `renderView(id)` régénère tout le HTML de l'onglet actif. `changed()` sauvegarde et redessine, sauf si une sheet est ouverte (elle sera redessinée à la fermeture via `dirtyOnClose`). Les inputs texte (reps/poids) utilisent l'événement `change` (pas `input`) pour ne pas perdre le focus à chaque frappe — ils ne déclenchent qu'un `save()`, pas un `changed()` complet.
 
 ### Piège déjà rencontré
+
+- **Dates en heure locale, jamais `toISOString()`** : `toISOString()` convertit en UTC ; en Suisse (UTC+1/+2) un minuit local devient la veille. Avant la v1.2, `weekKey()` renvoyait un dimanche et la boucle des semaines consécutives dérivait d'un jour par semaine, cassant les séries de plus d'une semaine. Toujours passer par `localISO(d)`, `todayISO()`, `addDaysISO()` (`core.js`). Les horodatages complets (`startedAt`, `completedAt`) restent en ISO UTC, c'est voulu.
+- **Info-bulles des graphiques** : un point de graphique est focusable (`tabindex`) ; le `focusin` se déclenche avant le `click`. Un clic ne doit donc pas « basculer » la bulle, sinon elle s'ouvre au focus puis se ferme au clic (bug trouvé par test). Un appui sur un point affiche toujours sa bulle, un appui ailleurs la masque.
+- **Fermeture différée de `#overlay`** : `closeSheet()` nettoie l'overlay 300 ms plus tard. Depuis la v1.2 un compteur (`overlayGen`) empêche ce nettoyage d'effacer une sheet ou une modale ouverte entre-temps (ex. confirmation → célébration). Toujours passer par `openSheet`/`openModal`.
 
 - **`#restbar` (barre de repos) chevauchant le contenu au scroll** : `#restbar` est positionné en `position:absolute` par rapport au viewport (hors du conteneur scrollable `.view`), donc il reste visuellement fixe pendant que le contenu défile en dessous. Le bouton « Terminer la séance » pouvait se retrouver caché derrière au mauvais moment. Fix appliqué : `padding-bottom` généreux (`180px`) sur `.view` pour garantir qu'on peut toujours faire défiler les boutons au-dessus de la zone occupée par la barre de repos. Si tu ajoutes d'autres éléments fixes en bas d'écran, vérifie ce chevauchement.
 - **Sélecteurs ambigus `data-a="closesheet"`** : le `scrim` (fond assombri) ET les boutons de fermeture partagent `data-a="closesheet"`. Si tu écris un test Playwright, cible précisément le bouton (`.sheet-hd [data-a="closesheet"]` ou `.center-modal [data-a="closesheet"]`), sinon le clic peut atterrir sur le scrim et être intercepté par la sheet/modal elle-même.
@@ -75,24 +79,40 @@ YaYa a demandé, après la v1.0, une expérience proche du « mode barman » de 
 - La fiche détail d'un exercice (`showExoInfo`) a été enrichie : gros pictogramme, consignes numérotées avec animation d'apparition décalée (`.cue-item`, `animation-delay`), encart sécurité mis en évidence (`.safety-box`).
 - Motivation : `motivRowHTML()` sur l'écran « avant de commencer » affiche un anneau des séances de la semaine (objectif = `S.goals.daysPerWeek`) et un badge de streak. Fonctions ajoutées dans `core.js` : `sessionsThisWeek()`.
 
-## 7. Cahier des charges d'origine (résumé)
+## 7. Séances au choix, statistiques et médailles (v1.2)
+
+Demande de YaYa : pouvoir dire quelle séance on veut faire, séparer la proposition de « notre » séance, retirer « Comment te sens-tu ? », plus de statistiques et de graphiques, des trophées à paliers, plus d'animations.
+
+- **Onglet Aujourd'hui** : contrôle segmenté **Proposée / Ma séance** (`S.settings.todayMode`).
+  - *Proposée* : puces de **type de séance** (`SESSION_TYPES` dans `engine.js` : Auto, Corps complet, Haut, Bas, Poussée, Tirage, Bras, Gainage & cardio). `generateEngineSession(type, avoid)` restreint le vivier par muscle principal (`poolForType`). « Auto » choisit selon la récupération (`resolveAutoType`) et l'explique dans `draft.reason`. « Autre proposition » pénalise les exercices de la proposition précédente et ajoute un léger aléa, pour que la proposition change vraiment.
+  - *Ma séance* : composition libre (`S.custom`), nombre de séries par exercice, **modèles** réutilisables (`S.templates`), « Partir de la séance proposée », et « Refaire cette séance » depuis l'historique. `buildCustomSession()` calcule charges et répétitions avec le même moteur de progression.
+  - Sélecteur d'exercices commun (`openPicker`) : recherche, filtre par muscle, multi-sélection avec bouton en pied de sheet (`openSheet(html,{tall, footer})`).
+- **Fin de séance** : plus de question de ressenti. `finishSession` demande confirmation seulement s'il reste des séries non validées ; les exercices sans série validée ne sont pas enregistrés. Célébration : confettis (canvas, `confettiBurst`), XP gagnée, montée de niveau, médailles débloquées.
+- **Séance en cours** : rappel « la dernière fois », saisie directe d'une valeur en touchant le nombre (`promptNumber`), report d'une modification de charge/reps sur les séries suivantes, séries record marquées `st.pr` (un record doit battre l'historique **et** les séries déjà validées de la séance, sinon il compterait deux fois). `isNewPR` ne compte plus la toute première séance d'un exercice.
+- **Médailles** (`trophies.js`) : 15 familles × 4 paliers (bronze, argent, or, platine), seuils dans `MEDALS[].t`, valeur courante via `val()`. `checkMedals(silent)` est appelé à l'initialisation en mode silencieux (rattrapage après mise à jour) puis à chaque fin de séance. Unité au singulier via `one`.
+- **Niveau** (`core.js`) : XP = 50/séance + 2/série + 10/record + points de médailles (10/25/50/100). Niveau L atteint à 125·L·(L−1) XP. Titres de « Apprenti·e » à « Légende de la forge ».
+- **Progrès** : sections Vue d'ensemble (niveau, chiffres clés, calendrier de régularité sur 18 semaines, séances et tonnage par semaine avec objectif, répartition musculaire sur 30 jours, derniers records), Exercices (mini-courbes, fiche avec 1RM estimé ou meilleure série, tonnage par séance, dernières séances), Médailles (bilan par palier, prochains paliers, grille).
+- **Graphiques** (`charts.js`) : suivi des règles du skill *dataviz* — une seule série par graphique, couleur d'accent, période en cours mise en valeur, étiquettes sélectives, lignes de grille fines, info-bulle au toucher, tableau « Voir les données » sous chaque graphique. Colonnes et calendrier en **HTML** (piège Safari de Zeste : les animations CSS à l'intérieur d'un SVG bouclent quand un parent anime) ; courbes en SVG révélées par un `clip-path` animé sur leur conteneur HTML.
+- **Animations** : `renderViewAnimated(id)` ajoute la classe `.enter` le temps d'une entrée d'onglet/de section (apparition décalée des éléments `.stagger`, barres qui poussent, compteurs `data-count` animés par `animateCounts`). Les rendus après une simple action (`changed()`) ne rejouent pas ces animations. Indicateur glissant des contrôles segmentés : `segHTML` + `settleSegs`. Tout est coupé sous `prefers-reduced-motion`.
+
+## 8. Cahier des charges d'origine (résumé)
 
 Voir le fichier `4a3df5ee-cahier-des-charges-forge.md` fourni au lancement du projet pour le texte complet. Points clés déjà couverts en v1.0 : matériel personnalisable et extensible, bibliothèque d'exercices filtrée, inclusion/exclusion d'exercices, objectifs personnalisés, suivi détaillé de séance (éditable, timer de repos, coche rapide), moteur de suggestion 100% local avec export/import IA, graphiques de progression, PR, streaks/régularité, trophées, écran d'accueil = séance du jour, thème clair/sombre automatique, page À propos avec copyright.
 
-## 8. Chantiers proposés pour la suite
+## 9. Chantiers proposés pour la suite
 
-1. Historique modifiable a posteriori (éditer une séance déjà enregistrée).
+1. Historique modifiable a posteriori (éditer les séries d'une séance déjà enregistrée ; la suppression existe depuis la v1.2).
 2. Export/partage d'une séance ou d'un récap (image), comme le Rewind de Zeste.
 3. Tests automatisés versionnés dans le dépôt (actuellement les tests Playwright ont été écrits et exécutés en session mais pas committés — à formaliser dans un dossier `tests/` si utile).
 4. Vérification de chaque exercice avec une source nommée (NSCA/ACSM/NASM) si YaYa souhaite le même niveau de rigueur que les recettes de Zeste.
 5. Vrai test sur iPhone Safari via WebKit : **bloqué dans cet environnement cloud** — `playwright install webkit` télécharge le binaire depuis `cdn.playwright.dev` / `playwright.download.prss.microsoft.com`, tous deux refusés par la politique réseau de l'environnement (403 « request blocked »). Les dépendances système WebKitGTK, elles, s'installent sans problème. Pour débloquer : ajouter l'un de ces deux hôtes à la liste des domaines autorisés dans les réglages réseau de l'environnement (menu de l'environnement cloud → Modifier), puis relancer `playwright install webkit`.
 6. Geste de balayage (swipe) pour naviguer entre exercices en mode focus, en plus des flèches actuelles — nécessiterait de gérer `touchstart`/`touchend` proprement sans casser le scroll vertical.
 
-## 9. Aperçu en artifact Claude
+## 10. Aperçu en artifact Claude
 
 En plus du dépôt Git (source de vérité), l'app peut être publiée comme Artifact claude.ai pour un aperçu rapide sans avoir à cloner/ouvrir le fichier : extraire le `<title>`, le `<style>` et le contenu de `<body>` de `dist/forge.html` (sans les balises `<!doctype>`/`<html>`/`<head>`/`<body>`, qu'un Artifact fournit lui-même), puis publier ce fragment avec l'outil Artifact. L'app n'utilise aucune ressource externe (polices système, pas de script CDN), donc elle passe telle quelle la politique de sécurité des Artifacts. Ce n'est qu'un aperçu de confort : le livrable réel reste le fichier unique du dépôt.
 
-## 10. Méthode de travail attendue
+## 11. Méthode de travail attendue
 
 - Lire le code concerné avant de modifier, ne pas réécrire inutilement.
 - Un changement à la fois, reconstruire (`sh build.sh`), tester (au minimum un smoke test navigateur : tous les onglets, démarrer/terminer une séance en mode focus, naviguer entre exercices, ouvrir les sheets du Profil).

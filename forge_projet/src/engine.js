@@ -120,40 +120,101 @@ function stepWeightValue(exo, current, dir){
   return Math.max(0, round1(current+dir*inc));
 }
 
-function pickExosForSession(n){
-  const pool = availableExos();
+// ---------- types de séance ----------
+const UPPER = ["pect","dos","epaules","biceps","triceps","avantbras"];
+const LOWER = ["quadriceps","ischios","fessiers","mollets"];
+const SESSION_TYPES = [
+  { id:"auto", n:"Auto",           em:"✨", muscles:null },
+  { id:"full", n:"Corps complet",  em:"🧍", muscles:null },
+  { id:"haut", n:"Haut du corps",  em:"💪", muscles:UPPER },
+  { id:"bas",  n:"Bas du corps",   em:"🦵", muscles:LOWER },
+  { id:"push", n:"Poussée",        em:"⬆️", muscles:["pect","epaules","triceps"] },
+  { id:"pull", n:"Tirage",         em:"⬇️", muscles:["dos","biceps","avantbras"] },
+  { id:"bras", n:"Bras",           em:"🦾", muscles:["biceps","triceps","avantbras"] },
+  { id:"core", n:"Gainage & cardio", em:"🔥", muscles:["abdos","cardio"] },
+];
+const SESSION_TYPE_MAP = {}; SESSION_TYPES.forEach(t=>SESSION_TYPE_MAP[t.id]=t);
+
+// « Auto » choisit un type selon la récupération : on évite de retravailler une
+// zone sollicitée il y a moins de 2 jours.
+function resolveAutoType(){
+  const recent = ms => ms.some(m=>daysSinceTrained(m)<2);
+  const upRecent = recent(UPPER), lowRecent = recent(LOWER);
+  if(lowRecent && !upRecent) return { type:"haut", reason:"Tes jambes ont travaillé récemment : on cible le haut du corps." };
+  if(upRecent && !lowRecent) return { type:"bas", reason:"Le haut du corps a travaillé récemment : on cible les jambes." };
+  if(upRecent && lowRecent) return { type:"core", reason:"Tout le corps a travaillé récemment : séance plus légère de gainage." };
+  return { type:"full", reason:"Tu es bien récupéré·e : séance corps complet, en priorité les groupes les moins travaillés." };
+}
+
+function poolForType(typeId){
+  const t = SESSION_TYPE_MAP[typeId];
+  const base = availableExos();
+  if(!t || !t.muscles) return base;
+  const primary = base.filter(e=>t.muscles.includes(e.muscles[0]));
+  if(primary.length>=3) return primary;
+  return base.filter(e=>e.muscles.some(m=>t.muscles.includes(m)));
+}
+
+// avoid : exercices de la proposition précédente, fortement pénalisés pour que
+// « Autre proposition » change vraiment. Le léger aléa départage les ex æquo.
+function pickExosForSession(n, pool, avoid){
+  pool = pool || availableExos();
+  avoid = avoid || new Set();
+  const score = {};
+  pool.forEach(e=>{ score[e.id] = scoreExo(e) + Math.random()*1.2 - (avoid.has(e.id)?6:0); });
+  const byScore = (a,b)=>score[b.id]-score[a.id];
   const chosen = [];
   const usedIds = new Set();
-  let bucketI = 0, guard=0;
-  while(chosen.length<n && guard<200){
-    guard++;
+  for(let bucketI=0; chosen.length<n && bucketI<PATTERN_CYCLE.length*3; bucketI++){
     const pattern = PATTERN_CYCLE[bucketI % PATTERN_CYCLE.length];
-    bucketI++;
-    const candidates = pool.filter(e=>e.pattern===pattern && !usedIds.has(e.id));
-    if(candidates.length){
-      candidates.sort((a,b)=>scoreExo(b)-scoreExo(a));
-      chosen.push(candidates[0]);
-      usedIds.add(candidates[0].id);
-    }
-    if(bucketI>PATTERN_CYCLE.length*3) break;
+    const candidates = pool.filter(e=>e.pattern===pattern && !usedIds.has(e.id)).sort(byScore);
+    if(candidates.length){ chosen.push(candidates[0]); usedIds.add(candidates[0].id); }
   }
   if(chosen.length<n){
-    const rest = pool.filter(e=>!usedIds.has(e.id)).sort((a,b)=>scoreExo(b)-scoreExo(a));
+    const rest = pool.filter(e=>!usedIds.has(e.id)).sort(byScore);
     for(const e of rest){ if(chosen.length>=n) break; chosen.push(e); usedIds.add(e.id); }
   }
   return chosen;
 }
 
-function generateEngineSession(){
+function sessionEntryFor(exo, setsN){
+  const sug = suggestForExo(exo);
+  const n = setsN || exo.sets;
+  return { exoId:exo.id, targetSets:n, targetReps:sug.targetReps, note:sug.note, sets:buildSetsFor(Object.assign({},exo,{sets:n}),sug) };
+}
+
+function generateEngineSession(typeId, avoid){
+  typeId = typeId || "auto";
+  let resolved = typeId, reason = null;
+  if(typeId==="auto"){ const r = resolveAutoType(); resolved = r.type; reason = r.reason; }
   const n = SESSION_SIZE[S.goals.sessionLength] || 6;
-  const exos = pickExosForSession(n);
+  const exos = pickExosForSession(resolved==="core" ? Math.min(n,5) : n, poolForType(resolved), avoid);
   return {
-    id: uid(), date: todayISO(), source:"engine", startedAt:null, completedAt:null, feeling:null,
-    exos: exos.map(exo=>{
-      const sug = suggestForExo(exo);
-      return { exoId:exo.id, targetSets:exo.sets, targetReps:sug.targetReps, note:sug.note, sets:buildSetsFor(exo,sug) };
-    })
+    id: uid(), date: todayISO(), source:"engine", type:typeId, resolvedType:resolved, reason,
+    startedAt:null, completedAt:null,
+    exos: exos.map(exo=>sessionEntryFor(exo))
   };
+}
+
+function buildCustomSession(entries, name){
+  return {
+    id: uid(), date: todayISO(), source:"custom", name: name||null, startedAt:null, completedAt:null,
+    exos: entries.filter(e=>EXO_MAP[e.exoId]).map(e=>sessionEntryFor(EXO_MAP[e.exoId], e.sets))
+  };
+}
+
+// durée estimée : ~40 s d'effort par série + le repos prévu
+function estimateMinutes(session){
+  const sec = session.exos.reduce((t,ex)=>{
+    const def = EXO_MAP[ex.exoId]; if(!def) return t;
+    return t + ex.sets.length*(40+def.restSec);
+  },0);
+  return Math.max(5, Math.round(sec/60/5)*5);
+}
+function focusMuscles(session){
+  const count = {};
+  session.exos.forEach(ex=>{ const d=EXO_MAP[ex.exoId]; if(d) count[d.muscles[0]]=(count[d.muscles[0]]||0)+ex.sets.length; });
+  return Object.keys(count).sort((a,b)=>count[b]-count[a]);
 }
 
 function resolveExoRef(ref){
@@ -179,19 +240,18 @@ function buildSessionFromImported(prog){
       if(!isNaN(a)&&!isNaN(b)) reps=[a,b];
     } else if(typeof ref.reps==="number"){ reps=[ref.reps,ref.reps]; }
     const weight = (ref.poids!=null?ref.poids:ref.weight!=null?ref.weight:null);
+    const mid = Math.round((reps[0]+reps[1])/2);
     const sets = [];
-    for(let i=0;i<setsN;i++) sets.push({reps:null,weight,done:false,rpe:null});
+    for(let i=0;i<setsN;i++) sets.push({reps:mid,weight,done:false,rpe:null});
     exos.push({ exoId:exo.id, targetSets:setsN, targetReps:reps, note:null, sets });
   });
-  return { id:uid(), date:todayISO(), source:"imported", startedAt:null, completedAt:null, feeling:null,
+  return { id:uid(), date:todayISO(), source:"imported", startedAt:null, completedAt:null,
     name: prog.nom||prog.name||null, exos, warnings };
 }
 
 function getOrCreateDraft(){
-  if(S.draft && S.draft.date===todayISO()) return S.draft;
-  if(S.draft && S.draft.date!==todayISO() && !S.draft.completedAt){
-    // séance d'un jour précédent jamais terminée : on la garde disponible mais on en propose une nouvelle
-  }
+  // une séance démarrée reste active même si minuit passe pendant l'entraînement
+  if(S.draft && (S.draft.date===todayISO() || S.draft.startedAt)) return S.draft;
   if(S.importedProgram && S.importedProgram.length){
     S.draft = buildSessionFromImported(S.importedProgram[0]);
   } else {
@@ -201,8 +261,11 @@ function getOrCreateDraft(){
   return S.draft;
 }
 
-function regenerateDraft(){
-  S.draft = S.importedProgram && S.importedProgram.length ? buildSessionFromImported(S.importedProgram[0]) : generateEngineSession();
+// typeId : type de séance voulu ; sans typeId on garde le type actuel et on varie les exercices
+function regenerateDraft(typeId){
+  const prev = S.draft;
+  const avoid = !typeId && prev ? new Set(prev.exos.map(e=>e.exoId)) : null;
+  S.draft = generateEngineSession(typeId || (prev&&prev.type) || "auto", avoid);
   save();
   return S.draft;
 }
@@ -226,7 +289,7 @@ function buildExportPrompt(){
       const detail = done.map(st=>`${st.reps||"?"}x${st.weight!=null?st.weight+"kg":"pdc"}`).join(", ");
       return `  - ${def.n} : ${detail}`;
     }).filter(Boolean).join("\n");
-    return `${fmtDate(s.date)} (ressenti ${s.feeling||"?"}/5)\n${lines}`;
+    return `${fmtDate(s.date)}${s.durationSec?" ("+Math.round(s.durationSec/60)+" min)":""}\n${lines}`;
   }).join("\n");
 
   return `Voici mon profil d'entraînement (app Forge). Peux-tu me proposer un programme de musculation adapté ?

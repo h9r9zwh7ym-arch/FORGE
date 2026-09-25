@@ -1,5 +1,5 @@
 // ================= INITIALISATION =================
-const APP_VERSION = "1.1";
+const APP_VERSION = "1.2";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){
@@ -12,6 +12,7 @@ function applyTheme(){
 function init(){
   buildShell();
   applyTheme();
+  checkMedals(true); // médailles déjà méritées (ex. après mise à jour) : attribuées sans célébration
   switchTab("today");
 
   const fi = qs("#fileImport");
