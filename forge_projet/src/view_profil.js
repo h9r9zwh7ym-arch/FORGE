@@ -22,6 +22,7 @@ function profileHeroHTML(){
     ${[1,2,3,4].map(k=>`<div><span class="pip big t${k}"></span><b data-count="${c[k]}">${c[k]}</b><small>${TIERS[k].n}</small></div>`).join("")}
   </div>`;
 }
+let profMoreOpen = false;
 function profileStatsHTML(){
   if(!S.sessions.length) return "";
   const fav = favoriteExercise(), wd = favoriteWeekday(), moment = favoriteMoment(), bw = bestWeek();
@@ -37,8 +38,8 @@ function profileStatsHTML(){
     ["💥","Records battus", S.meta.prCount||0, `${distinctExosCount()} exercice${distinctExosCount()>1?"s":""} pratiqué${distinctExosCount()>1?"s":""}`],
   ];
   const lifts = topLifts(5);
-  return `<h2 class="sh">Mes habitudes<button class="more" data-a="tab" data-id="progress">Tout voir</button></h2>
-    <div class="group">${rows.map((r,i)=>`<div class="row stat-row stagger" style="--i:${i+2}">
+  return `<h2 class="sh">Mes habitudes<button class="more" data-a="profMore">${profMoreOpen?"Moins":"Plus"}</button></h2>
+    <div class="group habits ${profMoreOpen?"open":""}">${rows.map((r,i)=>`<div class="row stat-row stagger ${i>=4?"extra":""}" style="--i:${i+2}">
       <div class="ico" style="background:var(--fill);font-size:16px">${r[0]}</div>
       <div class="grow"><div class="t">${r[1]}</div>${r[3]?`<div class="s">${r[3]}</div>`:""}</div>
       <div class="val strong">${r[2]}</div>
@@ -50,6 +51,15 @@ function profileStatsHTML(){
     </button>`).join("")}</div>`:""}`;
 }
 
+Object.assign(ACT, {
+  profMore(d, el){
+    profMoreOpen = !profMoreOpen;
+    const g = qs("#v-profil .group.habits");
+    if(el) el.textContent = profMoreOpen ? "Moins" : "Plus";
+    if(!g) return changed();
+    morphHeight(g, ()=>{ g.classList.toggle("open", profMoreOpen); g.classList.remove("clp-in"); if(profMoreOpen){ void g.offsetWidth; g.classList.add("clp-in"); } });
+  },
+});
 function renderProfil(){
   return `<div class="navbar"><div class="nb-title">Profil</div></div><div class="content">
     <h1 class="lt">Profil</h1>

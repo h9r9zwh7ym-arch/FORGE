@@ -5,6 +5,8 @@
 
 let liveFocusIdx = 0;
 let focusAnimDir = null;
+let valRoll = {};       // sens du défilement du chiffre modifié (+/−)
+let restReady = false;  // le repos vient de se terminer
 let stripBump = -1; // pastille du bandeau qui « rebondit » après une série validée
 let justDone = null; // {exi, si} : série qui vient d'être validée (animation du point)
 
@@ -72,13 +74,13 @@ function heroHTML(draft){
   const planned = plannedTemplate();
   let kind, eyebrow, title, meta, ids, act, region;
   if(planned){
-    kind = "planned"; eyebrow = "📌 Prévu aujourd'hui"; title = esc(planned.n);
+    kind = "planned"; eyebrow = "Prévu aujourd'hui"; title = esc(planned.n);
     ids = planned.exos.map(e=>e.exoId); region = tplRegion(planned);
     const sets = planned.exos.reduce((a,e)=>a+e.sets,0);
     meta = [`${planned.exos.length} exercices`, `${sets} séries`, `≈ ${tplMinutes(planned)} min`];
     act = `data-a="startTemplate" data-id="${planned.id}"`;
   } else if(S.settings.todayTab!=="proposal" && S.custom.exos.length){
-    kind = "custom"; eyebrow = "✍️ Ma séance est prête"; title = esc(S.custom.name||"Ma séance");
+    kind = "custom"; eyebrow = "Ma séance est prête"; title = esc(S.custom.name||"Ma séance");
     ids = S.custom.exos.map(e=>e.exoId);
     const sets = S.custom.exos.reduce((a,e)=>a+e.sets,0);
     meta = [`${ids.length} exercices`, `${sets} séries`, `≈ ${estimateMinutes({ exos:S.custom.exos.map(e=>({ exoId:e.exoId, sets:new Array(e.sets).fill(0) })) })} min`];
@@ -87,7 +89,7 @@ function heroHTML(draft){
     if(!draft.exos.length) return "";
     kind = "proposal";
     const t = SESSION_TYPE_MAP[draft.type]||SESSION_TYPES[0], rt = SESSION_TYPE_MAP[draft.resolvedType];
-    eyebrow = draft.source==="imported" ? "📥 Programme importé" : draft.type==="auto" ? "✨ Choisie pour toi" : "Séance proposée";
+    eyebrow = draft.source==="imported" ? "Programme importé" : draft.type==="auto" ? "Choisie pour toi" : "Séance proposée";
     title = draft.source==="imported" ? esc(draft.name||"Séance importée") : draft.type==="auto" && rt ? rt.n : t.n;
     ids = draft.exos.map(e=>e.exoId);
     meta = [`${ids.length} exercices`, `${draft.exos.reduce((t,e)=>t+e.sets.length,0)} séries`, `≈ ${estimateMinutes(draft)} min`];
@@ -135,7 +137,7 @@ function catLabel(def){ const c = EXO_CATS.find(c=>c.id===exoCategory(def)); ret
 function proposalPaneHTML(draft){
   const imported = draft.source==="imported";
   const heroShown = !sessionsToday().length && !plannedTemplate();
-  const typeChips = SESSION_TYPES.map(t=>`<button class="type-chip ${!imported&&draft.type===t.id?"on":""}" data-a="setType" data-v="${t.id}"><span>${t.em}</span>${t.n}</button>`).join("");
+  const typeChips = SESSION_TYPES.map(t=>`<button class="type-chip ${!imported&&draft.type===t.id?"on":""}" data-a="setType" data-v="${t.id}">${t.n}</button>`).join("");
   let hero;
   if(imported){
     hero = `<div class="plan-card stagger" style="--i:1">
@@ -372,48 +374,72 @@ function refreshPickerFooter(){
 
 // ---------- séance en cours ----------
 function renderTodayLive(draft){
+  const nav = `<div class="navbar live-nav"><div class="nb-left"><button class="icon-btn" aria-label="Abandonner la séance" data-a="abandonSession">${icon("close")}</button></div><div class="nb-title">${esc(liveName(draft))}</div><div class="nb-right"><button class="nb-done" data-a="finishSession">Terminer</button></div></div>`;
   if(!draft.exos.length){
-    return `<div class="navbar"><div class="nb-title">Séance en cours</div><div class="nb-right"><button class="icon-btn" aria-label="Abandonner" data-a="abandonSession">${icon("trash")}</button></div></div>
-    <div class="content"><h1 class="lt">Séance en cours</h1><div class="empty-state"><span class="em">🧰</span>Tous les exercices ont été retirés.<br>Ajoute-en un pour continuer.</div>
+    return `${nav}<div class="content"><div class="empty-state"><span class="em">🧰</span>Tous les exercices ont été retirés.<br>Ajoute-en un pour continuer.</div>
     <div class="btnrow"><button class="btn" data-a="addExoOpen">${icon("plus")} Ajouter un exercice</button></div></div>`;
   }
-  return `<div class="navbar"><div class="nb-title">Séance en cours</div><div class="nb-right"><button class="icon-btn" aria-label="Abandonner" data-a="abandonSession">${icon("trash")}</button></div></div>
-  <div class="content">
-    <div class="eyebrow" id="todayEyebrow">${liveEyebrow(draft)}</div>
-    <h1 class="lt">${esc(draft.name || (draft.source==="custom"?"Ma séance":"Séance en cours"))}</h1>
+  return `${nav}
+  <div class="content live">
+    <div class="live-head" id="liveHead">${liveHeadHTML(draft)}</div>
     <div class="live-strip" id="liveStrip">${liveStripHTML(draft)}</div>
     <div id="focusRegion">${renderFocusRegionInner(draft)}</div>
-    <div class="btnrow"><button class="btn" data-a="finishSession">Terminer la séance</button></div>
   </div>`;
+}
+function liveName(draft){ return draft.name || (draft.source==="custom" ? "Ma séance" : (SESSION_TYPE_MAP[draft.resolvedType||draft.type]||{}).n || "Séance"); }
+function liveCounts(draft){
+  const total = draft.exos.reduce((t,e)=>t+e.sets.length,0);
+  const done = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>s.done).length,0);
+  return { total, done, left: total-done, exosLeft: draft.exos.filter(e=>e.sets.some(s=>!s.done)).length };
+}
+function fmtClock(sec){
+  const h = Math.floor(sec/3600), m = Math.floor(sec/60)%60, x = sec%60;
+  return (h ? h+":"+String(m).padStart(2,"0") : m) + ":" + String(x).padStart(2,"0");
+}
+function elapsedSec(draft){ return Math.max(0, Math.round((Date.now()-Date.parse(draft.startedAt))/1000)); }
+function liveHeadHTML(draft){
+  const c = liveCounts(draft), pct = c.total ? c.done/c.total : 0;
+  const segs = draft.exos.map((e,i)=>{
+    const d = e.sets.filter(s=>s.done).length, n = e.sets.length;
+    return `<span class="lp-seg ${i===liveFocusIdx?"current":""} ${d===n?"full":""}" style="flex:${n}"><i style="width:${Math.round(d/n*100)}%"></i></span>`;
+  }).join("");
+  return `<div class="lh-row">
+      <div class="lh-clock"><span id="liveClock">${fmtClock(elapsedSec(draft))}</span><small>${esc(liveName(draft))}</small></div>
+      <div class="lh-pct"><b>${Math.round(pct*100)}<span>%</span></b><small>${c.left ? `${c.left} série${c.left>1?"s":""} à faire` : "tout est fait"}</small></div>
+    </div>
+    <div class="lp-bar" aria-label="${c.done} séries sur ${c.total}">${segs}</div>`;
 }
 function liveStripHTML(draft){
   const idx = Math.min(liveFocusIdx, draft.exos.length-1);
-  const doneExos = draft.exos.filter(e=>e.sets.every(s=>s.done)).length;
-  const left = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>!s.done).length,0);
-  const leftMin = Math.round(draft.exos.reduce((t,e)=>{ const d=EXO_MAP[e.exoId]; return t + e.sets.filter(s=>!s.done).length*(40+(d?d.restSec:60)); },0)/60);
   const chips = draft.exos.map((e,i)=>{
     const def = EXO_MAP[e.exoId], n = e.sets.length, d = e.sets.filter(s=>s.done).length;
-    const cls = (i===idx ? "current" : d===n ? "done" : d ? "started" : "") + (i===stripBump ? " bump" : "");
-    return `<button class="ls-chip ${cls}" data-a="focusJump" data-idx="${i}" aria-label="${esc(def.n)} : ${d} sur ${n} séries">
+    const cls = (i===idx ? "current" : "") + (d===n ? " done" : d ? " started" : " todo") + (i===stripBump ? " bump" : "");
+    return `<button class="ls-chip ${cls}" data-a="focusJump" data-idx="${i}" aria-label="${esc(def.n)} : ${d===n?"terminé":`${d} sur ${n} séries`}">
       <span class="ls-ring r-${regionOf(def)}" style="--p:${Math.round(d/n*100)}"><span>${d===n?icon("check"):pictoSVG(pictoKey(def))}</span></span>
       <span class="ls-name">${esc(def.n)}</span>
       <span class="ls-sets">${d}/${n}</span>
     </button>`;
   }).join("");
-  return `<div class="ls-sum"><span><b>${doneExos}/${draft.exos.length}</b> exercices</span><span><b>${left}</b> série${left>1?"s":""} restante${left>1?"s":""}</span>${left?`<span>≈ ${leftMin} min</span>`:""}</div>
-    <div class="ls-chips" id="lsChips">${chips}</div>`;
+  return `<div class="ls-chips" id="lsChips">${chips}</div>`;
+}
+// prochain exercice qui reste à faire après « from » (en bouclant), ou -1
+function exoFinished0(ex){ return ex.sets.every(s=>s.done); }
+function nextUndone(from){
+  const ex = S.draft.exos, n = ex.length;
+  for(let k=1;k<=n;k++){ const i = (from+k)%n; if(ex[i].sets.some(s=>!s.done)) return i; }
+  return -1;
 }
 function centerStripChip(smooth){
   const strip = qs("#lsChips"), c = strip && qs(".ls-chip.current", strip);
   if(!c) return;
   strip.scrollTo({ left: c.offsetLeft - strip.clientWidth/2 + c.offsetWidth/2, behavior: smooth?"smooth":"auto" });
 }
-function liveEyebrow(draft){
-  const totalSets = draft.exos.reduce((t,e)=>t+e.sets.length,0);
-  const doneSets = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>s.done).length,0);
-  const elapsed = Math.round((Date.now()-Date.parse(draft.startedAt))/1000);
-  return `${fmtDuration(elapsed)} · ${doneSets}/${totalSets} séries`;
-}
+function liveEyebrow(draft){ return fmtClock(elapsedSec(draft)); }
+// chronomètre de séance : une seule mise à jour du texte par seconde
+setInterval(()=>{
+  const c = document.getElementById("liveClock");
+  if(c && S.draft && S.draft.startedAt) c.textContent = fmtClock(elapsedSec(S.draft));
+}, 1000);
 
 function ringSVG(remain, total){
   const r=76, c=2*Math.PI*r;
@@ -435,13 +461,49 @@ function renderFocusRegionInner(draft){
   const idx = Math.min(liveFocusIdx, draft.exos.length-1);
   liveFocusIdx = idx;
   const ex = draft.exos[idx], def = EXO_MAP[ex.exoId];
-  const finishedCount = draft.exos.filter(e=>e.sets.every(s=>s.done)).length;
+  const c = liveCounts(draft);
+  if(!c.left) return sessionCompleteHTML(draft);
   const nav = `<div class="focus-nav">
     <button class="navbtn" aria-label="Exercice précédent" data-a="focusPrev" ${idx===0?"disabled":""} style="transform:scaleX(-1)">${icon("chev")}</button>
-    <button class="center-link" data-a="openOverview">Voir la séance (${finishedCount}/${draft.exos.length})</button>
+    <button class="center-link" data-a="openOverview"><span><b>${idx+1}</b> sur ${draft.exos.length}</span><small>Tout voir</small></button>
     <button class="navbtn" aria-label="Exercice suivant" data-a="focusNext" ${idx===draft.exos.length-1?"disabled":""}>${icon("chev")}</button>
   </div>`;
-  return `${renderFocusCard(idx, ex, def)}${nav}<div class="swipe-hint">Glisse la carte pour changer d'exercice</div>`;
+  const firstTime = idx===0 && c.done===0;
+  return `${renderFocusCard(idx, ex, def)}${upNextHTML(idx)}${nav}${firstTime?`<div class="swipe-hint">Glisse la carte ou touche le bandeau pour changer d'exercice</div>`:""}`;
+}
+function upNextHTML(idx){
+  const ex = S.draft.exos[idx];
+  const curDone = ex.sets.every(s=>s.done);
+  const ni = nextUndone(idx);
+  if(ni<0 || (ni===idx)) return curDone || ni<0 ? "" : `<div class="up-next last"><span class="un-flag">🏁</span><div class="grow"><div class="un-k">Dernier exercice</div><div class="un-t">Plus que celui-ci, tu y es presque !</div></div></div>`;
+  if(curDone) return ""; // le bouton « Exercice suivant » de la carte fait déjà le travail
+  const e = S.draft.exos[ni], def = EXO_MAP[e.exoId], left = e.sets.filter(s=>!s.done).length;
+  return `<button class="up-next r-${regionOf(def)}" data-a="focusJump" data-idx="${ni}">
+    ${exoIcon(def,"sm")}
+    <div class="grow"><div class="un-k">À suivre</div><div class="un-t">${esc(def.n)}</div></div>
+    <span class="un-s">${left} série${left>1?"s":""}</span>${icon("chev")}
+  </button>`;
+}
+let completeShown = false; // la fête « séance complète » ne se joue qu'une fois
+function sessionCompleteHTML(draft){
+  const c = liveCounts(draft), vol = draft.exos.reduce((t,e)=>t+e.sets.reduce((a,s)=>a+(s.done&&s.weight?s.weight*(s.reps||0):0),0),0);
+  const prs = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>s.pr).length,0);
+  const fresh = !completeShown; completeShown = true;
+  if(fresh) setTimeout(()=>{ const b = qs(".complete-card .cc-trophy"); if(b){ const r = b.getBoundingClientRect(); confettiBurst(r.left+r.width/2, r.top+r.height/2, 90); haptic([30,50,30,50,60]); } }, 250);
+  return `<div class="complete-card ${fresh?"fresh":""}">
+    <div class="cc-rays" aria-hidden="true"></div>
+    <div class="cc-trophy">🏆</div>
+    <div class="cc-title">Séance complète !</div>
+    <div class="cc-sub">Toutes les séries sont validées. Bravo.</div>
+    <div class="cc-stats">
+      <div><b>${c.done}</b><small>séries</small></div>
+      <div><b>${fmtClock(elapsedSec(draft))}</b><small>durée</small></div>
+      <div><b>${vol ? fmtNum(Math.round(vol)) : draft.exos.length}</b><small>${vol ? "kg soulevés" : "exercices"}</small></div>
+      ${prs?`<div><b>${prs}</b><small>record${prs>1?"s":""}</small></div>`:""}
+    </div>
+    <button class="btn big" data-a="finishSession">${icon("check")} Enregistrer la séance</button>
+    <button class="btn ghost sm" style="margin-top:6px" data-a="addExoOpen">${icon("plus")} Ajouter un exercice</button>
+  </div>`;
 }
 
 function lastTimeHTML(exoId){
@@ -459,18 +521,19 @@ function renderFocusCard(idx, ex, def){
   justDone = null;
   const resting = restState && restState.exoIdx===idx;
   const allDone = ex.sets.every(s=>s.done);
-  const header = `<button class="fc-info" aria-label="Fiche de l'exercice" data-a="showExoInfo" data-id="${def.id}">i</button>
+  const header = `<button class="fc-menu" aria-label="Options de l'exercice" data-a="focusMenu" data-idx="${idx}">•••</button>
+    <button class="fc-info" aria-label="Fiche de l'exercice" data-a="showExoInfo" data-id="${def.id}">i</button>
     <div class="fc-icon">${exoIcon(def,"lg")}</div>
     <div class="fc-name">${esc(def.n)}</div>
-    <div class="fc-sub"><button data-a="showExoInfo" data-id="${def.id}">${musclesLabel(def)} · <u>technique</u></button></div>`;
+    <div class="fc-sub">${musclesLabel(def)}</div>`;
   const setDots = si => `<div class="set-dots">${ex.sets.map((s,i)=>`<span class="sd ${s.done?"done":i===si?"current":""} ${i===jd?"just":""} ${s.pr?"pr":""}"></span>`).join("")}</div>`;
 
   if(resting){
     const remain = Math.max(0, Math.round((restState.endAt-Date.now())/1000));
     const next = ex.sets.find(s=>!s.done);
-    return `<div class="focus-card r-${regionOf(def)} ${animClass}">${header}
+    return `<div class="focus-card resting r-${regionOf(def)} ${animClass}">${header}
       ${setDots(-1)}
-      <div class="fc-phase">Repos</div>
+      <div class="fc-phase">Repos · respire</div>
       ${ringSVG(remain, restState.totalSec)}
       ${next?`<div class="fc-next">Ensuite : ${next.reps} reps${next.weight?" × "+next.weight+" kg":""}</div>`:""}
       <div class="ring-adjust"><button data-a="restAdjust" data-d="-15">−15 s</button><button data-a="restAdjust" data-d="15">+15 s</button><button class="skip" data-a="restSkip">Passer</button></div>
@@ -481,8 +544,11 @@ function renderFocusCard(idx, ex, def){
     const recap = ex.sets.map(s=>`<span class="chip ${s.pr?"pr":""}">${s.pr?"💥 ":""}${s.reps||"?"}${s.weight!=null?" × "+s.weight+" kg":""}</span>`).join("");
     return `<div class="focus-card r-${regionOf(def)} ${animClass}">${header}
       <div class="fc-done-badge">${icon("check")}</div>
+      <div class="fc-done-t">Exercice terminé</div>
       <div class="fc-recap">${recap}</div>
-      <div class="fc-quiet"><button data-a="swapExoOpen" data-idx="${idx}">Remplacer</button><button data-a="addSetFocus" data-exi="${idx}">+ série</button></div>
+      ${(()=>{ const ni = nextUndone(idx); if(ni<0) return ""; const nd = EXO_MAP[S.draft.exos[ni].exoId];
+        return `<button class="btn big next-exo" data-a="focusJump" data-idx="${ni}"><span class="ne-k">Exercice suivant</span><span class="ne-n">${esc(nd.n)}</span>${icon("chev")}</button>`; })()}
+      <div class="fc-quiet"><button data-a="addSetFocus" data-exi="${idx}">+ Ajouter une série</button></div>
     </div>`;
   }
 
@@ -490,25 +556,26 @@ function renderFocusCard(idx, ex, def){
   const st = ex.sets[si];
   const hasWeight = !!loadableTypeOf(def);
   const unit = isTimed(def) ? "Secondes" : "Répétitions";
+  const rr = restReady; restReady = false; // animation « c'est reparti » après le repos
+  setTimeout(()=>{ valRoll = {}; }, 0);
   return `<div class="focus-card r-${regionOf(def)} ${animClass}">${header}
     <div class="fc-phase">Série ${si+1} / ${ex.sets.length} · objectif ${repsLabel(ex.targetReps)}</div>
     ${setDots(si)}
     <div class="big-steppers">
       <div class="big-stepper"><div class="bs-label">${unit}</div><div class="bs-row">
         <button aria-label="Moins" data-a="stepReps" data-exi="${idx}" data-si="${si}" data-d="-1">−</button>
-        <button class="bs-val" aria-label="Saisir la valeur" data-a="editVal" data-f="reps" data-exi="${idx}" data-si="${si}">${st.reps??"–"}</button>
+        <button class="bs-val ${valRoll.f==="reps"?"roll-"+valRoll.d:""}" aria-label="Saisir la valeur" data-a="editVal" data-f="reps" data-exi="${idx}" data-si="${si}">${st.reps??"–"}</button>
         <button aria-label="Plus" data-a="stepReps" data-exi="${idx}" data-si="${si}" data-d="1">+</button>
       </div></div>
       ${hasWeight?`<div class="big-stepper"><div class="bs-label">Charge (kg)</div><div class="bs-row">
         <button aria-label="Moins" data-a="stepWeight" data-exi="${idx}" data-si="${si}" data-d="-1">−</button>
-        <button class="bs-val" aria-label="Saisir la charge" data-a="editVal" data-f="weight" data-exi="${idx}" data-si="${si}">${st.weight??"–"}</button>
+        <button class="bs-val ${valRoll.f==="weight"?"roll-"+valRoll.d:""}" aria-label="Saisir la charge" data-a="editVal" data-f="weight" data-exi="${idx}" data-si="${si}">${st.weight??"–"}</button>
         <button aria-label="Plus" data-a="stepWeight" data-exi="${idx}" data-si="${si}" data-d="1">+</button>
       </div></div>`:""}
     </div>
     ${lastTimeHTML(ex.exoId)}
     ${ex.note?`<div class="exo-note" style="margin:0 0 14px">${esc(ex.note)}</div>`:""}
-    <button class="btn big validate" data-a="validateSet" data-exi="${idx}">${icon("check")} Série validée</button>
-    <div class="fc-quiet" style="margin-top:14px"><button data-a="swapExoOpen" data-idx="${idx}">Remplacer</button><button data-a="removeExo" data-idx="${idx}">Retirer</button></div>
+    <button class="btn big validate ${rr?"ready":""}" data-a="validateSet" data-exi="${idx}">${icon("check")} Valider la série ${si+1}</button>
   </div>`;
 }
 
@@ -519,26 +586,28 @@ function refreshFocusRegion(){
   const strip = qs("#liveStrip");
   if(strip){ const sl = (qs("#lsChips")||{}).scrollLeft||0; strip.innerHTML = liveStripHTML(S.draft); qs("#lsChips").scrollLeft = sl; centerStripChip(true); }
   stripBump = -1;
-  const eyebrow = qs("#todayEyebrow");
-  if(eyebrow) eyebrow.textContent = liveEyebrow(S.draft);
+  const head = qs("#liveHead");
+  if(head) head.innerHTML = liveHeadHTML(S.draft);
   if(typeof renderRestBar==="function") renderRestBar();
 }
 
 function overviewBodyHTML(){
-  const rows = S.draft.exos.map((ex,i)=>{
+  const row = (ex,i)=>{
     const def = EXO_MAP[ex.exoId];
-    const done = ex.sets.filter(s=>s.done).length;
-    const allDone = done===ex.sets.length;
-    return `<div class="row">
+    const done = ex.sets.filter(s=>s.done).length, n = ex.sets.length, allDone = done===n;
+    return `<div class="row ov-row ${i===liveFocusIdx?"current":""} ${allDone?"done":""}">
       <button class="row-main" data-a="jumpFromOverview" data-idx="${i}">
-        ${allDone?`<span class="xico done">${icon("check")}</span>`:exoIcon(def)}
-        <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${done}/${ex.sets.length} séries</div></div>
+        <span class="ls-ring r-${regionOf(def)}" style="--p:${Math.round(done/n*100)}"><span>${allDone?icon("check"):pictoSVG(pictoKey(def))}</span></span>
+        <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${allDone?"Terminé":i===liveFocusIdx?`En cours · ${done}/${n} séries`:`${done}/${n} séries`}</div></div>
       </button>
       <button class="icon-btn" aria-label="Remplacer" data-a="swapExoOpen" data-idx="${i}">${icon("swap")}</button>
       <button class="icon-btn" aria-label="Retirer" data-a="removeExoOverview" data-idx="${i}">${icon("close")}</button>
     </div>`;
-  }).join("");
-  return `<div class="group">${rows}</div>
+  };
+  const todo = [], done = [];
+  S.draft.exos.forEach((ex,i)=>(ex.sets.every(s=>s.done)?done:todo).push(row(ex,i)));
+  return `${todo.length?`<div class="ov-h">À faire <span>${todo.length}</span></div><div class="group">${todo.join("")}</div>`:""}
+    ${done.length?`<div class="ov-h done">Terminés <span>${done.length}</span></div><div class="group">${done.join("")}</div>`:""}
     <div class="btnrow"><button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter des exercices</button></div>`;
 }
 
@@ -761,12 +830,13 @@ Object.assign(ACT, {
   editTemplateDays(d){ const t = S.templates.find(x=>x.id===d.id); if(t) openTemplateModal(t.n, t.days||[], t.id); },
   tplDayToggle(d, el){ el.classList.toggle("on"); },
   setType(d){ regenerateDraft(d.v); renderViewAnimated("today"); },
-  startSession(){ if(!S.draft.exos.length) return; S.draft.startedAt = new Date().toISOString(); liveFocusIdx = 0; save(); scrollTodayTop(); renderViewAnimated("today"); showLaunch(S.draft); },
+  startSession(){ if(!S.draft.exos.length) return; S.draft.startedAt = new Date().toISOString(); liveFocusIdx = 0; completeShown = false; save(); scrollTodayTop(); renderViewAnimated("today"); showLaunch(S.draft); },
   regenSession(){ regenerateDraft(); renderViewAnimated("today"); toast("Nouvelle proposition"); },
   dropImported(){
     confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); liveFocusIdx=0; save(); renderViewAnimated("today"); } });
   },
   removeExo(d, el){
+    if(S.draft.startedAt) closeSheet();
     const row = el && !S.draft.startedAt && el.closest(".row");
     const go = ()=>{
       S.draft.exos.splice(+d.idx,1);
@@ -838,7 +908,7 @@ Object.assign(ACT, {
     const planned = plannedTemplate();
     if(S.custom.tplId){ S.draft.tplId = S.custom.tplId; S.draft.planned = !!planned && planned.id===S.custom.tplId; }
     S.draft.startedAt = new Date().toISOString();
-    liveFocusIdx = 0;
+    liveFocusIdx = 0; completeShown = false;
     save(); scrollTodayTop(); renderViewAnimated("today");
     showLaunch(S.draft);
   },
@@ -883,7 +953,18 @@ Object.assign(ACT, {
   focusJump(d){ const ni=+d.idx; focusAnimDir = ni>liveFocusIdx?"r":ni<liveFocusIdx?"l":null; liveFocusIdx=ni; refreshFocusRegion(); },
   jumpFromOverview(d){ const ni=+d.idx; focusAnimDir = ni>liveFocusIdx?"r":ni<liveFocusIdx?"l":null; liveFocusIdx=ni; closeSheet(); refreshFocusRegion(); },
 
-  openOverview(){ openSheet(`<div class="sheet-hd"><span class="t">Séance complète</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${overviewBodyHTML()}</div>`); },
+  focusMenu(d){
+    const i = +d.idx, def = EXO_MAP[S.draft.exos[i].exoId];
+    openModal(`<div class="tm-head r-${regionOf(def)}">${exoIcon(def,"sm")}<div><div style="font-weight:700;font-size:calc(17rem/17)">${esc(def.n)}</div></div></div>
+      <div class="menu-list">
+        <button data-a="showExoInfo" data-id="${def.id}">${icon("search")}<span>Fiche et technique</span></button>
+        <button data-a="swapExoOpen" data-idx="${i}">${icon("swap")}<span>Remplacer l'exercice</span></button>
+        <button data-a="addSetFocus" data-exi="${i}">${icon("plus")}<span>Ajouter une série</span></button>
+        <button class="danger" data-a="removeExo" data-idx="${i}">${icon("trash")}<span>Retirer de la séance</span></button>
+      </div>
+      <button class="btn ghost" style="height:40px;margin-top:6px" data-a="closesheet">Fermer</button>`);
+  },
+  openOverview(){ openSheet(`<div class="sheet-hd"><span class="t">Exercices de la séance</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${overviewBodyHTML()}</div>`); },
   removeExoOverview(d){
     S.draft.exos.splice(+d.idx,1);
     if(liveFocusIdx>=S.draft.exos.length) liveFocusIdx = Math.max(0,S.draft.exos.length-1);
@@ -898,7 +979,8 @@ Object.assign(ACT, {
     const last = ex.sets[ex.sets.length-1];
     ex.sets.push({ reps:last?last.reps:null, weight:last?last.weight:null, done:false, rpe:null });
     ex.targetSets = ex.sets.length;
-    save(); refreshFocusRegion();
+    completeShown = false;
+    closeSheet(); save(); refreshFocusRegion();
   },
   // un changement se reporte sur les séries suivantes non validées qui avaient la même valeur
   stepReps(d){
@@ -906,6 +988,7 @@ Object.assign(ACT, {
     const v = Math.max(0,(old||0)+parseInt(d.d,10));
     ex.sets.forEach((s,i)=>{ if(i>=+d.si && !s.done && s.reps===old) s.reps = v; });
     st.reps = v;
+    valRoll = { f:"reps", d: parseInt(d.d,10)>0 ? "up" : "down" };
     save(); refreshFocusRegion();
   },
   stepWeight(d){
@@ -913,6 +996,7 @@ Object.assign(ACT, {
     const v = stepWeightValue(def, old||0, parseInt(d.d,10));
     ex.sets.forEach((s,i)=>{ if(i>=+d.si && !s.done && s.weight===old) s.weight = v; });
     st.weight = v;
+    valRoll = { f:"weight", d: parseInt(d.d,10)>0 ? "up" : "down" };
     save(); refreshFocusRegion();
   },
   editVal(d){
@@ -948,12 +1032,15 @@ Object.assign(ACT, {
     if(navigator.vibrate) try{ navigator.vibrate(18); }catch(e){}
     justDone = { exi, si };
     stripBump = exi;
-    if(!st.pr) floatText(bx, by-26, `✓ Série ${si+1}`);
+    if(!st.pr && !exoFinished0(ex)) floatText(bx, by-26, `✓ Série ${si+1}`);
     const exoFinished = !ex.sets.some(s=>!s.done);
-    startRestTimer(def.restSec, def.n, exi);
+    const ni = nextUndone(exi);
+    if(ni>=0) startRestTimer(def.restSec, def.n, exoFinished ? ni : exi);
+    else stopRestTimer();
     if(exoFinished){
       if(!st.pr) confettiBurst(bx, by, 36);
-      if(exi<S.draft.exos.length-1){ liveFocusIdx = exi+1; focusAnimDir="r"; }
+      if(ni>=0){ const nm = qs(".focus-card .fc-name"), r = nm && nm.getBoundingClientRect(); floatText(r ? r.left+r.width/2 : bx, r ? r.top+r.height/2 : by, "🔥 Exercice terminé !", "big"); }
+      if(ni>=0){ liveFocusIdx = ni; focusAnimDir = ni>exi ? "r" : "l"; }
     }
     save();
     refreshFocusRegion();
