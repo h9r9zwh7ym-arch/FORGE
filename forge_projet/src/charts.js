@@ -118,7 +118,7 @@ function heatmap(weeks){
 function hbarList(items){
   const max = Math.max(1,...items.map(x=>x.value));
   return items.map((it,i)=>`<div class="hb-row" data-tip="${esc(it.label+" : "+it.value+" "+(it.unit||""))}">
-    <div class="hb-top"><span>${esc(it.label)}</span><span class="hb-v">${it.value}${it.unit?" "+esc(it.unit):""}</span></div>
+    <div class="hb-top"><span>${it.region?`<i class="hb-dot r-${it.region}"></i>`:""}${esc(it.label)}</span><span class="hb-v">${it.value}${it.unit?" "+esc(it.unit):""}</span></div>
     <div class="hb-track"><div class="hb-fill" style="width:${it.value/max*100}%;--i:${i}"></div></div>
   </div>`).join("");
 }

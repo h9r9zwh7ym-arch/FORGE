@@ -6,6 +6,7 @@
   --ember:#FF7A1A; --ember2:#FFB300;
   --green:#1E7B34; --red:#D70015; --orange:#B25000; --blue:#0066CC; --purple:#7A3FC4;
   --bar:rgba(248,248,250,.82); --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  --r-push:#e87ba4; --r-push-ink:#2b0a18; --r-pull:#2a78d6; --r-pull-ink:#fff; --r-legs:#008300; --r-legs-ink:#fff; --r-core:#eda100; --r-core-ink:#2a1a00;
   --bronze:#A8672F; --bronze2:#E7B07A; --silver:#868C95; --silver2:#E4E7EB; --gold:#BF8A0F; --gold2:#F6D56A; --plat:#4E9DB4; --plat2:#D3F1F8;
   --serif:ui-serif,"New York","Iowan Old Style","Palatino",Georgia,serif;
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -22,6 +23,7 @@
     --ember:#FF9A3D; --ember2:#FFC53D;
     --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --blue:#409CFF; --purple:#BF80FF;
     --bar:rgba(20,20,22,.8); --shadow:none;
+    --r-push:#d55181; --r-push-ink:#fff; --r-pull:#3987e5; --r-pull-ink:#fff; --r-legs:#008300; --r-legs-ink:#fff; --r-core:#c98500; --r-core-ink:#1f1400;
   }
 }
 :root[data-theme="dark"]{
@@ -31,6 +33,7 @@
     --ember:#FF9A3D; --ember2:#FFC53D;
     --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --blue:#409CFF; --purple:#BF80FF;
     --bar:rgba(20,20,22,.8); --shadow:none;
+    --r-push:#d55181; --r-push-ink:#fff; --r-pull:#3987e5; --r-pull-ink:#fff; --r-legs:#008300; --r-legs-ink:#fff; --r-core:#c98500; --r-core-ink:#1f1400;
 }
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{height:100%;font-size:17px;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -198,7 +201,7 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 @keyframes focusInL{from{opacity:0;transform:translateX(-28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
 .focus-card.anim-r{animation:focusInR .3s cubic-bezier(.32,.72,0,1)}
 .focus-card.anim-l{animation:focusInL .3s cubic-bezier(.32,.72,0,1)}
-.fc-icon{width:60px;height:60px;border-radius:18px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;margin:0 auto 12px;font-size:28px}
+.fc-icon{display:flex;justify-content:center;margin:0 auto 12px}
 .fc-name{font-family:var(--serif);font-weight:700;font-size:calc(23rem/17);letter-spacing:-.01em;line-height:1.15;margin-bottom:3px}
 .fc-sub{color:var(--label2);font-size:calc(13.5rem/17);margin-bottom:18px}
 .fc-phase{font-size:calc(12rem/17);font-weight:700;color:var(--tint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px}
@@ -292,10 +295,9 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .dt-s{font-size:calc(13rem/17);color:var(--label2);margin-top:1px}
 
 /* ---- choix du type de séance ---- */
-.type-scroll,.chip-scroll,.tpl-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 16px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.type-scroll,.chip-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 16px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .chip-scroll .chip{flex:none;white-space:nowrap}
-.tpl-scroll{padding:4px 16px 14px;margin-bottom:-6px}
-.type-scroll::-webkit-scrollbar,.chip-scroll::-webkit-scrollbar,.tpl-scroll::-webkit-scrollbar{display:none}
+.type-scroll::-webkit-scrollbar,.chip-scroll::-webkit-scrollbar{display:none}
 .type-chip{flex:none;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:19px;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--sep);font-size:calc(14rem/17);font-weight:600;color:var(--label);transition:background .2s,color .2s,transform .12s}
 .type-chip:active{transform:scale(.95)}
 .type-chip.on{background:var(--tint);color:var(--on-tint);box-shadow:none}
@@ -310,14 +312,6 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .pc-muscles span{font-size:calc(12.5rem/17);font-weight:600;padding:4px 10px;border-radius:10px;background:var(--fill2);color:var(--label2)}
 
 /* ---- Ma séance ---- */
-.tpl-card{position:relative;flex:none;width:168px;background:var(--bg2);border-radius:16px;box-shadow:var(--shadow)}
-.tpl-main{display:block;width:100%;text-align:left;padding:14px 14px 12px}
-.tpl-main:active{opacity:.6}
-.tpl-name{font-weight:700;font-size:calc(15rem/17);padding-right:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tpl-sub{font-size:calc(12.5rem/17);color:var(--label2);margin-top:2px}
-.tpl-ems{margin-top:8px;font-size:16px;letter-spacing:2px}
-.tpl-del{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:12px;display:grid;place-items:center;color:var(--label3)}
-.tpl-del svg{width:14px;height:14px}
 .builder-empty{margin:4px 16px 0;padding:26px 22px 18px;border-radius:22px;background:var(--bg2);text-align:center;box-shadow:var(--shadow)}
 .be-ico{font-size:34px}
 .be-t{font-family:var(--serif);font-weight:700;font-size:calc(21rem/17);margin-top:6px}
@@ -553,11 +547,6 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 .pb-ico{font-size:22px}
 .pb-t{font-weight:800;font-size:calc(15rem/17)}
 .pb-s{font-size:calc(13rem/17);opacity:.9}
-.tpl-card.on{box-shadow:inset 0 0 0 2px var(--tint),var(--shadow)}
-.tpl-days{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:20px}
-.tpl-days span{font-size:calc(11rem/17);font-weight:700;padding:2px 7px;border-radius:7px;background:var(--tint-bg);color:var(--tint)}
-.tpl-days em{font-size:calc(11.5rem/17);color:var(--label3);font-style:normal}
-.tpl-del{font-size:13px;font-weight:800;letter-spacing:1px;color:var(--label2);width:30px}
 .tpl-daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
 .tpl-daypick button{height:40px;border-radius:10px;background:var(--fill2);font-size:calc(12.5rem/17);font-weight:700;color:var(--label2);transition:background .15s,color .15s,transform .12s}
 .tpl-daypick button:active{transform:scale(.92)}
@@ -580,6 +569,7 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 .ls-ring{--p:0;width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--tint) calc(var(--p)*1%),var(--fill) 0);transition:background .3s}
 .ls-ring>span{width:24px;height:24px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-size:12px}
 .ls-ring svg{width:14px;height:14px;color:var(--green)}
+.ls-ring svg.picto{color:inherit}
 .ls-name{font-size:calc(13rem/17);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .ls-sets{font-size:calc(11.5rem/17);color:var(--label2);font-variant-numeric:tabular-nums;flex:none}
 .ls-chip.current{background:var(--tint);box-shadow:none;color:var(--on-tint)}
@@ -645,6 +635,134 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 
 .group.builder .row .t{white-space:normal;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .btnrow .btn.sm{flex:1;padding:0 10px;white-space:nowrap}
+
+/* ================= v1.4 ================= */
+/* ---- zones du corps : couleur + pictogramme ---- */
+.r-push{--rc:var(--r-push);--ri:var(--r-push-ink)}
+.r-pull{--rc:var(--r-pull);--ri:var(--r-pull-ink)}
+.r-legs{--rc:var(--r-legs);--ri:var(--r-legs-ink)}
+.r-core{--rc:var(--r-core);--ri:var(--r-core-ink)}
+.xico{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;background:var(--rc,var(--tint));color:var(--ri,#fff);box-shadow:inset 0 -2px 0 rgba(0,0,0,.08)}
+.xico .picto{width:78%;height:78%}
+.xico.xs{width:22px;height:22px;border-radius:7px}
+.xico.sm{width:28px;height:28px;border-radius:8px}
+.xico.lg{width:64px;height:64px;border-radius:19px}
+.xico.xl{width:88px;height:88px;border-radius:26px;box-shadow:0 10px 24px -12px var(--rc),inset 0 -3px 0 rgba(0,0,0,.1)}
+.xico.done{background:var(--green);color:#fff}
+.xico.done svg{width:60%;height:60%}
+.row.tap:active .xico,.row-main:active .xico{transform:scale(.92)}
+.xico{transition:transform .15s}
+
+/* bouton / pastille « i » */
+.info-dot{width:20px;height:20px;border-radius:10px;flex:none;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-weight:700;font-size:13px;color:var(--label3);box-shadow:inset 0 0 0 1.5px var(--label3)}
+.info-btn{width:32px;height:32px;border-radius:16px;flex:none;display:grid;place-items:center;background:var(--fill2);color:var(--tint);font-family:var(--serif);font-style:italic;font-weight:700;font-size:16px;transition:transform .12s,background .15s}
+.info-btn:active{transform:scale(.88);background:var(--tint-bg)}
+.fc-info{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:17px;display:grid;place-items:center;background:var(--fill2);color:var(--tint);font-family:var(--serif);font-style:italic;font-weight:700;font-size:17px;z-index:2}
+.fc-info:active{transform:scale(.88)}
+.focus-card::before{content:"";position:absolute;left:50%;top:0;width:56px;height:4px;border-radius:0 0 4px 4px;background:var(--rc,var(--tint));transform:translateX(-50%)}
+.pick-row{padding-right:10px}
+.pick-row .row-main{padding:0}
+.pick-row .pick-check{background:none}
+
+/* ---- sections repliables ---- */
+.sec-h{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font-weight:700;font-size:calc(15.5rem/17);padding:2px 2px}
+.sec-h>span:first-child{flex:none}
+.sec-sum{flex:1;min-width:0;text-align:right;font-weight:600;font-size:calc(12.5rem/17);color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:4px;border-radius:10px;background:var(--fill);font-size:calc(12rem/17);color:var(--label2);vertical-align:2px}
+.sec-chev{flex:none;margin-left:auto;width:22px;height:22px;display:grid;place-items:center;color:var(--label3);transform:rotate(90deg);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.sec-chev.open{transform:rotate(-90deg)}
+.sec-chev svg,.sec-chev .chev{width:8px;height:13px}
+.sec-sum+.sec-chev{margin-left:0}
+
+/* ---- planning ---- */
+.week-plan{padding:12px 12px 10px}
+.week-plan .sec-h{margin-bottom:0}
+.wp-days{margin-top:10px;animation:fadeUp .3s ease both}
+.wp-day.has{background:color-mix(in srgb,var(--rc) 16%,var(--fill2))}
+.wp-day.has::after{content:"";position:absolute;left:50%;bottom:3px;width:16px;height:3px;border-radius:2px;background:var(--rc);transform:translateX(-50%)}
+.wp-day.has .wp-t{color:var(--label);font-weight:700}
+.wp-miss{position:absolute;top:-3px;right:-2px;width:11px;height:11px;border-radius:6px;background:var(--red);box-shadow:0 0 0 2px var(--bg2)}
+.wp-day.missed{opacity:.8}
+.wp-foot{font-size:calc(11.5rem/17);color:var(--label3);margin:8px 4px 0}
+.plan-banner .pb-go{width:42px;height:42px;border-radius:21px;background:#fff;color:var(--tint);display:grid;place-items:center;flex:none;box-shadow:0 4px 12px rgba(0,0,0,.18);transition:transform .12s}
+.plan-banner .pb-go:active{transform:scale(.9)}
+.plan-banner .pb-go svg{width:18px;height:18px;margin-left:2px}
+
+/* ---- séances enregistrées ---- */
+.tpl-section{margin:18px 16px 0}
+.tpl-section>.sec-h{padding:0 4px 10px}
+.tpl-list{display:flex;flex-direction:column;gap:10px}
+.tpl-card2{position:relative;background:var(--bg2);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s}
+.tpl-card2.loaded{box-shadow:inset 0 0 0 2px var(--tint),var(--shadow)}
+.tc-head{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px 13px 18px}
+.tc-head:active{background:var(--fill2)}
+.tc-bar{position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--rc)}
+.tc-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tc-name{font-weight:700;font-size:calc(16rem/17);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-tag{font-size:calc(10.5rem/17);font-weight:700;color:var(--tint);background:var(--tint-bg);padding:1px 6px;border-radius:6px;vertical-align:2px}
+.tc-meta{font-size:calc(12.5rem/17);color:var(--label2)}
+.tc-days{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tc-days span{font-size:calc(11rem/17);font-weight:700;padding:2px 7px;border-radius:7px;background:var(--fill);color:var(--label)}
+.tc-days em{font-size:calc(11.5rem/17);color:var(--label3);font-style:normal}
+.tc-picts{display:flex;gap:3px;flex:none}
+.tc-list{padding:0 12px 4px 18px;animation:fadeUp .3s ease both}
+.tc-exo{display:flex;align-items:center;gap:10px;width:100%;padding:6px 0;text-align:left;border-top:.5px solid var(--sep)}
+.tc-exo:active{opacity:.6}
+.tc-n{flex:1;min-width:0;font-size:calc(14.5rem/17);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-s{font-size:calc(13rem/17);color:var(--label2);font-weight:600}
+.tc-actions{display:flex;gap:8px;padding:8px 12px 14px 18px}
+.tc-actions .btn.sm{flex:1}
+.tc-actions .btn.icon-only{flex:none;width:44px;padding:0;font-weight:800;letter-spacing:1px}
+.show-more{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:10px;border-radius:12px;color:var(--tint);font-weight:600;font-size:calc(14.5rem/17)}
+.show-more svg,.show-more .chev{width:8px;height:13px;transform:rotate(90deg)}
+.show-more.up svg{transform:rotate(-90deg)}
+.show-more:active{background:var(--fill2)}
+
+/* ---- Ma séance : équilibre par zone ---- */
+.sh-actions{display:flex;gap:16px}
+.region-bar{display:flex;gap:2px;height:6px;margin:10px 20px 6px;border-radius:3px;overflow:hidden}
+.region-bar .rb{background:var(--rc);transition:flex .4s cubic-bezier(.2,.8,.2,1)}
+.region-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0 20px 10px;font-size:calc(11.5rem/17);color:var(--label2)}
+.region-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--rc);margin-right:5px;vertical-align:0}
+.mini-step.order button{font-size:16px}
+.mini-step button[disabled]{opacity:.25}
+.group.builder.reorder .row{animation:wiggle .35s ease}
+@keyframes wiggle{0%,100%{transform:none}30%{transform:translateX(-3px)}60%{transform:translateX(3px)}}
+
+/* ---- fiche exercice ---- */
+.exo-hero{padding:4px 16px 2px}
+.exo-hero .xico{margin:0 auto 12px;animation:badgePop .5s cubic-bezier(.32,1.4,.4,1)}
+.exo-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:8px}
+.rtag,.etag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:calc(12.5rem/17);font-weight:700;background:var(--fill2);color:var(--label)}
+.rtag::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--rc)}
+.first-time{margin:14px 16px 0;padding:11px 14px;border-radius:12px;background:var(--tint-bg);color:var(--label);font-size:calc(13.5rem/17);line-height:1.4}
+.exo-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 16px 0}
+.exo-facts div{background:var(--bg2);border-radius:14px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.exo-facts b{font-size:calc(14.5rem/17)}
+.exo-facts span{font-size:calc(11.5rem/17);color:var(--label2)}
+.btnrow.col{flex-direction:column}
+.btnrow.col .btn svg{transform:scaleX(-1)}
+
+/* ---- menu d'une séance ---- */
+.tm-head{position:relative;display:flex;gap:12px;align-items:center;text-align:left;padding-left:14px;margin-bottom:14px}
+.tm-head .tc-bar{border-radius:3px}
+.menu-list{display:flex;flex-direction:column;background:var(--fill2);border-radius:14px;overflow:hidden}
+.menu-list button{display:flex;align-items:center;gap:12px;padding:13px 14px;text-align:left;font-weight:600;font-size:calc(15rem/17);color:var(--label)}
+.menu-list button+button{border-top:.5px solid var(--sep)}
+.menu-list button svg{color:var(--tint);width:19px;height:19px}
+.menu-list button.danger,.menu-list button.danger svg{color:var(--red)}
+.menu-list button:active{background:var(--fill)}
+
+/* ---- divers ---- */
+.muted-n{font-weight:500;opacity:.7}
+.ls-ring{background:conic-gradient(var(--rc,var(--tint)) calc(var(--p)*1%),var(--fill) 0)}
+.ls-ring>span{color:var(--rc,var(--tint))}
+.ls-ring .picto{width:17px;height:17px}
+.ls-chip.current .ls-ring>span{color:var(--on-tint)}
+@media (prefers-reduced-motion:reduce){
+  .xico,.wp-days,.tc-list,.exo-hero .xico,.group.builder.reorder .row{animation:none!important;transition:none!important}
+}
+.hb-dot{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--rc);margin-right:7px;vertical-align:1px}
 </style></head><body><div id="app"></div><nav class="tabbar" aria-label="Onglets"></nav><div id="restbar"></div><div id="overlay" role="dialog"></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="fileImport" accept="application/json,.json" style="display:none"><script>
 // ================= MATÉRIEL =================
 // Catalogue du matériel reconnu par le moteur de suggestion. Chaque exercice de la
@@ -1026,6 +1144,75 @@ const EXOS = EXO_RAW.map(([id,n,muscles,equip,pattern,uni,def,cues,safety])=>({
 const EXO_MAP = {}; EXOS.forEach(e=>EXO_MAP[e.id]=e);
 // exercices mesurés en secondes plutôt qu'en répétitions (planche, chaise, marche du fermier…)
 function isTimed(def){ return def.cues.some(c=>/en secondes/.test(c)); }
+// ================= PICTOGRAMMES DES EXERCICES =================
+// Silhouettes au trait (24×24, trait « currentColor ») : une par famille de mouvement.
+// La tête est un disque plein ; le reste est tracé en lignes arrondies.
+const PICTO_PATHS = {
+  squat:    { h:[13,4.3], d:"M12.6 6.6 10 12l5.3.8-.9 6.2M11.4 8.6l5.8 1.1M8.5 19h8" },
+  lunge:    { h:[11,4.2], d:"M11 6.6v5.9l4.8.4v6.1M11 12.5l-3.4 4.1-3.6.4M11 8.4l2.6 3.2M4 19h14" },
+  hinge:    { h:[5.6,7.4], d:"M7.5 8.6 15 11.2l-.3 7.8M15 11.2l3 7.8M9 9.2v6M5.8 15.2h6.4M5.8 14v2.4M12.2 14v2.4" },
+  bench:    { h:[4.6,13.8], d:"M6.6 14.6h10.6l2.6 4.6M9 14.6V8.4M6 8.4h6M6 7.2v2.4M12 7.2v2.4M4 17.4h15M6 17.4V21M17 17.4V21" },
+  fly:      { h:[12,4.4], d:"M12 6.8v8.4M12 9C9.6 9 7.4 8 5.4 5.8M12 9c2.4 0 4.6-1 6.6-3.2M4.4 4.8l2 2M17.6 6.8l2-2M12 15.2l-2.4 4.8M12 15.2l2.4 4.8" },
+  pushup:   { h:[4.6,9.6], d:"M6.5 10.6 20 15.6M8.6 11.4v5.6M3.5 18.4h17" },
+  dips:     { h:[12,4.4], d:"M12 6.8v7.4M10.4 7.8 7.4 11M13.6 7.8l3 3.2M4 11h5M15 11h5M12 14.2l-1.4 5M12 14.2l3 3.6" },
+  overhead: { h:[12,7.6], d:"M12 10v5.8M12 15.8l-2.4 5M12 15.8l2.4 5M10.6 10.6 8.2 3.6M13.4 10.6l2.4-7M5 3.6h14M5 2.4v2.4M19 2.4v2.4" },
+  raise:    { h:[12,4.4], d:"M12 6.8v7.6M12 14.4l-2.4 5.6M12 14.4l2.4 5.6M12 8.6H5M12 8.6h7M5 7v3.2M19 7v3.2" },
+  row:      { h:[5.2,8], d:"M7 9 14.6 11l.4 8M14.6 11l3 8M8.8 9.6l2.8-2.4.4 5M10.6 12.2h2.8" },
+  hang:     { h:[12,6.4], d:"M3.5 3h17M8 3l2.6 5.2M16 3l-2.6 5.2M12 8.8v6.4M12 15.2l-1 5.6M12 15.2l1 5.6" },
+  curl:     { h:[9.6,4.4], d:"M9.6 6.8v7.6M9.6 14.4l-2.2 5.6M9.6 14.4l2.2 5.6M9.8 8.4l1.4 4.4 4-3.8M13.8 7.6l2.8 2.8" },
+  triceps:  { h:[9.4,6.8], d:"M9.4 9.2v6M9.4 15.2l-2 5.6M9.4 15.2l2 5.6M10.8 9.4l2.4-6 2.6 4.6M14.8 8.8l2-2" },
+  bridge:   { h:[4.4,15.6], d:"M6.4 16.4 12.6 12l4.6.4 1.4 5.8M3 18.6h18M9 14.4l-1 4.2" },
+  plank:    { h:[5,10.6], d:"M6.8 11.6 20 14.6M8.2 12v5h3M20 14.6l.4 3.2M3.5 18.4h17.5" },
+  crunch:   { h:[6.2,9.6], d:"M7.6 11 12.4 16l3.8-4.4 2.8 5.8M9.6 12.2l1.8-2.6M3.5 18.4h17" },
+  calf:     { h:[11,4.2], d:"M11 6.6v7.6M11 14.2v4.6l1.6 1.6M11 8.4l2.8 3.2M8 21h8M18 18v-6M16.2 13.8 18 12l1.8 1.8" },
+  cardio:   { h:[12,4.4], d:"M12 6.8v6.8M12 8.4 7.4 4M12 8.4 16.6 4M12 13.6l-4.2 6.2M12 13.6l4.2 6.2M3.6 9.4h2M18.4 9.4h2" },
+  carry:    { h:[12,4.2], d:"M12 6.6v7.6M12 14.2l-2.8 6M12 14.2l2.6 5.8M12 8.4l-3.6 5M12 8.4l3.6 5M6.6 13.6h3.6M13.8 13.6h3.6" },
+};
+
+// Famille de mouvement de chaque exercice (repli : famille déduite du pattern).
+const PICTO_OF = {
+  pompes:"pushup", pompes_genoux:"pushup", pompes_surelevees:"pushup", pompes_declinees:"pushup", pompes_diamant:"pushup", pompes_larges:"pushup", pompe_pike:"pushup",
+  dips_banc:"dips",
+  squat_pdc:"squat", squat_gobelet:"squat", squat_barre:"squat", goblet_squat_kb:"squat", squat_elastique:"squat", squat_sumo_haltere:"squat", squat_saute:"squat", chaise_murale:"squat", band_walk:"squat", thruster_haltere:"overhead",
+  squat_bulgare_pdc:"lunge", fentes_avant:"lunge", fentes_arriere:"lunge", fentes_marchees:"lunge", fentes_laterales:"lunge", fentes_halteres:"lunge", step_up:"lunge",
+  pont_fessier:"bridge", pont_fessier_uni:"bridge", pont_fessier_elastique:"bridge", hip_thrust_barre:"bridge", hip_thrust_haltere:"bridge",
+  rdl_halteres:"hinge", rdl_uni_haltere:"hinge", deadlift_barre:"hinge", rdl_barre:"hinge", deadlift_kb:"hinge", kb_sumo_deadlift:"hinge", swing_kb:"hinge", superman:"plank",
+  planche:"plank", planche_laterale:"plank", mountain_climbers:"plank", bird_dog:"plank", gainage_creux:"crunch", dead_bug:"crunch", crunch:"crunch", releve_jambes:"crunch",
+  burpees:"cardio", jumping_jacks:"cardio",
+  mollets_pdc:"calf", mollets_uni_pdc:"calf", mollets_halteres:"calf",
+  tractions:"hang", tractions_suppination:"hang", suspension_barre:"hang", releve_genoux_suspendu:"hang",
+  dc_haltere:"bench", dc_incline_haltere:"bench", dc_barre:"bench", dc_incline_barre:"bench", dc_serre_barre:"bench", floor_press_haltere:"bench", squeeze_press:"bench", pullover_haltere:"bench",
+  ecarte_couche:"fly", ecarte_incline:"fly", ecarte_sol:"fly", ecarte_elastique_pect:"fly",
+  rowing_uni_haltere:"row", rowing_deux_halteres:"row", rowing_barre:"row", rowing_uni_kb:"row", renegade_row:"row", tirage_elastique:"row",
+  dev_epaules_haltere:"overhead", militaire_barre:"overhead", arnold_press:"overhead", kb_overhead_press:"overhead", dev_epaules_elastique:"overhead",
+  elevations_laterales:"raise", elevations_frontales:"raise", oiseau_haltere:"raise", ecarte_elastique:"raise", face_pull_elastique:"raise",
+  curl_biceps:"curl", curl_marteau:"curl", curl_concentre:"curl", curl_incline:"curl", curl_barre:"curl", curl_biceps_elastique:"curl", curl_poignets:"curl",
+  extension_triceps_nuque:"triceps", kickback_triceps:"triceps", extension_triceps_allonge:"triceps", barre_front:"triceps", extension_triceps_elastique:"triceps",
+  shrugs_halteres:"carry", marche_fermier:"carry", kb_fermier:"carry",
+};
+const PICTO_BY_PATTERN = { squat:"squat", hinge:"hinge", push:"pushup", pull:"row", lunge:"lunge", core:"plank", calf:"calf" };
+
+function pictoKey(def){ return PICTO_OF[def.id] || PICTO_BY_PATTERN[def.pattern] || "squat"; }
+function pictoSVG(key){
+  const p = PICTO_PATHS[key] || PICTO_PATHS.squat;
+  return `<svg class="picto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="${p.h[0]}" cy="${p.h[1]}" r="2.1" fill="currentColor"/><path d="${p.d}" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+// ---- code couleur par zone du corps (couleur + pictogramme + libellé : jamais la couleur seule) ----
+const REGIONS = {
+  push: { n:"Poussée",          muscles:["pect","epaules","triceps"] },
+  pull: { n:"Tirage",           muscles:["dos","biceps","avantbras"] },
+  legs: { n:"Jambes",           muscles:["quadriceps","ischios","fessiers","mollets"] },
+  core: { n:"Gainage & cardio", muscles:["abdos","cardio"] },
+};
+const REGION_OF_MUSCLE = {};
+Object.keys(REGIONS).forEach(r=>REGIONS[r].muscles.forEach(m=>REGION_OF_MUSCLE[m]=r));
+function regionOf(def){ return REGION_OF_MUSCLE[def.muscles[0]] || "core"; }
+
+// tuile d'exercice : pictogramme sur fond de la couleur de zone
+function exoIcon(def, size){
+  return `<span class="xico r-${regionOf(def)} ${size||""}" title="${esc(REGIONS[regionOf(def)].n)}">${pictoSVG(pictoKey(def))}</span>`;
+}
 // ================= ÉTAT & STOCKAGE =================
 const STORAGE_KEY = "forge.v1";
 
@@ -1064,7 +1251,7 @@ function load(){
     merged.settings = Object.assign({}, d.settings, parsed.settings||{});
     merged.meta = Object.assign({}, d.meta, parsed.meta||{});
     merged.custom = Object.assign({}, d.custom, parsed.custom||{});
-    merged.sessions = parsed.sessions||[];
+    merged.sessions = (parsed.sessions||[]).map(compactSession);
     merged.templates = parsed.templates||[];
     merged.medals = parsed.medals||{};
     merged.importedProgram = parsed.importedProgram||[];
@@ -1074,9 +1261,51 @@ function load(){
   }catch(e){ return defaultState(); }
 }
 
+// ---------- sauvegarde différée + cache des statistiques ----------
+// save() est appelé à chaque interaction (un appui sur +/− par exemple). Réécrire tout
+// l'historique (plusieurs centaines de Ko après quelques années) à chaque fois coûtait
+// ~70 ms sur téléphone : on invalide le cache tout de suite et on écrit au calme,
+// avec écriture forcée quand l'app passe en arrière-plan ou se ferme.
+let DATA_VER = 0;
+const MEMO = new Map();
+function memo(key, fn){
+  const hit = MEMO.get(key);
+  if(hit && hit.v===DATA_VER) return hit.r;
+  const r = fn();
+  MEMO.set(key, { v:DATA_VER, r });
+  return r;
+}
+let persistTimer = null, persistBlocked = false;
+// Une séance terminée n'a plus besoin des champs de travail (notes, cibles de séries,
+// ressenti vide, séries non faites) : on les retire pour garder le stockage léger.
+function compactSession(s){
+  const out = {};
+  ["id","date","source","type","resolvedType","name","tplId","planned","startedAt","completedAt","durationSec"].forEach(k=>{ if(s[k]!=null && s[k]!==false) out[k] = s[k]; });
+  out.exos = (s.exos||[]).map(ex=>({
+    exoId: ex.exoId,
+    targetReps: ex.targetReps,
+    sets: ex.sets.filter(st=>st.done).map(st=>{
+      const o = { reps: st.reps, done: true };
+      if(st.weight!=null) o.weight = st.weight;
+      if(st.pr) o.pr = true;
+      return o;
+    })
+  })).filter(ex=>ex.sets.length);
+  return out;
+}
 function save(){
+  DATA_VER++;
+  if(persistBlocked) return;
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persistNow, 400);
+}
+function persistNow(){
+  clearTimeout(persistTimer); persistTimer = null;
+  if(persistBlocked) return;
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
 }
+window.addEventListener("pagehide", ()=>{ if(persistTimer) persistNow(); });
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden" && persistTimer) persistNow(); });
 
 // ---------- utilitaires ----------
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
@@ -1129,7 +1358,8 @@ function availableExos(){
 }
 
 // ---------- historique : agrégats ----------
-function lastPerformance(exoId){
+function lastPerformance(exoId){ return memo("lp:"+exoId, ()=>lastPerformance_raw(exoId)); }
+function lastPerformance_raw(exoId){
   for(let i=S.sessions.length-1;i>=0;i--){
     const s = S.sessions[i];
     const ex = s.exos.find(x=>x.exoId===exoId);
@@ -1137,7 +1367,8 @@ function lastPerformance(exoId){
   }
   return null;
 }
-function daysSinceTrained(muscleId){
+function daysSinceTrained(muscleId){ return memo("dst:"+muscleId+todayISO(), ()=>daysSinceTrained_raw(muscleId)); }
+function daysSinceTrained_raw(muscleId){
   for(let i=S.sessions.length-1;i>=0;i--){
     const s = S.sessions[i];
     const trained = s.exos.some(ex=>{
@@ -1161,16 +1392,22 @@ function sessionReps(s){
 function sessionPRCount(s){
   return s.exos.reduce((t,ex)=>t+ex.sets.filter(st=>st.done&&st.pr).length,0);
 }
-function totalVolumeAllTime(){ return S.sessions.reduce((t,s)=>t+sessionVolume(s),0); }
-function totalSets(){ return S.sessions.reduce((t,s)=>t+sessionSetCount(s),0); }
-function totalDurationSec(){ return S.sessions.reduce((t,s)=>t+(s.durationSec||0),0); }
-function bestSessionVolume(){ return S.sessions.reduce((m,s)=>Math.max(m,sessionVolume(s)),0); }
-function distinctExosCount(){
+function totalVolumeAllTime(){ return memo("totalVolumeAllTime", totalVolumeAllTime_raw); }
+function totalVolumeAllTime_raw(){ return S.sessions.reduce((t,s)=>t+sessionVolume(s),0); }
+function totalSets(){ return memo("totalSets", totalSets_raw); }
+function totalSets_raw(){ return S.sessions.reduce((t,s)=>t+sessionSetCount(s),0); }
+function totalDurationSec(){ return memo("totalDurationSec", totalDurationSec_raw); }
+function totalDurationSec_raw(){ return S.sessions.reduce((t,s)=>t+(s.durationSec||0),0); }
+function bestSessionVolume(){ return memo("bestSessionVolume", bestSessionVolume_raw); }
+function bestSessionVolume_raw(){ return S.sessions.reduce((m,s)=>Math.max(m,sessionVolume(s)),0); }
+function distinctExosCount(){ return memo("distinctExosCount", distinctExosCount_raw); }
+function distinctExosCount_raw(){
   const ids = new Set();
   S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) ids.add(ex.exoId); }));
   return ids.size;
 }
-function distinctMusclesCount(){
+function distinctMusclesCount(){ return memo("distinctMusclesCount", distinctMusclesCount_raw); }
+function distinctMusclesCount_raw(){
   const ms = new Set();
   S.sessions.forEach(s=>s.exos.forEach(ex=>{
     const def = EXO_MAP[ex.exoId];
@@ -1184,7 +1421,8 @@ function estimated1RM(weight,reps){
   if(!weight||!reps) return weight||0;
   return weight*(1+reps/30); // formule d'Epley
 }
-function exoPRs(exoId){
+function exoPRs(exoId){ return memo("pr:"+exoId, ()=>exoPRs_raw(exoId)); }
+function exoPRs_raw(exoId){
   let maxWeight=0, maxVolumeSession=0, best1rm=0, count=0;
   S.sessions.forEach(s=>{
     const ex = s.exos.find(x=>x.exoId===exoId);
@@ -1219,7 +1457,8 @@ function currentStreakWeeks(){
   while(weeks.has(cursor)){ n++; cursor = addDaysISO(cursor,-7); }
   return n;
 }
-function maxStreakWeeksEver(){
+function maxStreakWeeksEver(){ return memo("maxStreakWeeksEver", maxStreakWeeksEver_raw); }
+function maxStreakWeeksEver_raw(){
   const weeks = Array.from(new Set(S.sessions.map(s=>weekKey(s.date)))).sort();
   let best=0, cur=0, prev=null;
   weeks.forEach(w=>{
@@ -1228,7 +1467,8 @@ function maxStreakWeeksEver(){
   });
   return best;
 }
-function perfectWeeksCount(){
+function perfectWeeksCount(){ return memo("perfectWeeksCount", perfectWeeksCount_raw); }
+function perfectWeeksCount_raw(){
   const goal = S.goals.daysPerWeek||3, per = {};
   S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
   return Object.values(per).filter(n=>n>=goal).length;
@@ -1267,7 +1507,8 @@ function weeklyBuckets(n){
   });
   return out;
 }
-function dayMap(){
+function dayMap(){ return memo("dayMap", dayMap_raw); }
+function dayMap_raw(){
   const m = {};
   S.sessions.forEach(s=>{
     const e = m[s.date] || (m[s.date]={sessions:0,volume:0,sets:0});
@@ -1278,7 +1519,8 @@ function dayMap(){
 
 // ---------- niveau (XP) ----------
 const LEVEL_TITLES = [[15,"Légende de la forge"],[10,"Maître forgeron·ne"],[6,"Forgeron·ne"],[3,"Compagnon·ne"],[1,"Apprenti·e"]];
-function totalXP(){
+function totalXP(){ return memo("totalXP", totalXP_raw); }
+function totalXP_raw(){
   const medalPts = Object.values(S.medals).reduce((t,m)=>t+[0,10,25,50,100].slice(1,(m.t||0)+1).reduce((a,b)=>a+b,0),0);
   return S.sessions.length*50 + totalSets()*2 + (S.meta.prCount||0)*10 + medalPts;
 }
@@ -1300,19 +1542,22 @@ function plannedTemplate(iso){
 }
 
 // ---------- statistiques du profil ----------
-function favoriteExercise(){
+function favoriteExercise(){ return memo("favoriteExercise", favoriteExercise_raw); }
+function favoriteExercise_raw(){
   const c = {};
   S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) c[ex.exoId]=(c[ex.exoId]||0)+1; }));
   const id = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
   return id ? { def:EXO_MAP[id], n:c[id] } : null;
 }
-function favoriteWeekday(){
+function favoriteWeekday(){ return memo("favoriteWeekday", favoriteWeekday_raw); }
+function favoriteWeekday_raw(){
   const c = [0,0,0,0,0,0,0];
   S.sessions.forEach(s=>c[weekdayIdx(s.date)]++);
   const max = Math.max(...c);
   return max ? { i:c.indexOf(max), n:max } : null;
 }
-function favoriteMoment(){
+function favoriteMoment(){ return memo("favoriteMoment", favoriteMoment_raw); }
+function favoriteMoment_raw(){
   const c = { "le matin":0, "à midi":0, "l'après-midi":0, "le soir":0 };
   S.sessions.forEach(s=>{
     const h = startHour(s); if(h===null) return;
@@ -1321,13 +1566,15 @@ function favoriteMoment(){
   const k = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
   return c[k] ? k : null;
 }
-function bestWeek(){
+function bestWeek(){ return memo("bestWeek", bestWeek_raw); }
+function bestWeek_raw(){
   const per = {};
   S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
   const k = Object.keys(per).sort((a,b)=>per[b]-per[a])[0];
   return k ? { wk:k, n:per[k] } : null;
 }
-function topLifts(n){
+function topLifts(n){ return memo("tl:"+n, ()=>topLifts_raw(n)); }
+function topLifts_raw(n){
   const best = {};
   S.sessions.forEach(s=>s.exos.forEach(ex=>ex.sets.forEach(st=>{
     if(!st.done || !st.weight) return;
@@ -1336,7 +1583,8 @@ function topLifts(n){
   })));
   return Object.keys(best).filter(id=>EXO_MAP[id]).map(id=>Object.assign({ def:EXO_MAP[id] }, best[id])).sort((a,b)=>b.w-a.w).slice(0,n);
 }
-function firstSessionDate(){ return S.sessions.length ? S.sessions.reduce((m,s)=>s.date<m?s.date:m, S.sessions[0].date) : null; }
+function firstSessionDate(){ return memo("firstSessionDate", firstSessionDate_raw); }
+function firstSessionDate_raw(){ return S.sessions.length ? S.sessions.reduce((m,s)=>s.date<m?s.date:m, S.sessions[0].date) : null; }
 // ================= MOTEUR DE SUGGESTION (100% local, aucun appel réseau) =================
 const PATTERN_CYCLE = ["squat","hinge","push","pull","lunge","core","calf"];
 const SESSION_SIZE = { court:4, moyen:6, long:8 };
@@ -2120,7 +2368,7 @@ function heatmap(weeks){
 function hbarList(items){
   const max = Math.max(1,...items.map(x=>x.value));
   return items.map((it,i)=>`<div class="hb-row" data-tip="${esc(it.label+" : "+it.value+" "+(it.unit||""))}">
-    <div class="hb-top"><span>${esc(it.label)}</span><span class="hb-v">${it.value}${it.unit?" "+esc(it.unit):""}</span></div>
+    <div class="hb-top"><span>${it.region?`<i class="hb-dot r-${it.region}"></i>`:""}${esc(it.label)}</span><span class="hb-v">${it.value}${it.unit?" "+esc(it.unit):""}</span></div>
     <div class="hb-track"><div class="hb-fill" style="width:${it.value/max*100}%;--i:${i}"></div></div>
   </div>`).join("");
 }
@@ -2252,8 +2500,9 @@ const MEDALS = [
 const MEDAL_MAP = {}; MEDALS.forEach(m=>MEDAL_MAP[m.id]=m);
 
 function medalTier(m){ return (S.medals[m.id]||{}).t||0; }
+function medalVal(m){ return memo("mv:"+m.id, m.val); }
 function medalProgress(m){
-  const v = m.val(), t = medalTier(m);
+  const v = medalVal(m), t = medalTier(m);
   const next = t<4 ? m.t[t] : null, prev = t>0 ? m.t[t-1] : (m.base||0);
   return { v, t, next, pct: next==null ? 1 : Math.max(0,Math.min(1,(v-prev)/(next-prev))) };
 }
@@ -2267,7 +2516,7 @@ function checkMedals(silent){
   const ups = [];
   const now = new Date().toISOString();
   MEDALS.forEach(m=>{
-    const v = m.val();
+    const v = medalVal(m);
     const reached = m.t.filter(th=>v>=th).length;
     const cur = S.medals[m.id] || { t:0, d:{} };
     if(reached>cur.t){
@@ -2399,7 +2648,6 @@ Object.assign(ACT, {
 // Avant la séance : deux sections — « Proposée » (moteur, avec choix du type de séance)
 // et « Ma séance » (composée par l'utilisateur, avec modèles réutilisables).
 // Pendant la séance : mode focus, un exercice à la fois.
-const PATTERN_EMOJI = { squat:"🏋️", hinge:"⚙️", push:"⬆️", pull:"⬇️", lunge:"🚶", core:"🔲", calf:"🦶" };
 
 let liveFocusIdx = 0;
 let focusAnimDir = null;
@@ -2464,10 +2712,11 @@ function renderTodayPreview(draft){
 let freshIds = new Set(); // exercices qui viennent d'être ajoutés : animation d'apparition
 function exoRowHTML(def, sub, i, actions, app){
   const fresh = freshIds.has(def.id);
-  return `<div class="row stagger ${fresh?"fresh":""}" style="--i:${i+2}">
-    <button class="row-main" data-a="showExoInfo" data-id="${def.id}">
-      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+  return `<div class="row stagger ${fresh?"fresh":""}" style="--i:${Math.min(i+2,14)}">
+    <button class="row-main" data-a="showExoInfo" data-id="${def.id}" aria-label="${esc(def.n)} : voir la fiche">
+      ${exoIcon(def)}
       <div class="grow"><div class="t">${esc(def.n)}${app?' <span class="app-badge" title="Ajouté par l\'app">✨</span>':""}</div><div class="s">${sub}</div></div>
+      <span class="info-dot" aria-hidden="true">i</span>
     </button>${actions}
   </div>`;
 }
@@ -2513,44 +2762,110 @@ function proposalPaneHTML(draft){
     <div class="btnrow"><button class="btn big" data-a="startSession">${icon("play")} Commencer cette séance</button></div>`;
 }
 
+// ---------- séances enregistrées & planning ----------
+function uiState(){ return S.settings.ui || (S.settings.ui = { planOpen:true, tplOpen:true }); }
+let openTpls = new Set();   // séances enregistrées dépliées
+let showAllTpls = false;
+let reorderMode = false;
+
+function tplRegion(t){
+  const c = {};
+  t.exos.forEach(e=>{ const d=EXO_MAP[e.exoId]; if(d) c[regionOf(d)]=(c[regionOf(d)]||0)+e.sets; });
+  return Object.keys(c).sort((a,b)=>c[b]-c[a])[0] || "core";
+}
+function tplMinutes(t){ return estimateMinutes({ exos:t.exos.map(e=>({ exoId:e.exoId, sets:new Array(e.sets).fill(0) })) }); }
+function daysLabel(days){ return days.slice().sort().map(d=>JOURS_COURTS[d]).join(" · "); }
+// prochaine séance planifiée après aujourd'hui (sur 7 jours)
+function nextPlanned(){
+  for(let k=1;k<=7;k++){
+    const iso = addDaysISO(todayISO(), k), t = plannedTemplate(iso);
+    if(t) return { iso, t, k };
+  }
+  return null;
+}
+
+function sectionHead(title, key, extra){
+  const open = uiState()[key];
+  return `<button class="sec-h" data-a="toggleSection" data-k="${key}" aria-expanded="${open}">
+    <span>${title}</span>${extra||""}<span class="sec-chev ${open?"open":""}">${icon("chev")}</span>
+  </button>`;
+}
+
 function weekPlanHTML(){
   const today = todayISO(), monday = weekKey(today);
   const doneDays = new Set(S.sessions.map(s=>s.date));
+  const nxt = nextPlanned();
+  const open = uiState().planOpen;
+  const todayT = plannedTemplate();
+  const summary = todayT ? `Aujourd'hui : ${esc(todayT.n)}` : nxt ? `Prochaine : ${JOURS_COURTS[weekdayIdx(nxt.iso)].toLowerCase()}. · ${esc(nxt.t.n)}` : (S.templates.length ? "Aucun jour planifié" : "");
   return `<div class="week-plan stagger" style="--i:0">
-    <div class="wp-h"><span>Mon planning</span><span class="wp-hint">touche un jour pour y placer une séance</span></div>
-    <div class="wp-days">${JOURS_COURTS.map((j,i)=>{
+    ${sectionHead("Mon planning", "planOpen", summary?`<span class="sec-sum">${summary}</span>`:"")}
+    ${open ? `<div class="wp-days">${JOURS_COURTS.map((j,i)=>{
       const iso = addDaysISO(monday,i);
       const t = S.templates.find(t=>(t.days||[]).includes(i));
-      return `<button class="wp-day ${iso===today?"today":""} ${t?"has":""} ${doneDays.has(iso)?"done":""}" data-a="planDay" data-d="${i}">
+      const done = doneDays.has(iso), missed = t && iso<today && !done;
+      return `<button class="wp-day ${iso===today?"today":""} ${t?"has r-"+tplRegion(t):""} ${done?"done":""} ${missed?"missed":""}" data-a="planDay" data-d="${i}" aria-label="${JOURS[(i+1)%7]} ${parseISO(iso).getDate()} : ${t?esc(t.n):"rien de prévu"}${done?", séance faite":""}${missed?", séance manquée":""}">
         <span class="wp-j">${j}</span><span class="wp-n">${parseISO(iso).getDate()}</span>
         <span class="wp-t">${t?esc(t.n):"—"}</span>
-        ${doneDays.has(iso)?`<span class="wp-check">${icon("check")}</span>`:""}
+        ${done?`<span class="wp-check">${icon("check")}</span>`:missed?`<span class="wp-miss" title="Séance prévue non faite"></span>`:""}
       </button>`;
     }).join("")}</div>
+    <div class="wp-foot">${S.templates.length ? "Touche un jour pour y placer une séance enregistrée." : "Enregistre une séance, puis place-la sur un ou plusieurs jours."}</div>` : ""}
+  </div>`;
+}
+
+function tplCardHTML(t, i){
+  const open = openTpls.has(t.id), region = tplRegion(t), loaded = S.custom.tplId===t.id;
+  const sets = t.exos.reduce((a,e)=>a+e.sets,0);
+  const list = open ? `<div class="tc-list">${t.exos.map(e=>{ const d=EXO_MAP[e.exoId]; return d?`<button class="tc-exo" data-a="showExoInfo" data-id="${d.id}">${exoIcon(d,"sm")}<span class="tc-n">${esc(d.n)}</span><span class="tc-s">${e.sets}×</span></button>`:""; }).join("")}</div>
+    <div class="tc-actions">
+      <button class="btn sm" data-a="startTemplate" data-id="${t.id}">${icon("play")} Commencer</button>
+      <button class="btn secondary sm" data-a="loadTemplate" data-id="${t.id}">${icon("edit")} Modifier</button>
+      <button class="btn secondary sm icon-only" aria-label="Plus d'options" data-a="templateMenu" data-id="${t.id}">•••</button>
+    </div>` : "";
+  return `<div class="tpl-card2 r-${region} ${open?"open":""} ${loaded?"loaded":""} stagger" style="--i:${Math.min(i+1,10)}">
+    <button class="tc-head" data-a="toggleTpl" data-id="${t.id}" aria-expanded="${open}">
+      <span class="tc-bar"></span>
+      <span class="tc-main">
+        <span class="tc-name">${esc(t.n)}${loaded?' <span class="tc-tag">chargée</span>':""}</span>
+        <span class="tc-meta">${t.exos.length} exercice${t.exos.length>1?"s":""} · ${sets} séries · ≈ ${tplMinutes(t)} min</span>
+        <span class="tc-days">${(t.days||[]).length ? (t.days||[]).slice().sort().map(d=>`<span>${JOURS_COURTS[d]}</span>`).join("") : `<em>pas de jour fixe</em>`}</span>
+      </span>
+      <span class="tc-picts">${t.exos.slice(0,3).map(e=>EXO_MAP[e.exoId]?exoIcon(EXO_MAP[e.exoId],"xs"):"").join("")}</span>
+      <span class="sec-chev ${open?"open":""}">${icon("chev")}</span>
+    </button>
+    ${list}
+  </div>`;
+}
+
+function templatesHTML(){
+  if(!S.templates.length) return "";
+  const open = uiState().tplOpen;
+  const list = showAllTpls ? S.templates : S.templates.slice(0,3);
+  const hidden = S.templates.length - list.length;
+  return `<div class="tpl-section">
+    ${sectionHead(`Mes séances enregistrées <span class="sec-count">${S.templates.length}</span>`, "tplOpen")}
+    ${open ? `<div class="tpl-list">${list.map(tplCardHTML).join("")}</div>
+      ${hidden>0 ? `<button class="show-more" data-a="tplShowAll">Afficher les ${hidden} autre${hidden>1?"s":""} ${icon("chev")}</button>`
+        : S.templates.length>3 ? `<button class="show-more up" data-a="tplShowAll">Afficher moins ${icon("chev")}</button>` : ""}` : ""}
   </div>`;
 }
 
 function customPaneHTML(){
   const c = S.custom.exos;
   const planned = plannedTemplate();
-  const plannedBanner = planned && S.custom.tplId===planned.id && !sessionsToday().some(s=>s.tplId===planned.id) ? `<div class="plan-banner stagger" style="--i:1">
-      <span class="pb-ico">📌</span><div class="grow"><div class="pb-t">Séance prévue aujourd'hui</div><div class="pb-s">${esc(planned.n)} · ${JOURS[parseISO(todayISO()).getDay()]}</div></div>
+  const doneToday = planned && sessionsToday().some(s=>s.tplId===planned.id);
+  const plannedBanner = planned && !doneToday ? `<div class="plan-banner r-${tplRegion(planned)} stagger" style="--i:1">
+      <span class="pb-ico">📌</span>
+      <div class="grow"><div class="pb-t">Prévu aujourd'hui</div><div class="pb-s">${esc(planned.n)} · ${planned.exos.length} exercices · ≈ ${tplMinutes(planned)} min</div></div>
+      <button class="pb-go" data-a="startTemplate" data-id="${planned.id}" aria-label="Commencer ${esc(planned.n)}">${icon("play")}</button>
     </div>` : "";
-  const tpls = S.templates.length ? `<h2 class="sh">Mes séances enregistrées</h2>
-    <div class="tpl-scroll">${S.templates.map((t,i)=>`<div class="tpl-card stagger ${S.custom.tplId===t.id?"on":""}" style="--i:${i+1}">
-      <button class="tpl-main" data-a="loadTemplate" data-id="${t.id}">
-        <div class="tpl-name">${esc(t.n)}</div>
-        <div class="tpl-sub">${t.exos.length} exercice${t.exos.length>1?"s":""} · ${t.exos.reduce((a,e)=>a+e.sets,0)} séries</div>
-        <div class="tpl-days">${(t.days||[]).length ? (t.days||[]).slice().sort().map(d=>`<span>${JOURS_COURTS[d]}</span>`).join("") : `<em>pas de jour</em>`}</div>
-      </button>
-      <button class="tpl-del" aria-label="Options du modèle" data-a="templateMenu" data-id="${t.id}">•••</button>
-    </div>`).join("")}</div>` : "";
-  const head = weekPlanHTML() + plannedBanner + tpls;
+  const head = weekPlanHTML() + plannedBanner + templatesHTML();
   if(!c.length){
     return `${head}<div class="builder-empty stagger" style="--i:2">
       <div class="be-ico">✍️</div>
       <div class="be-t">Compose ta séance</div>
-      <div class="be-s">Choisis tes exercices, ou laisse l'app te proposer un complément. Forge calcule les charges à partir de ton historique.</div>
+      <div class="be-s">Choisis tes exercices, ou laisse l'app te proposer une base. Forge calcule les charges à partir de ton historique.</div>
       <button class="btn" data-a="customAddOpen">${icon("plus")} Choisir des exercices</button>
       <button class="btn secondary" style="margin-top:8px" data-a="customFill">✨ Laisser l'app choisir</button>
       <button class="btn ghost sm" style="margin-top:6px" data-a="customFromProposal">Partir de la séance proposée</button>
@@ -2558,18 +2873,25 @@ function customPaneHTML(){
   }
   const rows = c.map((e,i)=>{
     const def = EXO_MAP[e.exoId]; if(!def) return "";
-    return exoRowHTML(def, `${catLabel(def)} · ${MUSCLE_MAP[def.muscles[0]].n}`, i, `<div class="mini-step">
+    const actions = reorderMode
+      ? `<div class="mini-step order"><button aria-label="Monter" data-a="customMove" data-idx="${i}" data-d="-1" ${i===0?"disabled":""}>↑</button><button aria-label="Descendre" data-a="customMove" data-idx="${i}" data-d="1" ${i===c.length-1?"disabled":""}>↓</button></div>`
+      : `<div class="mini-step">
         <button aria-label="Moins de séries" data-a="customSets" data-idx="${i}" data-d="-1">−</button><span>${e.sets}×</span><button aria-label="Plus de séries" data-a="customSets" data-idx="${i}" data-d="1">+</button>
       </div>
-      <button class="icon-btn" aria-label="Retirer" data-a="customRemove" data-idx="${i}">${icon("close")}</button>`, e.app);
+      <button class="icon-btn" aria-label="Retirer" data-a="customRemove" data-idx="${i}">${icon("close")}</button>`;
+    return exoRowHTML(def, `${catLabel(def)} · ${MUSCLE_MAP[def.muscles[0]].n}`, i, actions, e.app);
   }).join("");
   freshIds = new Set();
   const sets = c.reduce((t,e)=>t+e.sets,0);
   const preview = { exos: c.map(e=>({ exoId:e.exoId, sets:new Array(e.sets).fill(0) })) };
+  const regions = {}; c.forEach(e=>{ const d=EXO_MAP[e.exoId]; if(d) regions[regionOf(d)]=(regions[regionOf(d)]||0)+e.sets; });
+  const balance = Object.keys(REGIONS).filter(r=>regions[r]).map(r=>`<span class="rb r-${r}" style="flex:${regions[r]}" title="${REGIONS[r].n} : ${regions[r]} séries"></span>`).join("");
   return `${head}
-    <h2 class="sh">${esc(S.custom.name||"Ma séance")}<button class="more" data-a="customClear">Vider</button></h2>
+    <h2 class="sh">${esc(S.custom.name||"Ma séance")}<span class="sh-actions">${c.length>1?`<button class="more" data-a="toggleReorder">${reorderMode?"Terminé":"Réorganiser"}</button>`:""}<button class="more" data-a="customClear">Vider</button></span></h2>
     <div class="sh-sub">${c.length} exercice${c.length>1?"s":""} · ${sets} séries · ≈ ${estimateMinutes(preview)} min</div>
-    <div class="group builder">${rows}</div>
+    <div class="region-bar" aria-hidden="true">${balance}</div>
+    <div class="region-legend">${Object.keys(REGIONS).filter(r=>regions[r]).map(r=>`<span><i class="r-${r}"></i>${REGIONS[r].n}</span>`).join("")}</div>
+    <div class="group builder ${reorderMode?"reorder":""}">${rows}</div>
     <div class="btnrow">
       <button class="btn secondary sm" data-a="customAddOpen">${icon("plus")} Ajouter</button>
       <button class="btn secondary sm" data-a="customFill">✨ Compléter</button>
@@ -2582,6 +2904,9 @@ function customPaneHTML(){
 let picker = null;
 function openPicker(opts){
   picker = Object.assign({ multi:false, selected:[], exclude:new Set(), q:"", muscle:null, cat:null }, opts);
+  renderPickerSheet();
+}
+function renderPickerSheet(){
   const owned = new Set(availableExos().map(exoCategory));
   const cats = [["","Tout le matériel"]].concat(EXO_CATS.filter(c=>owned.has(c.id)).map(c=>[c.id, c.em+" "+c.n])).map(([id,n])=>`<button class="chip cat ${(picker.cat||"")===id?"on":""}" data-a="pickerCat" data-v="${id}">${esc(n)}</button>`).join("");
   const chips = [["","Tous les muscles"]].concat(MUSCLES.map(m=>[m.id,m.n])).map(([id,n])=>`<button class="chip ${(picker.muscle||"")===id?"on":""}" data-a="pickerMuscle" data-v="${id}">${esc(n)}</button>`).join("");
@@ -2594,7 +2919,8 @@ function openPicker(opts){
     <div class="sheet-body" id="pickerList">${pickerListHTML()}</div>`,
     { tall:true, footer: picker.multi ? `<button class="btn" id="pickerDone" data-a="pickerDone" disabled>Ajouter</button>` : null });
   const inp = qs("#pickerSearch");
-  if(inp) inp.addEventListener("input", ()=>{ picker.q = inp.value; qs("#pickerList").innerHTML = pickerListHTML(); });
+  if(inp){ inp.value = picker.q; inp.addEventListener("input", ()=>{ picker.q = inp.value; qs("#pickerList").innerHTML = pickerListHTML(); }); }
+  refreshPickerFooter();
 }
 function pickerListHTML(){
   const q = normName(picker.q);
@@ -2611,11 +2937,14 @@ function pickerListHTML(){
     return `<div class="pick-h"><span>${c.em}</span> ${esc(c.n)} <span class="pick-n">${list.length}</span></div><div class="group">${list.map(e=>{
       const on = picker.selected.includes(e.id);
       const m = e.muscles[0], sub = m!==lastM ? `<div class="pick-m">${esc(MUSCLE_MAP[m].n)}</div>` : ""; lastM = m;
-      return `${sub}<button class="row tap pick-row ${on?"on":""}" data-a="pickerTap" data-id="${e.id}">
-        <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[e.pattern]}</div>
-        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${musclesLabel(e)}${e.equip.includes("bench")?" · banc":""}</div></div>
-        ${picker.multi?`<span class="pick-check">${on?icon("check"):""}</span>`:""}
-      </button>`;
+      return `${sub}<div class="row pick-row ${on?"on":""}" data-id="${e.id}">
+        <button class="row-main" data-a="pickerTap" data-id="${e.id}">
+          ${exoIcon(e)}
+          <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${musclesLabel(e)}${e.equip.includes("bench")?" · banc":""}</div></div>
+        </button>
+        <button class="info-btn" aria-label="Fiche de ${esc(e.n)}" data-a="pickerInfo" data-id="${e.id}">i</button>
+        ${picker.multi?`<button class="pick-check" aria-label="Sélectionner" data-a="pickerTap" data-id="${e.id}">${on?icon("check"):""}</button>`:""}
+      </div>`;
     }).join("")}</div>`;
   }).join("");
 }
@@ -2651,7 +2980,7 @@ function liveStripHTML(draft){
     const def = EXO_MAP[e.exoId], n = e.sets.length, d = e.sets.filter(s=>s.done).length;
     const cls = i===idx ? "current" : d===n ? "done" : d ? "started" : "";
     return `<button class="ls-chip ${cls}" data-a="focusJump" data-idx="${i}" aria-label="${esc(def.n)} : ${d} sur ${n} séries">
-      <span class="ls-ring" style="--p:${Math.round(d/n*100)}"><span>${d===n?icon("check"):PATTERN_EMOJI[def.pattern]||"💪"}</span></span>
+      <span class="ls-ring r-${regionOf(def)}" style="--p:${Math.round(d/n*100)}"><span>${d===n?icon("check"):pictoSVG(pictoKey(def))}</span></span>
       <span class="ls-name">${esc(def.n)}</span>
       <span class="ls-sets">${d}/${n}</span>
     </button>`;
@@ -2715,7 +3044,8 @@ function renderFocusCard(idx, ex, def){
   justDone = null;
   const resting = restState && restState.exoIdx===idx;
   const allDone = ex.sets.every(s=>s.done);
-  const header = `<div class="fc-icon">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+  const header = `<button class="fc-info" aria-label="Fiche de l'exercice" data-a="showExoInfo" data-id="${def.id}">i</button>
+    <div class="fc-icon">${exoIcon(def,"lg")}</div>
     <div class="fc-name">${esc(def.n)}</div>
     <div class="fc-sub"><button data-a="showExoInfo" data-id="${def.id}">${musclesLabel(def)} · <u>technique</u></button></div>`;
   const setDots = si => `<div class="set-dots">${ex.sets.map((s,i)=>`<span class="sd ${s.done?"done":i===si?"current":""} ${i===jd?"just":""} ${s.pr?"pr":""}"></span>`).join("")}</div>`;
@@ -2723,7 +3053,7 @@ function renderFocusCard(idx, ex, def){
   if(resting){
     const remain = Math.max(0, Math.round((restState.endAt-Date.now())/1000));
     const next = ex.sets.find(s=>!s.done);
-    return `<div class="focus-card ${animClass}">${header}
+    return `<div class="focus-card r-${regionOf(def)} ${animClass}">${header}
       ${setDots(-1)}
       <div class="fc-phase">Repos</div>
       ${ringSVG(remain, restState.totalSec)}
@@ -2734,7 +3064,7 @@ function renderFocusCard(idx, ex, def){
 
   if(allDone){
     const recap = ex.sets.map(s=>`<span class="chip ${s.pr?"pr":""}">${s.pr?"💥 ":""}${s.reps||"?"}${s.weight!=null?" × "+s.weight+" kg":""}</span>`).join("");
-    return `<div class="focus-card ${animClass}">${header}
+    return `<div class="focus-card r-${regionOf(def)} ${animClass}">${header}
       <div class="fc-done-badge">${icon("check")}</div>
       <div class="fc-recap">${recap}</div>
       <div class="fc-quiet"><button data-a="swapExoOpen" data-idx="${idx}">Remplacer</button><button data-a="addSetFocus" data-exi="${idx}">+ série</button></div>
@@ -2745,7 +3075,7 @@ function renderFocusCard(idx, ex, def){
   const st = ex.sets[si];
   const hasWeight = !!loadableTypeOf(def);
   const unit = isTimed(def) ? "Secondes" : "Répétitions";
-  return `<div class="focus-card ${animClass}">${header}
+  return `<div class="focus-card r-${regionOf(def)} ${animClass}">${header}
     <div class="fc-phase">Série ${si+1} / ${ex.sets.length} · objectif ${repsLabel(ex.targetReps)}</div>
     ${setDots(si)}
     <div class="big-steppers">
@@ -2785,7 +3115,7 @@ function overviewBodyHTML(){
     const allDone = done===ex.sets.length;
     return `<div class="row">
       <button class="row-main" data-a="jumpFromOverview" data-idx="${i}">
-        <div class="ico" style="background:${allDone?"var(--green)":"var(--tint)"}">${allDone?icon("check"):PATTERN_EMOJI[def.pattern]||"💪"}</div>
+        ${allDone?`<span class="xico done">${icon("check")}</span>`:exoIcon(def)}
         <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${done}/${ex.sets.length} séries</div></div>
       </button>
       <button class="icon-btn" aria-label="Remplacer" data-a="swapExoOpen" data-idx="${i}">${icon("swap")}</button>
@@ -2802,7 +3132,7 @@ function finalizeSession(){
   draft.completedAt = new Date().toISOString();
   draft.durationSec = Math.round((Date.parse(draft.completedAt)-Date.parse(draft.startedAt))/1000);
   draft.exos = draft.exos.filter(ex=>ex.sets.some(s=>s.done));
-  S.sessions.push(clone(draft));
+  S.sessions.push(compactSession(clone(draft)));
   if(draft.source==="imported" && S.importedProgram.length) S.importedProgram.shift();
   S.draft = null;
   liveFocusIdx = 0;
@@ -2828,7 +3158,7 @@ function openTemplateModal(name, days, id){
   openModal(`<div style="font-weight:700;font-size:calc(17rem/17);margin-bottom:4px">${id?"Séance enregistrée":"Enregistrer ma séance"}</div>
     <div class="hr-note" style="margin:0 0 12px">Choisis les jours où tu veux la faire : elle s'affichera directement ces jours-là à l'ouverture de l'app.</div>
     <div class="num-field"><input id="tplName" type="text" maxlength="40" placeholder="Ex. Haut du corps A" value="${esc(name)}"></div>
-    <div class="tpl-daypick">${JOURS_COURTS.map((j,i)=>`<button class="${days.includes(i)?"on":""}" data-a="tplDayToggle" data-d="${i}">${j}</button>`).join("")}</div>
+    <div class="tpl-daypick">${JOURS_COURTS.map((j,i)=>`<button class="${days.includes(i)||(!id&&(S.custom.pendingDays||[]).includes(i))?"on":""}" data-a="tplDayToggle" data-d="${i}">${j}</button>`).join("")}</div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
       <button class="btn" data-a="saveTemplateOk" ${id?`data-id="${id}"`:""} ${id&&S.custom.tplId!==id?'data-edit="1"':""}>Enregistrer</button>
       <button class="btn ghost" data-a="closesheet" style="height:40px">Annuler</button>
@@ -2845,7 +3175,8 @@ function openPlanDaySheet(day){
     <div class="sheet-body">
       ${S.templates.length ? `<p class="body" style="margin-bottom:12px">Quelle séance enregistrée veux-tu faire chaque ${label} ?</p><div class="group">${rows}</div>
         ${cur?`<div class="btnrow"><button class="btn ghost" data-a="planSet" data-d="${day}">Ne rien prévoir le ${label}</button></div>`:""}`
-      : `<div class="empty-state"><span class="em">📋</span>Tu n'as pas encore de séance enregistrée.<br>Compose une séance dans « Ma séance », puis touche « Enregistrer » pour la placer sur ce jour.</div>`}
+      : `<div class="empty-state" style="padding:24px 20px"><span class="em">📋</span>Tu n'as pas encore de séance enregistrée.</div>`}
+      <div class="btnrow"><button class="btn ${S.templates.length?"secondary":""}" data-a="planNew" data-d="${day}">${icon("plus")} Composer une nouvelle séance pour le ${label}</button></div>
     </div>`);
 }
 // À l'ouverture (et quand on planifie le jour même) : charge la séance prévue aujourd'hui dans « Ma séance »
@@ -2931,13 +3262,55 @@ Object.assign(ACT, {
   },
   templateMenu(d){
     const t = S.templates.find(x=>x.id===d.id); if(!t) return;
-    openModal(`<div style="font-weight:700;font-size:calc(17rem/17)">${esc(t.n)}</div>
-      <div class="hr-note" style="margin:4px 0 14px">${t.exos.length} exercices · ${(t.days||[]).length?"le "+t.days.slice().sort().map(x=>JOURS[(x+1)%7]).join(", "):"aucun jour assigné"}</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn" data-a="loadTemplate" data-id="${t.id}">Charger dans Ma séance</button>
-        <button class="btn secondary" data-a="editTemplateDays" data-id="${t.id}">Choisir les jours</button>
-        <button class="btn ghost" style="color:var(--red)" data-a="deleteTemplate" data-id="${t.id}">Supprimer</button>
-      </div>`);
+    openModal(`<div class="tm-head r-${tplRegion(t)}"><span class="tc-bar"></span><div><div style="font-weight:700;font-size:calc(17rem/17)">${esc(t.n)}</div>
+      <div class="hr-note" style="margin:2px 0 0">${t.exos.length} exercices · ${(t.days||[]).length?daysLabel(t.days):"aucun jour fixe"}</div></div></div>
+      <div class="menu-list">
+        <button data-a="startTemplate" data-id="${t.id}">${icon("play")}<span>Commencer maintenant</span></button>
+        <button data-a="loadTemplate" data-id="${t.id}">${icon("edit")}<span>Modifier les exercices</span></button>
+        <button data-a="editTemplateDays" data-id="${t.id}">${icon("clock")}<span>Jours et nom</span></button>
+        <button data-a="duplicateTemplate" data-id="${t.id}">${icon("bookmark")}<span>Dupliquer</span></button>
+        <button class="danger" data-a="deleteTemplate" data-id="${t.id}">${icon("trash")}<span>Supprimer</span></button>
+      </div>
+      <button class="btn ghost" style="height:40px;margin-top:6px" data-a="closesheet">Fermer</button>`);
+  },
+  toggleSection(d){ const u = uiState(); u[d.k] = !u[d.k]; save(); changed(); },
+  toggleTpl(d){ if(openTpls.has(d.id)) openTpls.delete(d.id); else openTpls.add(d.id); changed(); },
+  tplShowAll(){ showAllTpls = !showAllTpls; changed(); },
+  toggleReorder(){ reorderMode = !reorderMode; changed(); },
+  customMove(d){
+    const i = +d.idx, j = i+parseInt(d.d,10), a = S.custom.exos;
+    if(j<0 || j>=a.length) return;
+    [a[i],a[j]] = [a[j],a[i]];
+    freshIds.add(a[j].exoId);
+    save(); changed();
+  },
+  startTemplate(d){
+    const t = S.templates.find(x=>x.id===d.id); if(!t) return;
+    S.custom = { exos: clone(t.exos), name: t.n, tplId: t.id, planDate: todayISO() };
+    closeSheet();
+    ACT.startCustom();
+  },
+  duplicateTemplate(d){
+    const t = S.templates.find(x=>x.id===d.id); if(!t) return;
+    const copy = { id:uid(), n:`${t.n} (copie)`, days:[], exos:clone(t.exos) };
+    S.templates.splice(S.templates.indexOf(t)+1, 0, copy);
+    openTpls.add(copy.id);
+    closeSheet(); save(); changed(); toast("Séance dupliquée");
+  },
+  planNew(d){
+    S.custom = { exos:[], pendingDays:[+d.d] };
+    S.settings.todayTab = "custom";
+    closeSheet(); save(); renderViewAnimated("today");
+    setTimeout(()=>ACT.customAddOpen(), 380);
+  },
+  pickerInfo(d){ ACT.showExoInfo({ id:d.id, back:"1" }); },
+  backToPicker(){ if(picker) renderPickerSheet(); },
+  swapFromInfo(d){
+    const idx = +d.idx;
+    S.draft.exos[idx] = sessionEntryFor(EXO_MAP[d.id]);
+    liveFocusIdx = idx; focusAnimDir = "r";
+    closeSheet(); save(); refreshFocusRegion();
+    toast(`Remplacé par ${EXO_MAP[d.id].n}`);
   },
   editTemplateDays(d){ const t = S.templates.find(x=>x.id===d.id); if(t) openTemplateModal(t.n, t.days||[], t.id); },
   tplDayToggle(d, el){ el.classList.toggle("on"); },
@@ -2976,7 +3349,8 @@ Object.assign(ACT, {
     const i = picker.selected.indexOf(d.id);
     if(i>=0) picker.selected.splice(i,1); else picker.selected.push(d.id);
     const row = qs(`.pick-row[data-id="${d.id}"]`);
-    if(row){ row.classList.toggle("on", i<0); qs(".pick-check",row).innerHTML = i<0 ? icon("check") : ""; }
+    if(row){ row.classList.toggle("on", i<0); const c = qs(".pick-check",row); if(c) c.innerHTML = i<0 ? icon("check") : ""; }
+    if(navigator.vibrate) try{ navigator.vibrate(6); }catch(e){}
     refreshPickerFooter();
   },
   pickerMuscle(d){
@@ -3035,6 +3409,8 @@ Object.assign(ACT, {
     if(t){ t.n = name; t.days = days; if(!editOnly) t.exos = clone(S.custom.exos.map(e=>({ exoId:e.exoId, sets:e.sets }))); }
     else { t = { id:uid(), n:name, days, exos:clone(S.custom.exos.map(e=>({ exoId:e.exoId, sets:e.sets }))) }; S.templates.push(t); }
     if(!editOnly || S.custom.tplId===t.id){ S.custom.name = name; S.custom.tplId = t.id; }
+    delete S.custom.pendingDays;
+    openTpls.add(t.id);
     closeSheet(); save(); changed();
     toast(days.length ? `« ${name} » enregistrée pour le ${days.slice().sort().map(k=>JOURS[(k+1)%7]).join(", ")}` : `« ${name} » enregistrée`);
   },
@@ -3042,7 +3418,8 @@ Object.assign(ACT, {
     const t = S.templates.find(x=>x.id===d.id); if(!t) return;
     S.custom = { exos: clone(t.exos), name: t.n, tplId: t.id };
     t.exos.forEach(e=>freshIds.add(e.exoId));
-    closeSheet(); save(); renderViewAnimated("today"); toast(`« ${t.n} » chargée`);
+    closeSheet(); save(); renderViewAnimated("today"); toast(`« ${t.n} » chargée dans Ma séance`);
+    setTimeout(()=>{ const g = qs("#v-today .group.builder"); if(g) g.scrollIntoView({ behavior:"smooth", block:"center" }); }, 260);
   },
   deleteTemplate(d){
     const t = S.templates.find(x=>x.id===d.id); if(!t) return;
@@ -3133,29 +3510,52 @@ Object.assign(ACT, {
   },
 
   showExoInfo(d){
-    const e = EXO_MAP[d.id];
+    const e = EXO_MAP[d.id], region = regionOf(e);
     const pr = exoPRs(e.id), last = lastPerformance(e.id);
+    const live = S.draft && S.draft.startedAt;
     const inCustom = S.custom.exos.some(x=>x.exoId===e.id);
+    const cat = EXO_CATS.find(c=>c.id===exoCategory(e));
     const stats = pr.count ? `<div class="stat-strip" style="margin-top:14px">
         <div class="stat-box"><div class="num">${pr.count}</div><div class="lbl">séance${pr.count>1?"s":""}</div></div>
-        <div class="stat-box"><div class="num">${pr.maxWeight?pr.maxWeight+" kg":"–"}</div><div class="lbl">record charge</div></div>
+        <div class="stat-box"><div class="num">${pr.maxWeight?fmtDec(pr.maxWeight)+" kg":"–"}</div><div class="lbl">record charge</div></div>
         <div class="stat-box"><div class="num">${last?fmtRelative(last.session.date):"–"}</div><div class="lbl">dernière fois</div></div>
-      </div>` : "";
-    openSheet(`<div class="sheet-hd"><span class="t">Technique</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+      </div>` : `<div class="first-time">Tu n'as encore jamais fait cet exercice : commence léger pour prendre tes repères.</div>`;
+    const similar = availableExos().filter(x=>x.id!==e.id && x.muscles[0]===e.muscles[0]).slice(0,4);
+    const liveIdx = live ? S.draft.exos.findIndex(x=>x.exoId===e.id) : -1;
+    const simHTML = similar.length ? `<h2 class="sh">Même muscle principal</h2><div class="group">${similar.map(x=>`<div class="row">
+        <button class="row-main" data-a="showExoInfo" data-id="${x.id}">${exoIcon(x)}<div class="grow"><div class="t">${esc(x.n)}</div><div class="s">${catLabel(x)}</div></div><span class="info-dot">i</span></button>
+        ${liveIdx>=0 ? `<button class="chip" data-a="swapFromInfo" data-idx="${liveIdx}" data-id="${x.id}">Remplacer</button>` : !live && !S.custom.exos.some(c=>c.exoId===x.id) ? `<button class="chip" data-a="addToCustom" data-id="${x.id}">+ Ajouter</button>` : ""}
+      </div>`).join("")}</div>` : "";
+    const back = picker && d.back ? `<button class="btn secondary" data-a="backToPicker">${icon("chev")} Retour à la liste</button>` : "";
+    openSheet(`<div class="sheet-hd"><span class="t">Fiche exercice</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
       <div class="sheet-body">
-      <div class="exo-hero"><div class="ico">${PATTERN_EMOJI[e.pattern]||"💪"}</div><div class="nm">${esc(e.n)}</div></div>
-      <div class="exo-muscle-chips">${e.muscles.map((m,i)=>`<span class="chip ${i===0?"on":""}">${MUSCLE_MAP[m].n}</span>`).join("")}</div>
+      <div class="exo-hero r-${region}">
+        ${exoIcon(e,"xl")}
+        <div class="nm">${esc(e.n)}</div>
+        <div class="exo-tags"><span class="rtag r-${region}">${REGIONS[region].n}</span><span class="etag">${cat.em} ${esc(cat.n)}</span>${e.equip.includes("bench")?`<span class="etag">+ banc</span>`:""}</div>
+      </div>
+      <div class="exo-muscle-chips">${e.muscles.map((m,i)=>`<span class="chip ${i===0?"on":""}">${i===0?"Principal : ":""}${MUSCLE_MAP[m].n}</span>`).join("")}</div>
       ${stats}
+      <div class="exo-facts">
+        <div><b>${e.sets} × ${e.repsMin}-${e.repsMax}</b><span>${isTimed(e)?"secondes":"répétitions"} conseillées</span></div>
+        <div><b>${e.restSec} s</b><span>de repos</span></div>
+        <div><b>${e.uni?"Unilatéral":"Bilatéral"}</b><span>${e.uni?"un côté à la fois":"les deux côtés"}</span></div>
+      </div>
       <h2 class="sh">Exécution</h2>
       <div class="cue-list">${e.cues.map((c,i)=>`<div class="cue-item" style="animation-delay:${i*0.07}s"><div class="cue-num">${i+1}</div><div class="cue-txt">${esc(c)}</div></div>`).join("")}</div>
       <div class="safety-box"><div class="lbl">Sécurité</div><div class="txt">${esc(e.safety)}</div></div>
-      <p class="hr-note" style="margin:10px 20px 0">Repos conseillé : ${e.restSec} s · ${e.sets} × ${e.repsMin}-${e.repsMax}</p>
-      ${!S.draft||!S.draft.startedAt ? `<div class="btnrow"><button class="btn secondary" data-a="addToCustom" data-id="${e.id}" ${inCustom?"disabled":""}>${inCustom?"Déjà dans Ma séance":"Ajouter à Ma séance"}</button></div>`:""}
+      ${simHTML}
+      <div class="btnrow col">
+        ${back}
+        ${pr.count ? `<button class="btn secondary" data-a="openExoChart" data-id="${e.id}">Voir ma progression</button>` : ""}
+        ${!live ? `<button class="btn ${inCustom?"secondary":""}" data-a="addToCustom" data-id="${e.id}" ${inCustom?"disabled":""}>${inCustom?"Déjà dans Ma séance":"Ajouter à Ma séance"}</button>` : ""}
+      </div>
       </div>`);
   },
   addToCustom(d){
     if(S.custom.exos.some(x=>x.exoId===d.id)) return;
     S.custom.exos.push({ exoId:d.id, sets:EXO_MAP[d.id].sets });
+    freshIds.add(d.id);
     save(); closeSheet(); changed(); toast("Ajouté à Ma séance");
   },
 
@@ -3183,15 +3583,21 @@ function sessionTitle(s){
   const t = SESSION_TYPE_MAP[s.resolvedType||s.type];
   return t ? t.n : "Séance";
 }
-function sessionEmoji(s){
-  if(s.source==="custom") return "✍️";
-  if(s.source==="imported") return "🤖";
-  const t = SESSION_TYPE_MAP[s.resolvedType||s.type];
-  return t && t.id!=="auto" ? t.em : "🏋️";
+// icône d'une séance : pictogramme de l'exercice principal, couleur de la zone dominante
+function sessionIcon(s){
+  const count = {};
+  s.exos.forEach(ex=>{ const d=EXO_MAP[ex.exoId]; if(d) count[regionOf(d)] = (count[regionOf(d)]||0) + ex.sets.filter(st=>st.done).length; });
+  const region = Object.keys(count).sort((a,b)=>count[b]-count[a])[0] || "core";
+  const first = s.exos.map(ex=>EXO_MAP[ex.exoId]).find(d=>d && regionOf(d)===region);
+  return `<span class="xico r-${region}">${pictoSVG(first?pictoKey(first):"squat")}</span>`;
 }
 
+// Affichage par paquets : l'historique complet (des centaines de séances après
+// quelques années) prenait plus de 100 ms à dessiner sur téléphone.
+let histLimit = 25;
 function renderHistory(){
-  const sessions = S.sessions.slice().reverse();
+  const all = S.sessions.slice().reverse();
+  const sessions = all.slice(0, histLimit);
   if(!sessions.length){
     return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
       <h1 class="lt">Historique</h1>
@@ -3212,7 +3618,7 @@ function renderHistory(){
     const rows = m.list.map(s=>{
       const prs = sessionPRCount(s);
       return `<button class="row tap stagger" style="--i:${Math.min(i++,12)}" data-a="openSessionDetail" data-id="${s.id}">
-        <div class="ico" style="background:var(--tint)">${sessionEmoji(s)}</div>
+        ${sessionIcon(s)}
         <div class="grow"><div class="t">${esc(sessionTitle(s))}${prs?` <span class="pr-badge">💥 ${prs}</span>`:""}</div>
         <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries · ${fmtKg(sessionVolume(s))}</div></div>
         <div class="val">${s.durationSec?fmtDuration(s.durationSec):""}</div><span class="chev">${icon("chev")}</span>
@@ -3222,8 +3628,13 @@ function renderHistory(){
       <div class="sh-sub">${m.list.length} séance${m.list.length>1?"s":""} · ${fmtKg(vol)}</div>
       <div class="group">${rows}</div>`;
   }).join("");
+  const more = all.length - sessions.length;
   return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
-    <h1 class="lt">Historique</h1>${html}</div>`;
+    <h1 class="lt">Historique</h1>
+    <div class="sh-sub" style="margin-top:-4px">${all.length} séance${all.length>1?"s":""} au total · ${fmtKg(totalVolumeAllTime())} soulevés</div>
+    ${html}
+    ${more>0?`<div class="btnrow"><button class="btn secondary" data-a="histMore">Afficher ${Math.min(more,25)} séance${Math.min(more,25)>1?"s":""} de plus <span class="muted-n">· ${more} restante${more>1?"s":""}</span></button></div>`:""}
+  </div>`;
 }
 
 function sessionDetailHTML(s){
@@ -3233,7 +3644,7 @@ function sessionDetailHTML(s){
     const sets = ex.sets.filter(st=>st.done);
     if(!sets.length) return "";
     return `<div class="row" style="align-items:flex-start">
-      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      ${exoIcon(def)}
       <div class="grow"><div class="t">${esc(def.n)}</div>
       <div class="set-chips">${sets.map(st=>`<span class="chip ${st.pr?"pr":""}">${st.pr?"💥 ":""}${st.reps||"?"}${st.weight!=null&&st.weight!==""?" × "+st.weight+" kg":""}</span>`).join("")}</div></div>
     </div>`;
@@ -3255,6 +3666,7 @@ function sessionDetailHTML(s){
 }
 
 Object.assign(ACT, {
+  histMore(){ histLimit += 25; changed(); },
   openSessionDetail(d){
     const s = S.sessions.find(x=>x.id===d.id);
     if(s) openSheet(sessionDetailHTML(s));
@@ -3289,7 +3701,7 @@ function muscleSets(days){
     const n = ex.sets.filter(st=>st.done).length;
     if(n) counts[def.muscles[0]] = (counts[def.muscles[0]]||0)+n;
   }));
-  return MUSCLES.map(m=>({ label:m.n, value:counts[m.id]||0, unit:"séries" })).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
+  return MUSCLES.map(m=>({ label:m.n, value:counts[m.id]||0, unit:"séries", region:REGION_OF_MUSCLE[m.id] })).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
 }
 function recentPRs(n){
   const out = [];
@@ -3395,7 +3807,7 @@ function exosPaneHTML(){
     if(!def) return "";
     const pr = exoPRs(id);
     return `<button class="row tap stagger" style="--i:${Math.min(i,12)}" data-a="openExoChart" data-id="${id}">
-      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      ${exoIcon(def)}
       <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${pts.length} séance${pts.length>1?"s":""} · ${loaded&&pr.maxWeight?"record "+pr.maxWeight+" kg":"record "+Math.max(...pts.map(p=>p.best))+" reps"}</div></div>
       ${sparkline(pts.slice(-10).map(p=>p.best))}
       <span class="chev">${icon("chev")}</span>
@@ -3645,7 +4057,7 @@ function exoPrefsBodyHTML(){
     const rows = list.map(e=>{
       const excl = isExcluded(e.id), incl = isIncluded(e.id), avail = hasEquip(S.equipment, e.equip);
       return `<div class="row ${avail?"":"unavail"}">
-        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}${e.equip.includes("bench")?" · banc":""}</div></div>
+        <button class="row-main" data-a="showExoInfo" data-id="${e.id}" style="flex:1">${exoIcon(e)}<div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}${e.equip.includes("bench")?" · banc":""}</div></div></button>
         <button class="chip ${incl?"on":""}" aria-label="Privilégier" data-a="toggleIncluded" data-id="${e.id}">★</button>
         <button class="chip ${excl?"excl":""}" data-a="toggleExcluded" data-id="${e.id}">Exclure</button>
       </div>`;
@@ -3757,12 +4169,12 @@ Object.assign(ACT, {
 
   confirmReset(){
     confirmSheet({ title:"Réinitialiser toutes les données ?", html:"Cette action est irréversible : séances, matériel, objectifs et trophées seront définitivement supprimés.", ok:"Tout supprimer", danger:true,
-      onOk:()=>{ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+      onOk:()=>{ persistBlocked = true; localStorage.removeItem(STORAGE_KEY); location.reload(); } });
   },
 });
 VIEWS.profil = renderProfil;
 // ================= INITIALISATION =================
-const APP_VERSION = "1.3";
+const APP_VERSION = "1.4";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){

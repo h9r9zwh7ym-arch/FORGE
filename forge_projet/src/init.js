@@ -1,5 +1,5 @@
 // ================= INITIALISATION =================
-const APP_VERSION = "1.3";
+const APP_VERSION = "1.4";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){

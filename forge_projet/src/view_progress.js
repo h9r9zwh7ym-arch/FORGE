@@ -14,7 +14,7 @@ function muscleSets(days){
     const n = ex.sets.filter(st=>st.done).length;
     if(n) counts[def.muscles[0]] = (counts[def.muscles[0]]||0)+n;
   }));
-  return MUSCLES.map(m=>({ label:m.n, value:counts[m.id]||0, unit:"séries" })).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
+  return MUSCLES.map(m=>({ label:m.n, value:counts[m.id]||0, unit:"séries", region:REGION_OF_MUSCLE[m.id] })).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
 }
 function recentPRs(n){
   const out = [];
@@ -120,7 +120,7 @@ function exosPaneHTML(){
     if(!def) return "";
     const pr = exoPRs(id);
     return `<button class="row tap stagger" style="--i:${Math.min(i,12)}" data-a="openExoChart" data-id="${id}">
-      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      ${exoIcon(def)}
       <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${pts.length} séance${pts.length>1?"s":""} · ${loaded&&pr.maxWeight?"record "+pr.maxWeight+" kg":"record "+Math.max(...pts.map(p=>p.best))+" reps"}</div></div>
       ${sparkline(pts.slice(-10).map(p=>p.best))}
       <span class="chev">${icon("chev")}</span>

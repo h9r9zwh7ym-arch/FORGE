@@ -119,8 +119,9 @@ const MEDALS = [
 const MEDAL_MAP = {}; MEDALS.forEach(m=>MEDAL_MAP[m.id]=m);
 
 function medalTier(m){ return (S.medals[m.id]||{}).t||0; }
+function medalVal(m){ return memo("mv:"+m.id, m.val); }
 function medalProgress(m){
-  const v = m.val(), t = medalTier(m);
+  const v = medalVal(m), t = medalTier(m);
   const next = t<4 ? m.t[t] : null, prev = t>0 ? m.t[t-1] : (m.base||0);
   return { v, t, next, pct: next==null ? 1 : Math.max(0,Math.min(1,(v-prev)/(next-prev))) };
 }
@@ -134,7 +135,7 @@ function checkMedals(silent){
   const ups = [];
   const now = new Date().toISOString();
   MEDALS.forEach(m=>{
-    const v = m.val();
+    const v = medalVal(m);
     const reached = m.t.filter(th=>v>=th).length;
     const cur = S.medals[m.id] || { t:0, d:{} };
     if(reached>cur.t){

@@ -8,7 +8,7 @@ Tu reprends **Forge**, une app web de suivi de musculation pour iPhone, dévelop
 - Usage **solo sur iPhone (Safari)**. Cible réelle = Safari/WebKit, même si le développement peut se tester sous Chromium.
 - **Véracité des informations d'exercice** : toute consigne d'exécution ou de sécurité ajoutée doit s'appuyer sur des repères techniques reconnus (alignement articulaire, dos neutre, amplitude contrôlée...). Ne jamais inventer une consigne dangereuse. En cas de doute, reste conservateur et renvoie vers un professionnel.
 - **100% local** : aucun backend, aucun compte, aucun appel réseau. Tout est stocké dans `localStorage` (clé `forge.v1`).
-- **Numérotation des versions** : version actuelle **1.3**. Incrémente `APP_VERSION` (`src/init.js`) à chaque livraison notable.
+- **Numérotation des versions** : version actuelle **1.4**. Incrémente `APP_VERSION` (`src/init.js`) à chaque livraison notable.
 - Copyright affiché dans « À propos » : `© <année> Yannick Wahler. Tous droits réservés.` (constante `COPYRIGHT`, `src/init.js`).
 - Cahier des charges d'origine : voir la conversation initiale (résumé ci-dessous, section 6).
 
@@ -20,6 +20,8 @@ sh build.sh   # assemble dist/forge.html ET copie vers ../index.html (racine du 
 ```
 
 Pas de framework, pas de dépendance npm pour l'app elle-même. Pour tester dans un vrai navigateur : ouvrir `index.html` directement (`file://`), ou le servir avec `python3 -m http.server`.
+
+**WebKit (moteur de Safari) est installé depuis la v1.4** (`npx playwright install webkit`, l'hôte `cdn.playwright.dev` a été autorisé dans les réglages réseau de l'environnement). Lancer chaque test dans les deux moteurs : Chromium via `executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'`, WebKit via `webkit.launch()` avec `hasTouch:true, isMobile:true`. Attendre la disparition de `#splash` avant d'interagir, et ne pas lire `localStorage` juste après une action : l'écriture est différée de 400 ms (appeler `persistNow()` dans le test si besoin).
 
 Pour un smoke test automatisé (Playwright/Chromium déjà installé dans les environnements Claude Code cloud) : ouvrir la page, cliquer sur chaque onglet, démarrer une séance, cocher une série, terminer la séance, vérifier l'absence d'erreurs console (`page.on('pageerror', ...)`).
 
@@ -107,24 +109,33 @@ Demande de YaYa : trier les exercices par matériel, en ajouter (pectoraux aux h
 - **Profil** : carte d'identité (prénom modifiable, niveau, ancienneté), bilan des médailles par palier, « Mes habitudes » (exercice favori, jour et moment préférés, durée moyenne, meilleure semaine…), « Mes records » (5 charges les plus lourdes). Fonctions dans `core.js` (`favoriteExercise`, `favoriteWeekday`, `favoriteMoment`, `bestWeek`, `topLifts`).
 - **Médailles** : 24 familles en 5 catégories (`MEDAL_CATS`). Les platines visent plusieurs années (500 séances, 104 semaines d'affilée, 5 « années de fer » à 48 semaines actives, 1,5 million de kg…). Vérifié sur 10 semaines de données simulées régulières : aucun or ni platine. « Deux fois plus fort » compare au meilleur des 3 premières séances d'un exercice pratiqué depuis 90 jours au moins (sinon une progression de débutant donnait le platine en quelques semaines). Les paliers déjà obtenus sous d'anciens seuils sont conservés (`checkMedals` ne fait que monter).
 
-## 9. Cahier des charges d'origine (résumé)
+## 9. Pictogrammes, couleurs, séances enregistrées, optimisation (v1.4)
+
+- **Pictogrammes** (`data_pictos.js`) : 19 silhouettes au trait (squat, fente, soulevé de terre, développé couché, écarté, pompe, dips, développé militaire, élévations, rowing, traction, curl, triceps, pont, gainage, crunch, mollets, cardio, port de charges), attribuées à chaque exercice par `PICTO_OF` (tous les 98 exercices ont une entrée ; vérifié par script). `exoIcon(def, taille)` rend la tuile ; tailles `xs/sm/(défaut)/lg/xl`. Les emojis de flèches ont disparu.
+- **Code couleur par zone** (`REGIONS`, `regionOf(def)` d'après le muscle principal) : poussée = magenta, tirage = bleu, jambes = vert, gainage & cardio = jaune. Teintes tirées de la palette documentée du skill *dataviz* et validées avec son script (`validate_palette.js --pairs all`, clair et sombre) : toutes les vérifications passent ; la séparation daltonisme (ΔE 6,9) est dans la zone tolérée **à condition d'un encodage secondaire** — la couleur est donc toujours accompagnée du pictogramme et/ou du libellé. Le trait du pictogramme est foncé sur le magenta et le jaune clairs (contraste insuffisant avec le blanc), blanc ailleurs (`--r-*-ink`). L'orange reste réservé aux actions et le rouge au danger. Les variables CSS : `--r-push`, `--r-pull`, `--r-legs`, `--r-core` (+ `-ink`), activées par les classes `.r-push` … qui posent `--rc`/`--ri`. **Piège rencontré** : une valeur par défaut `--rc` posée sur `.xico` (même spécificité, déclarée après) écrasait les classes de zone ; les défauts passent désormais par `var(--rc, var(--tint))`.
+- **Bouton « i »** partout : lignes de « Ma séance » et de la proposition, cartes de séances enregistrées, sélecteur (la fiche ouverte depuis le sélecteur a un bouton « Retour à la liste » qui conserve la recherche, les filtres et la sélection : `renderPickerSheet()`), carte de la séance en cours (`.fc-info`). Fiche enrichie : zone, matériel, faits clés (séries × reps, repos, unilatéral), exercices du même muscle principal avec « Remplacer » (en séance) ou « + Ajouter ».
+- **Séances enregistrées** : liste verticale de cartes repliables (`openTpls`), 3 visibles puis « Afficher les N autres » (`showAllTpls`), sections « Mon planning » et « Mes séances enregistrées » repliables (état mémorisé dans `S.settings.ui`). Chaque carte : barre de la couleur de zone dominante, jours, mini-pictos ; dépliée : exercices, « Commencer » (démarre directement, `startTemplate`), « Modifier », menu (jours et nom, dupliquer, supprimer). « Ma séance » : mode « Réorganiser » (↑/↓), barre d'équilibre par zone avec légende.
+- **Planning** : jours colorés par la zone de la séance prévue, pastille rouge pour une séance prévue non faite plus tôt dans la semaine, résumé « Prochaine : jeu. · Jambes », bandeau du jour avec bouton ▶ pour démarrer, et depuis un jour vide « Composer une nouvelle séance pour le … » (le jour est pré-coché à l'enregistrement : `S.custom.pendingDays`).
+- **Optimisation**, mesurée sur 3 ans simulés (470 séances), processeur ralenti ×4 : Historique 64 → 6 ms (affichage par paquets de 25, `histLimit`), Médailles 75 → 4 ms, Profil 19 → 6 ms, appui sur +/− 59 → 0 ms (85 → 12 ms avec rendu). Moyens : `memo(clé, fn)` invalidé par `DATA_VER` à chaque `save()` (statistiques, records, valeurs des médailles), écriture `localStorage` différée (`persistNow()` forcé sur `pagehide`/`visibilitychange` ; `persistBlocked` pendant la réinitialisation), séances terminées compactées (`compactSession` : −20 % de stockage). **Règle** : toute modification de `S.sessions` doit passer par `save()`, sinon le cache sert des valeurs périmées.
+
+## 10. Cahier des charges d'origine (résumé)
 
 Voir le fichier `4a3df5ee-cahier-des-charges-forge.md` fourni au lancement du projet pour le texte complet. Points clés déjà couverts en v1.0 : matériel personnalisable et extensible, bibliothèque d'exercices filtrée, inclusion/exclusion d'exercices, objectifs personnalisés, suivi détaillé de séance (éditable, timer de repos, coche rapide), moteur de suggestion 100% local avec export/import IA, graphiques de progression, PR, streaks/régularité, trophées, écran d'accueil = séance du jour, thème clair/sombre automatique, page À propos avec copyright.
 
-## 10. Chantiers proposés pour la suite
+## 11. Chantiers proposés pour la suite
 
 1. Historique modifiable a posteriori (éditer les séries d'une séance déjà enregistrée ; la suppression existe depuis la v1.2).
 2. Export/partage d'une séance ou d'un récap (image), comme le Rewind de Zeste.
 3. Tests automatisés versionnés dans le dépôt (actuellement les tests Playwright ont été écrits et exécutés en session mais pas committés — à formaliser dans un dossier `tests/` si utile).
 4. Vérification de chaque exercice avec une source nommée (NSCA/ACSM/NASM) si YaYa souhaite le même niveau de rigueur que les recettes de Zeste.
-5. Vrai test sur iPhone Safari via WebKit : **bloqué dans cet environnement cloud** — `playwright install webkit` télécharge le binaire depuis `cdn.playwright.dev` / `playwright.download.prss.microsoft.com`, tous deux refusés par la politique réseau de l'environnement (403 « request blocked »). Les dépendances système WebKitGTK, elles, s'installent sans problème. Pour débloquer : ajouter l'un de ces deux hôtes à la liste des domaines autorisés dans les réglages réseau de l'environnement (menu de l'environnement cloud → Modifier), puis relancer `playwright install webkit`.
+5. ~~Test WebKit~~ fait depuis la v1.4 (WebKit 26 via Playwright). Reste : un essai sur un vrai iPhone (gestes, retour haptique, safe areas). Historique de la note : WebKit était **bloqué dans cet environnement cloud** — `playwright install webkit` télécharge le binaire depuis `cdn.playwright.dev` / `playwright.download.prss.microsoft.com`, tous deux refusés par la politique réseau de l'environnement (403 « request blocked »). Les dépendances système WebKitGTK, elles, s'installent sans problème. Pour débloquer : ajouter l'un de ces deux hôtes à la liste des domaines autorisés dans les réglages réseau de l'environnement (menu de l'environnement cloud → Modifier), puis relancer `playwright install webkit`.
 6. Geste de balayage (swipe) pour naviguer entre exercices en mode focus, en plus des flèches actuelles — nécessiterait de gérer `touchstart`/`touchend` proprement sans casser le scroll vertical.
 
-## 11. Aperçu en artifact Claude
+## 12. Aperçu en artifact Claude
 
 En plus du dépôt Git (source de vérité), l'app peut être publiée comme Artifact claude.ai pour un aperçu rapide sans avoir à cloner/ouvrir le fichier : extraire le `<title>`, le `<style>` et le contenu de `<body>` de `dist/forge.html` (sans les balises `<!doctype>`/`<html>`/`<head>`/`<body>`, qu'un Artifact fournit lui-même), puis publier ce fragment avec l'outil Artifact. L'app n'utilise aucune ressource externe (polices système, pas de script CDN), donc elle passe telle quelle la politique de sécurité des Artifacts. Ce n'est qu'un aperçu de confort : le livrable réel reste le fichier unique du dépôt.
 
-## 12. Méthode de travail attendue
+## 13. Méthode de travail attendue
 
 - Lire le code concerné avant de modifier, ne pas réécrire inutilement.
 - Un changement à la fois, reconstruire (`sh build.sh`), tester (au minimum un smoke test navigateur : tous les onglets, démarrer/terminer une séance en mode focus, naviguer entre exercices, ouvrir les sheets du Profil).

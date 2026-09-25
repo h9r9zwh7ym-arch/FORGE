@@ -6,15 +6,21 @@ function sessionTitle(s){
   const t = SESSION_TYPE_MAP[s.resolvedType||s.type];
   return t ? t.n : "Séance";
 }
-function sessionEmoji(s){
-  if(s.source==="custom") return "✍️";
-  if(s.source==="imported") return "🤖";
-  const t = SESSION_TYPE_MAP[s.resolvedType||s.type];
-  return t && t.id!=="auto" ? t.em : "🏋️";
+// icône d'une séance : pictogramme de l'exercice principal, couleur de la zone dominante
+function sessionIcon(s){
+  const count = {};
+  s.exos.forEach(ex=>{ const d=EXO_MAP[ex.exoId]; if(d) count[regionOf(d)] = (count[regionOf(d)]||0) + ex.sets.filter(st=>st.done).length; });
+  const region = Object.keys(count).sort((a,b)=>count[b]-count[a])[0] || "core";
+  const first = s.exos.map(ex=>EXO_MAP[ex.exoId]).find(d=>d && regionOf(d)===region);
+  return `<span class="xico r-${region}">${pictoSVG(first?pictoKey(first):"squat")}</span>`;
 }
 
+// Affichage par paquets : l'historique complet (des centaines de séances après
+// quelques années) prenait plus de 100 ms à dessiner sur téléphone.
+let histLimit = 25;
 function renderHistory(){
-  const sessions = S.sessions.slice().reverse();
+  const all = S.sessions.slice().reverse();
+  const sessions = all.slice(0, histLimit);
   if(!sessions.length){
     return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
       <h1 class="lt">Historique</h1>
@@ -35,7 +41,7 @@ function renderHistory(){
     const rows = m.list.map(s=>{
       const prs = sessionPRCount(s);
       return `<button class="row tap stagger" style="--i:${Math.min(i++,12)}" data-a="openSessionDetail" data-id="${s.id}">
-        <div class="ico" style="background:var(--tint)">${sessionEmoji(s)}</div>
+        ${sessionIcon(s)}
         <div class="grow"><div class="t">${esc(sessionTitle(s))}${prs?` <span class="pr-badge">💥 ${prs}</span>`:""}</div>
         <div class="s">${esc(fmtDate(s.date,"long"))} · ${sessionSetCount(s)} séries · ${fmtKg(sessionVolume(s))}</div></div>
         <div class="val">${s.durationSec?fmtDuration(s.durationSec):""}</div><span class="chev">${icon("chev")}</span>
@@ -45,8 +51,13 @@ function renderHistory(){
       <div class="sh-sub">${m.list.length} séance${m.list.length>1?"s":""} · ${fmtKg(vol)}</div>
       <div class="group">${rows}</div>`;
   }).join("");
+  const more = all.length - sessions.length;
   return `<div class="navbar"><div class="nb-title">Historique</div></div><div class="content">
-    <h1 class="lt">Historique</h1>${html}</div>`;
+    <h1 class="lt">Historique</h1>
+    <div class="sh-sub" style="margin-top:-4px">${all.length} séance${all.length>1?"s":""} au total · ${fmtKg(totalVolumeAllTime())} soulevés</div>
+    ${html}
+    ${more>0?`<div class="btnrow"><button class="btn secondary" data-a="histMore">Afficher ${Math.min(more,25)} séance${Math.min(more,25)>1?"s":""} de plus <span class="muted-n">· ${more} restante${more>1?"s":""}</span></button></div>`:""}
+  </div>`;
 }
 
 function sessionDetailHTML(s){
@@ -56,7 +67,7 @@ function sessionDetailHTML(s){
     const sets = ex.sets.filter(st=>st.done);
     if(!sets.length) return "";
     return `<div class="row" style="align-items:flex-start">
-      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+      ${exoIcon(def)}
       <div class="grow"><div class="t">${esc(def.n)}</div>
       <div class="set-chips">${sets.map(st=>`<span class="chip ${st.pr?"pr":""}">${st.pr?"💥 ":""}${st.reps||"?"}${st.weight!=null&&st.weight!==""?" × "+st.weight+" kg":""}</span>`).join("")}</div></div>
     </div>`;
@@ -78,6 +89,7 @@ function sessionDetailHTML(s){
 }
 
 Object.assign(ACT, {
+  histMore(){ histLimit += 25; changed(); },
   openSessionDetail(d){
     const s = S.sessions.find(x=>x.id===d.id);
     if(s) openSheet(sessionDetailHTML(s));

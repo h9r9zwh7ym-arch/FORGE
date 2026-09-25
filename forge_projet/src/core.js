@@ -36,7 +36,7 @@ function load(){
     merged.settings = Object.assign({}, d.settings, parsed.settings||{});
     merged.meta = Object.assign({}, d.meta, parsed.meta||{});
     merged.custom = Object.assign({}, d.custom, parsed.custom||{});
-    merged.sessions = parsed.sessions||[];
+    merged.sessions = (parsed.sessions||[]).map(compactSession);
     merged.templates = parsed.templates||[];
     merged.medals = parsed.medals||{};
     merged.importedProgram = parsed.importedProgram||[];
@@ -46,9 +46,51 @@ function load(){
   }catch(e){ return defaultState(); }
 }
 
+// ---------- sauvegarde différée + cache des statistiques ----------
+// save() est appelé à chaque interaction (un appui sur +/− par exemple). Réécrire tout
+// l'historique (plusieurs centaines de Ko après quelques années) à chaque fois coûtait
+// ~70 ms sur téléphone : on invalide le cache tout de suite et on écrit au calme,
+// avec écriture forcée quand l'app passe en arrière-plan ou se ferme.
+let DATA_VER = 0;
+const MEMO = new Map();
+function memo(key, fn){
+  const hit = MEMO.get(key);
+  if(hit && hit.v===DATA_VER) return hit.r;
+  const r = fn();
+  MEMO.set(key, { v:DATA_VER, r });
+  return r;
+}
+let persistTimer = null, persistBlocked = false;
+// Une séance terminée n'a plus besoin des champs de travail (notes, cibles de séries,
+// ressenti vide, séries non faites) : on les retire pour garder le stockage léger.
+function compactSession(s){
+  const out = {};
+  ["id","date","source","type","resolvedType","name","tplId","planned","startedAt","completedAt","durationSec"].forEach(k=>{ if(s[k]!=null && s[k]!==false) out[k] = s[k]; });
+  out.exos = (s.exos||[]).map(ex=>({
+    exoId: ex.exoId,
+    targetReps: ex.targetReps,
+    sets: ex.sets.filter(st=>st.done).map(st=>{
+      const o = { reps: st.reps, done: true };
+      if(st.weight!=null) o.weight = st.weight;
+      if(st.pr) o.pr = true;
+      return o;
+    })
+  })).filter(ex=>ex.sets.length);
+  return out;
+}
 function save(){
+  DATA_VER++;
+  if(persistBlocked) return;
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persistNow, 400);
+}
+function persistNow(){
+  clearTimeout(persistTimer); persistTimer = null;
+  if(persistBlocked) return;
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
 }
+window.addEventListener("pagehide", ()=>{ if(persistTimer) persistNow(); });
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden" && persistTimer) persistNow(); });
 
 // ---------- utilitaires ----------
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
@@ -101,7 +143,8 @@ function availableExos(){
 }
 
 // ---------- historique : agrégats ----------
-function lastPerformance(exoId){
+function lastPerformance(exoId){ return memo("lp:"+exoId, ()=>lastPerformance_raw(exoId)); }
+function lastPerformance_raw(exoId){
   for(let i=S.sessions.length-1;i>=0;i--){
     const s = S.sessions[i];
     const ex = s.exos.find(x=>x.exoId===exoId);
@@ -109,7 +152,8 @@ function lastPerformance(exoId){
   }
   return null;
 }
-function daysSinceTrained(muscleId){
+function daysSinceTrained(muscleId){ return memo("dst:"+muscleId+todayISO(), ()=>daysSinceTrained_raw(muscleId)); }
+function daysSinceTrained_raw(muscleId){
   for(let i=S.sessions.length-1;i>=0;i--){
     const s = S.sessions[i];
     const trained = s.exos.some(ex=>{
@@ -133,16 +177,22 @@ function sessionReps(s){
 function sessionPRCount(s){
   return s.exos.reduce((t,ex)=>t+ex.sets.filter(st=>st.done&&st.pr).length,0);
 }
-function totalVolumeAllTime(){ return S.sessions.reduce((t,s)=>t+sessionVolume(s),0); }
-function totalSets(){ return S.sessions.reduce((t,s)=>t+sessionSetCount(s),0); }
-function totalDurationSec(){ return S.sessions.reduce((t,s)=>t+(s.durationSec||0),0); }
-function bestSessionVolume(){ return S.sessions.reduce((m,s)=>Math.max(m,sessionVolume(s)),0); }
-function distinctExosCount(){
+function totalVolumeAllTime(){ return memo("totalVolumeAllTime", totalVolumeAllTime_raw); }
+function totalVolumeAllTime_raw(){ return S.sessions.reduce((t,s)=>t+sessionVolume(s),0); }
+function totalSets(){ return memo("totalSets", totalSets_raw); }
+function totalSets_raw(){ return S.sessions.reduce((t,s)=>t+sessionSetCount(s),0); }
+function totalDurationSec(){ return memo("totalDurationSec", totalDurationSec_raw); }
+function totalDurationSec_raw(){ return S.sessions.reduce((t,s)=>t+(s.durationSec||0),0); }
+function bestSessionVolume(){ return memo("bestSessionVolume", bestSessionVolume_raw); }
+function bestSessionVolume_raw(){ return S.sessions.reduce((m,s)=>Math.max(m,sessionVolume(s)),0); }
+function distinctExosCount(){ return memo("distinctExosCount", distinctExosCount_raw); }
+function distinctExosCount_raw(){
   const ids = new Set();
   S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) ids.add(ex.exoId); }));
   return ids.size;
 }
-function distinctMusclesCount(){
+function distinctMusclesCount(){ return memo("distinctMusclesCount", distinctMusclesCount_raw); }
+function distinctMusclesCount_raw(){
   const ms = new Set();
   S.sessions.forEach(s=>s.exos.forEach(ex=>{
     const def = EXO_MAP[ex.exoId];
@@ -156,7 +206,8 @@ function estimated1RM(weight,reps){
   if(!weight||!reps) return weight||0;
   return weight*(1+reps/30); // formule d'Epley
 }
-function exoPRs(exoId){
+function exoPRs(exoId){ return memo("pr:"+exoId, ()=>exoPRs_raw(exoId)); }
+function exoPRs_raw(exoId){
   let maxWeight=0, maxVolumeSession=0, best1rm=0, count=0;
   S.sessions.forEach(s=>{
     const ex = s.exos.find(x=>x.exoId===exoId);
@@ -191,7 +242,8 @@ function currentStreakWeeks(){
   while(weeks.has(cursor)){ n++; cursor = addDaysISO(cursor,-7); }
   return n;
 }
-function maxStreakWeeksEver(){
+function maxStreakWeeksEver(){ return memo("maxStreakWeeksEver", maxStreakWeeksEver_raw); }
+function maxStreakWeeksEver_raw(){
   const weeks = Array.from(new Set(S.sessions.map(s=>weekKey(s.date)))).sort();
   let best=0, cur=0, prev=null;
   weeks.forEach(w=>{
@@ -200,7 +252,8 @@ function maxStreakWeeksEver(){
   });
   return best;
 }
-function perfectWeeksCount(){
+function perfectWeeksCount(){ return memo("perfectWeeksCount", perfectWeeksCount_raw); }
+function perfectWeeksCount_raw(){
   const goal = S.goals.daysPerWeek||3, per = {};
   S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
   return Object.values(per).filter(n=>n>=goal).length;
@@ -239,7 +292,8 @@ function weeklyBuckets(n){
   });
   return out;
 }
-function dayMap(){
+function dayMap(){ return memo("dayMap", dayMap_raw); }
+function dayMap_raw(){
   const m = {};
   S.sessions.forEach(s=>{
     const e = m[s.date] || (m[s.date]={sessions:0,volume:0,sets:0});
@@ -250,7 +304,8 @@ function dayMap(){
 
 // ---------- niveau (XP) ----------
 const LEVEL_TITLES = [[15,"Légende de la forge"],[10,"Maître forgeron·ne"],[6,"Forgeron·ne"],[3,"Compagnon·ne"],[1,"Apprenti·e"]];
-function totalXP(){
+function totalXP(){ return memo("totalXP", totalXP_raw); }
+function totalXP_raw(){
   const medalPts = Object.values(S.medals).reduce((t,m)=>t+[0,10,25,50,100].slice(1,(m.t||0)+1).reduce((a,b)=>a+b,0),0);
   return S.sessions.length*50 + totalSets()*2 + (S.meta.prCount||0)*10 + medalPts;
 }
@@ -272,19 +327,22 @@ function plannedTemplate(iso){
 }
 
 // ---------- statistiques du profil ----------
-function favoriteExercise(){
+function favoriteExercise(){ return memo("favoriteExercise", favoriteExercise_raw); }
+function favoriteExercise_raw(){
   const c = {};
   S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) c[ex.exoId]=(c[ex.exoId]||0)+1; }));
   const id = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
   return id ? { def:EXO_MAP[id], n:c[id] } : null;
 }
-function favoriteWeekday(){
+function favoriteWeekday(){ return memo("favoriteWeekday", favoriteWeekday_raw); }
+function favoriteWeekday_raw(){
   const c = [0,0,0,0,0,0,0];
   S.sessions.forEach(s=>c[weekdayIdx(s.date)]++);
   const max = Math.max(...c);
   return max ? { i:c.indexOf(max), n:max } : null;
 }
-function favoriteMoment(){
+function favoriteMoment(){ return memo("favoriteMoment", favoriteMoment_raw); }
+function favoriteMoment_raw(){
   const c = { "le matin":0, "à midi":0, "l'après-midi":0, "le soir":0 };
   S.sessions.forEach(s=>{
     const h = startHour(s); if(h===null) return;
@@ -293,13 +351,15 @@ function favoriteMoment(){
   const k = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
   return c[k] ? k : null;
 }
-function bestWeek(){
+function bestWeek(){ return memo("bestWeek", bestWeek_raw); }
+function bestWeek_raw(){
   const per = {};
   S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
   const k = Object.keys(per).sort((a,b)=>per[b]-per[a])[0];
   return k ? { wk:k, n:per[k] } : null;
 }
-function topLifts(n){
+function topLifts(n){ return memo("tl:"+n, ()=>topLifts_raw(n)); }
+function topLifts_raw(n){
   const best = {};
   S.sessions.forEach(s=>s.exos.forEach(ex=>ex.sets.forEach(st=>{
     if(!st.done || !st.weight) return;
@@ -308,4 +368,5 @@ function topLifts(n){
   })));
   return Object.keys(best).filter(id=>EXO_MAP[id]).map(id=>Object.assign({ def:EXO_MAP[id] }, best[id])).sort((a,b)=>b.w-a.w).slice(0,n);
 }
-function firstSessionDate(){ return S.sessions.length ? S.sessions.reduce((m,s)=>s.date<m?s.date:m, S.sessions[0].date) : null; }
+function firstSessionDate(){ return memo("firstSessionDate", firstSessionDate_raw); }
+function firstSessionDate_raw(){ return S.sessions.length ? S.sessions.reduce((m,s)=>s.date<m?s.date:m, S.sessions[0].date) : null; }

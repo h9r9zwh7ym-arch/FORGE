@@ -177,7 +177,7 @@ function exoPrefsBodyHTML(){
     const rows = list.map(e=>{
       const excl = isExcluded(e.id), incl = isIncluded(e.id), avail = hasEquip(S.equipment, e.equip);
       return `<div class="row ${avail?"":"unavail"}">
-        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}${e.equip.includes("bench")?" · banc":""}</div></div>
+        <button class="row-main" data-a="showExoInfo" data-id="${e.id}" style="flex:1">${exoIcon(e)}<div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}${e.equip.includes("bench")?" · banc":""}</div></div></button>
         <button class="chip ${incl?"on":""}" aria-label="Privilégier" data-a="toggleIncluded" data-id="${e.id}">★</button>
         <button class="chip ${excl?"excl":""}" data-a="toggleExcluded" data-id="${e.id}">Exclure</button>
       </div>`;
@@ -289,7 +289,7 @@ Object.assign(ACT, {
 
   confirmReset(){
     confirmSheet({ title:"Réinitialiser toutes les données ?", html:"Cette action est irréversible : séances, matériel, objectifs et trophées seront définitivement supprimés.", ok:"Tout supprimer", danger:true,
-      onOk:()=>{ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+      onOk:()=>{ persistBlocked = true; localStorage.removeItem(STORAGE_KEY); location.reload(); } });
   },
 });
 VIEWS.profil = renderProfil;
