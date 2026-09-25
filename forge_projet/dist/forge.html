@@ -193,14 +193,7 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .streak-badge svg{width:15px;height:15px}
 
 /* ---- mode focus : séance en cours ---- */
-.focus-dots{display:flex;gap:6px;padding:2px 20px 16px}
-.focus-dots button{flex:1;height:5px;border-radius:3px;background:var(--fill);position:relative;overflow:hidden;transition:background .2s}
-.focus-dots button.done{background:var(--green)}
-.focus-dots button.current{background:var(--tint)}
-.focus-dots button.current::after{content:"";position:absolute;inset:0;background:var(--tint);animation:dotPulse 1.7s ease-in-out infinite}
-@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.35}}
-
-.focus-card{background:var(--bg2);border-radius:26px;margin:0 16px;padding:26px 22px 22px;text-align:center;box-shadow:var(--shadow);position:relative}
+.focus-card{background:var(--bg2);border-radius:26px;margin:0 16px;padding:26px 22px 22px;text-align:center;box-shadow:var(--shadow);position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none;transition:transform .12s}
 @keyframes focusInR{from{opacity:0;transform:translateX(28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
 @keyframes focusInL{from{opacity:0;transform:translateX(-28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
 .focus-card.anim-r{animation:focusInR .3s cubic-bezier(.32,.72,0,1)}
@@ -529,6 +522,129 @@ h2.sh button.more{font-size:calc(15rem/17);font-weight:500;color:var(--tint)}
 .cm-t{font-size:calc(12rem/17);font-weight:700;margin-top:6px;line-height:1.2}
 .cm-tier{font-size:calc(11rem/17);color:var(--label2)}
 .confetti{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
+
+/* ================= v1.3 ================= */
+/* ---- lignes : apparition / disparition ---- */
+@keyframes rowIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes rowFlash{0%{background:var(--tint-bg)}100%{background:transparent}}
+.row.fresh{animation:rowIn .4s cubic-bezier(.2,.8,.2,1) both,rowFlash 1.4s ease .2s}
+.row.leaving{transition:opacity .2s,transform .2s;opacity:0;transform:translateX(30px)}
+.app-badge{font-size:12px;vertical-align:1px}
+.row.unavail{opacity:.45}
+.stat-row .val.strong,.row .val.strong{color:var(--label);font-weight:700;font-size:calc(15.5rem/17);max-width:48%;overflow:hidden;text-overflow:ellipsis}
+.rank{width:28px;height:28px;border-radius:14px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;font-weight:800;font-size:calc(14rem/17);flex:none}
+
+/* ---- planning de la semaine ---- */
+.week-plan{margin:0 16px 14px;padding:12px 12px 10px;border-radius:18px;background:var(--bg2)}
+.wp-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 4px 10px;font-weight:700;font-size:calc(15rem/17)}
+.wp-hint{font-weight:500;font-size:calc(11.5rem/17);color:var(--label2);text-align:right}
+.wp-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.wp-day{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px 6px;border-radius:12px;background:var(--fill2);min-width:0;transition:transform .12s,background .2s}
+.wp-day:active{transform:scale(.93)}
+.wp-j{font-size:calc(10.5rem/17);font-weight:700;color:var(--label2);text-transform:uppercase;letter-spacing:.03em}
+.wp-n{font-size:calc(17rem/17);font-weight:700}
+.wp-t{font-size:calc(9.5rem/17);color:var(--label3);width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.wp-day.has{background:var(--tint-bg)}
+.wp-day.has .wp-t{color:var(--tint);font-weight:700}
+.wp-day.today{box-shadow:inset 0 0 0 2px var(--tint)}
+.wp-check{position:absolute;top:-4px;right:-3px;width:17px;height:17px;border-radius:9px;background:var(--green);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 2px var(--bg2)}
+.wp-check svg{width:11px;height:11px}
+.plan-banner{display:flex;align-items:center;gap:12px;margin:0 16px 14px;padding:12px 14px;border-radius:16px;background:linear-gradient(120deg,var(--tint),var(--ember2));color:#fff;box-shadow:0 8px 20px -10px var(--tint)}
+.pb-ico{font-size:22px}
+.pb-t{font-weight:800;font-size:calc(15rem/17)}
+.pb-s{font-size:calc(13rem/17);opacity:.9}
+.tpl-card.on{box-shadow:inset 0 0 0 2px var(--tint),var(--shadow)}
+.tpl-days{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:20px}
+.tpl-days span{font-size:calc(11rem/17);font-weight:700;padding:2px 7px;border-radius:7px;background:var(--tint-bg);color:var(--tint)}
+.tpl-days em{font-size:calc(11.5rem/17);color:var(--label3);font-style:normal}
+.tpl-del{font-size:13px;font-weight:800;letter-spacing:1px;color:var(--label2);width:30px}
+.tpl-daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
+.tpl-daypick button{height:40px;border-radius:10px;background:var(--fill2);font-size:calc(12.5rem/17);font-weight:700;color:var(--label2);transition:background .15s,color .15s,transform .12s}
+.tpl-daypick button:active{transform:scale(.92)}
+.tpl-daypick button.on{background:var(--tint);color:var(--on-tint)}
+
+/* ---- sélecteur par matériel ---- */
+.chip-scroll .chip.cat{font-weight:600}
+.pick-h{display:flex;align-items:center;gap:6px;font-size:calc(13rem/17);letter-spacing:.03em}
+.pick-n{margin-left:auto;font-weight:600;color:var(--label3)}
+.pick-m{padding:8px 16px 2px;font-size:calc(11.5rem/17);font-weight:700;color:var(--tint);text-transform:uppercase;letter-spacing:.04em;background:var(--bg2)}
+
+/* ---- séance en cours : vue d'ensemble en haut ---- */
+.live-strip{position:sticky;top:44px;z-index:15;margin:0 0 12px;padding:6px 0 8px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+.ls-sum{display:flex;gap:14px;padding:0 20px 8px;font-size:calc(12.5rem/17);color:var(--label2)}
+.ls-sum b{color:var(--label);font-weight:700}
+.ls-chips{display:flex;gap:8px;overflow-x:auto;padding:0 16px 2px;scrollbar-width:none;scroll-snap-type:x proximity}
+.ls-chips::-webkit-scrollbar{display:none}
+.ls-chip{flex:none;display:flex;align-items:center;gap:7px;height:40px;padding:0 12px 0 5px;border-radius:20px;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--sep);scroll-snap-align:center;transition:background .2s,box-shadow .2s,transform .12s;max-width:190px}
+.ls-chip:active{transform:scale(.95)}
+.ls-ring{--p:0;width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--tint) calc(var(--p)*1%),var(--fill) 0);transition:background .3s}
+.ls-ring>span{width:24px;height:24px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-size:12px}
+.ls-ring svg{width:14px;height:14px;color:var(--green)}
+.ls-name{font-size:calc(13rem/17);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ls-sets{font-size:calc(11.5rem/17);color:var(--label2);font-variant-numeric:tabular-nums;flex:none}
+.ls-chip.current{background:var(--tint);box-shadow:none;color:var(--on-tint)}
+.ls-chip.current .ls-sets{color:var(--on-tint);opacity:.85}
+.ls-chip.current .ls-ring{background:conic-gradient(var(--on-tint) calc(var(--p)*1%),rgba(255,255,255,.3) 0)}
+.ls-chip.current .ls-ring>span{background:var(--tint)}
+.ls-chip.done{box-shadow:inset 0 0 0 1.5px var(--green)}
+.ls-chip.done .ls-ring{background:var(--green)}
+.swipe-hint{text-align:center;font-size:calc(11.5rem/17);color:var(--label3);margin-top:8px}
+
+/* ---- glisser la carte ---- */
+.focus-card.dragging{transition:none;cursor:grabbing}
+.focus-card.snap{transition:transform .35s cubic-bezier(.32,1.4,.4,1)}
+@keyframes flyL{to{transform:translateX(-120%) rotate(-10deg);opacity:0}}
+@keyframes flyR{to{transform:translateX(120%) rotate(10deg);opacity:0}}
+.focus-card.fly-l{animation:flyL .18s ease-in forwards}
+.focus-card.fly-r{animation:flyR .18s ease-in forwards}
+
+/* ---- petites animations ---- */
+@keyframes tabPop{0%{transform:scale(1)}40%{transform:scale(1.22) translateY(-2px)}100%{transform:scale(1)}}
+.tabbtn.on svg{animation:tabPop .35s cubic-bezier(.32,1.4,.4,1)}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(0)}30%{transform:scale(1.15) rotate(-6deg)}60%{transform:scale(.95) rotate(4deg)}}
+.streak-badge svg{animation:flicker 1.6s ease-in-out 3}
+
+/* ---- profil ---- */
+.profile-hero{display:flex;align-items:center;gap:16px;margin:0 16px;padding:18px 16px;border-radius:22px;background:linear-gradient(150deg,var(--tint-bg),transparent 65%),var(--bg2);box-shadow:var(--shadow)}
+.ph-avatar{position:relative;width:70px;height:70px;border-radius:50%;flex:none;padding:4px;background:conic-gradient(from 200deg,var(--ember2),var(--tint),var(--ember2))}
+.ph-avatar span{width:100%;height:100%;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:30px}
+.ph-avatar em{position:absolute;right:-4px;bottom:-2px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;background:var(--tint);color:var(--on-tint);font-style:normal;font-weight:800;font-size:13px;display:grid;place-items:center;box-shadow:0 0 0 3px var(--bg2)}
+.ph-main{flex:1;min-width:0}
+.ph-name{font-family:var(--serif);font-weight:700;font-size:calc(22rem/17);text-align:left;display:flex;align-items:center;gap:6px;max-width:100%}
+.ph-name svg{width:15px;height:15px;color:var(--label3);flex:none}
+.ph-title{font-size:calc(13.5rem/17);color:var(--tint);font-weight:700;margin-top:1px}
+.ph-sub{font-size:calc(12rem/17);color:var(--label2);margin-top:6px}
+.ph-medals{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 16px 0;padding:10px 6px;border-radius:16px;background:var(--bg2)}
+.ph-medals div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ph-medals b{font-size:calc(17rem/17)}
+.ph-medals small{font-size:calc(11rem/17);color:var(--label2)}
+
+/* ---- lancement ---- */
+.splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 80% at 50% 45%,#2a1508 0%,#0c0705 60%,#000 100%);color:#fff;transition:opacity .45s ease,transform .45s ease}
+.splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+.sp-stage{position:relative;width:200px;height:150px;transform:scale(1.25);margin-bottom:26px}
+.sp-anvil{position:absolute;left:40px;top:84px;width:120px;height:64px;animation:spAnvil .5s cubic-bezier(.2,.8,.2,1) both,spShake .28s ease .62s}
+.sp-anvil svg,.sp-hammer svg{width:100%;height:100%;display:block}
+.sp-hammer{position:absolute;left:103px;top:29px;width:80px;height:80px;transform-origin:50% 95%;animation:spHammer .75s cubic-bezier(.5,0,.75,0) .1s both}
+.sp-glow{position:absolute;left:85px;top:90px;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.85) 0%,rgba(255,110,20,.35) 35%,transparent 70%);opacity:0;animation:spGlow 1.2s ease-out .6s both}
+.sp-sparks{position:absolute;left:85px;top:90px;width:0;height:0}
+.sp-sparks i{position:absolute;left:-2px;top:-2px;width:4px;height:4px;border-radius:2px;background:#ffd27a;box-shadow:0 0 6px 2px rgba(255,150,40,.9);opacity:0;transform:rotate(var(--a)) translateX(0) scale(var(--s));animation:spSpark .75s cubic-bezier(.1,.7,.3,1) calc(.62s + var(--t)) both}
+.sp-word{display:flex;font-family:var(--serif);font-weight:700;font-size:52px;letter-spacing:.02em}
+.sp-word span{display:inline-block;animation:spLetter .6s cubic-bezier(.2,.9,.3,1.3) calc(.8s + var(--i)*70ms) both;text-shadow:0 0 24px rgba(255,140,40,.45)}
+.sp-tag{margin-top:10px;font-size:15px;color:rgba(255,236,220,.72);animation:fadeUp .6s ease 1.25s both}
+@keyframes spAnvil{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes spHammer{0%{opacity:0;transform:rotate(30deg)}20%{opacity:1;transform:rotate(38deg)}82%{transform:rotate(-66deg)}100%{transform:rotate(-60deg)}}
+@keyframes spShake{0%,100%{transform:none}25%{transform:translate(-2px,2px)}50%{transform:translate(2px,1px)}75%{transform:translate(-1px,0)}}
+@keyframes spGlow{0%{opacity:0;transform:scale(.3)}25%{opacity:1;transform:scale(1)}100%{opacity:.35;transform:scale(1.3)}}
+@keyframes spSpark{0%{opacity:1;transform:rotate(var(--a)) translateX(0) scale(var(--s))}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) translateY(18px) scale(.2)}}
+@keyframes spLetter{from{opacity:0;transform:translateY(22px) scale(.8)}to{opacity:1;transform:none}}
+.splash.reduce *{animation:none!important}
+@media (prefers-reduced-motion:reduce){
+  .row.fresh,.focus-card.fly-l,.focus-card.fly-r,.tabbtn.on svg,.streak-badge svg{animation:none!important}
+}
+
+.group.builder .row .t{white-space:normal;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.btnrow .btn.sm{flex:1;padding:0 10px;white-space:nowrap}
 </style></head><body><div id="app"></div><nav class="tabbar" aria-label="Onglets"></nav><div id="restbar"></div><div id="overlay" role="dialog"></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="fileImport" accept="application/json,.json" style="display:none"><script>
 // ================= MATÉRIEL =================
 // Catalogue du matériel reconnu par le moteur de suggestion. Chaque exercice de la
@@ -564,6 +680,21 @@ function defaultEquipment(){
 function hasEquip(eq, list){
   if(!list || !list.length) return true;
   return list.every(id=>id==="bodyweight" || eq.owned[id]);
+}
+
+// Catégories d'affichage des exercices : l'équipement principal qui les caractérise
+// (le banc est un accessoire, il ne crée pas de catégorie).
+const EXO_CATS = [
+  { id:"bodyweight", n:"Poids du corps",   em:"🤸" },
+  { id:"dumbbells",  n:"Haltères",         em:"🏋️" },
+  { id:"barbell",    n:"Barre & disques",  em:"🏋️‍♂️" },
+  { id:"kettlebell", n:"Kettlebell",       em:"🔔" },
+  { id:"bands",      n:"Élastiques",       em:"➰" },
+  { id:"pullup_bar", n:"Barre de traction", em:"🚪" },
+];
+function exoCategory(e){
+  for(const c of ["dumbbells","barbell","kettlebell","bands","pullup_bar"]) if(e.equip.includes(c)) return c;
+  return "bodyweight";
 }
 // ================= EXERCICES =================
 // Bibliothèque d'exercices de musculation. Les consignes d'exécution et de sécurité
@@ -774,6 +905,117 @@ const EXO_RAW = [
 ["band_walk","Marche latérale élastique",["fessiers"],["bands"],"squat",true,{sets:3,repsMin:10,repsMax:15,restSec:45},
   ["Élastique placé au-dessus des genoux ou des chevilles, légère flexion des genoux.","Fais des pas latéraux en gardant la tension dans l'élastique.","Garde les hanches de niveau, sans te pencher."],
   "Reste en position mi-squat basse tout du long pour maximiser le travail des fessiers moyens."],
+
+// ---- ajouts v1.3 ----
+// poids du corps
+["pompes_diamant","Pompes serrées (diamant)",["triceps","pect","epaules"],["bodyweight"],"push",false,{sets:3,repsMin:6,repsMax:12,restSec:75},
+  ["Mains rapprochées sous la poitrine, index et pouces formant un losange.","Descends en gardant les coudes près du corps, corps aligné.","Pousse en expirant jusqu'à l'extension des bras."],
+  "Plus exigeant pour les poignets et les coudes : écarte un peu les mains si tu ressens une gêne articulaire."],
+["pompes_larges","Pompes prise large",["pect","epaules","triceps"],["bodyweight"],"push",false,{sets:3,repsMin:8,repsMax:15,restSec:75},
+  ["Mains nettement plus larges que les épaules, corps aligné.","Descends la poitrine vers le sol en contrôlant.","Pousse en expirant sans laisser le bassin s'affaisser."],
+  "N'écarte pas les mains au point de sentir une tension à l'avant de l'épaule."],
+["fentes_laterales","Fentes latérales",["quadriceps","fessiers"],["bodyweight"],"lunge",true,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Grand pas sur le côté, pied orienté vers l'avant.","Fléchis la jambe d'appui en poussant les hanches en arrière, l'autre jambe reste tendue.","Repousse sur le pied fléchi pour revenir au centre."],
+  "Garde le genou fléchi dans l'axe du pied ; réduis l'amplitude si l'intérieur de la cuisse tire trop."],
+["squat_saute","Squat sauté",["quadriceps","fessiers","cardio"],["bodyweight"],"squat",false,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Descends en squat, dos neutre.","Pousse fort dans le sol pour sauter verticalement.","Réceptionne-toi en douceur sur l'avant des pieds, genoux fléchis, et enchaîne."],
+  "Exercice à impact : maîtrise d'abord le squat classique, et arrête si les genoux ou les chevilles sont douloureux."],
+["gainage_creux","Gainage creux (hollow hold)",["abdos"],["bodyweight"],"core",false,{sets:3,repsMin:15,repsMax:40,restSec:45},
+  ["Allongé sur le dos, bas du dos plaqué au sol.","Décolle épaules et jambes tendues de quelques centimètres, bras le long du corps ou tendus derrière la tête.","Maintiens la position (durée en secondes) en respirant calmement."],
+  "Si le bas du dos décolle, plie les genoux ou remonte les jambes plus haut."],
+["dead_bug","Dead bug",["abdos"],["bodyweight"],"core",true,{sets:3,repsMin:8,repsMax:12,restSec:45},
+  ["Allongé sur le dos, bras tendus vers le plafond, hanches et genoux à 90°.","Tends lentement un bras vers l'arrière et la jambe opposée vers l'avant.","Reviens au centre et alterne, bas du dos plaqué au sol."],
+  "Va lentement : si le bas du dos se creuse, réduis l'amplitude du mouvement."],
+["mollets_uni_pdc","Mollets unilatéral (poids du corps)",["mollets"],["bodyweight"],"calf",true,{sets:3,repsMin:10,repsMax:20,restSec:45},
+  ["Debout sur une jambe, une main en appui pour l'équilibre.","Monte sur la pointe du pied le plus haut possible.","Redescends lentement, idéalement talon sous le niveau de la marche si tu es sur une marche."],
+  "Mouvement contrôlé, sans rebond en bas de l'amplitude."],
+// barre de traction
+["releve_genoux_suspendu","Relevé de genoux suspendu",["abdos"],["bodyweight","pullup_bar"],"core",false,{sets:3,repsMin:8,repsMax:15,restSec:60},
+  ["Suspendu à la barre, épaules engagées.","Remonte les genoux vers la poitrine en enroulant légèrement le bassin.","Redescends lentement sans te balancer."],
+  "Évite le balancier : si tu oscilles, marque un temps d'arrêt en bas avant chaque répétition."],
+// haltères — pectoraux
+["floor_press_haltere","Développé au sol haltères",["pect","triceps"],["dumbbells"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:90},
+  ["Allongé au sol, genoux fléchis, haltères au-dessus de la poitrine.","Descends jusqu'à ce que l'arrière des bras touche doucement le sol.","Pousse les haltères vers le haut en expirant."],
+  "Pratique sans banc ; pose les coudes en douceur au sol, sans rebond."],
+["ecarte_sol","Écarté au sol haltères",["pect"],["dumbbells"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Allongé au sol, haltères au-dessus de la poitrine, coudes légèrement fléchis.","Ouvre les bras en arc de cercle jusqu'à effleurer le sol avec les bras.","Ramène les haltères au-dessus de la poitrine en serrant les pectoraux."],
+  "Utilise une charge légère ; le sol limite l'amplitude et protège l'épaule."],
+["squeeze_press","Développé serré haltères (squeeze press)",["pect","triceps"],["dumbbells","bench"],"push",false,{sets:3,repsMin:10,repsMax:12,restSec:75},
+  ["Allongé sur le banc, haltères collés l'un contre l'autre au-dessus de la poitrine.","Descends-les ensemble jusqu'à la poitrine en les pressant l'un contre l'autre.","Pousse vers le haut en maintenant la pression entre les haltères."],
+  "Charge modérée : la pression constante entre les haltères suffit à solliciter fortement les pectoraux."],
+["ecarte_incline","Écarté incliné haltères",["pect","epaules"],["dumbbells","bench"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Banc incliné à 30-45°, haltères au-dessus du haut de la poitrine.","Ouvre les bras en arc de cercle, coudes légèrement fléchis.","Ramène les haltères en contractant le haut des pectoraux."],
+  "Nécessite un banc réglable ; ne descends pas au-delà d'un étirement confortable de l'épaule."],
+["pullover_haltere","Pull-over haltère",["pect","dos"],["dumbbells","bench"],"pull",false,{sets:3,repsMin:10,repsMax:12,restSec:60},
+  ["Allongé sur le banc, un haltère tenu à deux mains au-dessus de la poitrine.","Descends l'haltère derrière la tête en arc de cercle, coudes légèrement fléchis.","Ramène-le au-dessus de la poitrine sans cambrer le dos."],
+  "Garde une charge légère et arrête la descente avant que l'épaule ou le bas du dos ne compensent."],
+// haltères — autres
+["arnold_press","Développé Arnold",["epaules","triceps"],["dumbbells"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Assis, haltères devant le visage, paumes vers toi.","Pousse vers le haut en tournant les paumes vers l'avant.","Redescends en inversant la rotation."],
+  "Mouvement de rotation : charge légère à modérée, sans cambrer le bas du dos."],
+["curl_concentre","Curl concentré",["biceps"],["dumbbells","bench"],"pull",true,{sets:3,repsMin:10,repsMax:12,restSec:45},
+  ["Assis sur le banc, coude calé contre l'intérieur de la cuisse.","Monte l'haltère vers l'épaule sans bouger le coude.","Redescends lentement jusqu'à l'extension."],
+  "Isolation stricte : réduis la charge plutôt que de t'aider du buste."],
+["curl_incline","Curl incliné haltères",["biceps"],["dumbbells","bench"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Assis sur un banc incliné, bras pendants, paumes vers l'avant.","Fléchis les coudes sans les avancer.","Redescends lentement jusqu'à l'extension complète."],
+  "L'étirement du biceps est important en bas du mouvement : commence plus léger qu'au curl debout."],
+["extension_triceps_allonge","Extension triceps allongé (haltères)",["triceps"],["dumbbells","bench"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Allongé sur le banc, haltères tendus au-dessus des épaules, paumes face à face.","Fléchis les coudes pour descendre les haltères de chaque côté de la tête.","Tends les bras en gardant les coudes orientés vers le plafond."],
+  "Contrôle la descente pour ne jamais approcher les haltères du visage de façon brusque."],
+["step_up","Montées sur banc (step-up)",["quadriceps","fessiers"],["dumbbells","bench"],"lunge",true,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Haltères le long du corps, pied entier posé sur le banc.","Monte en poussant sur le talon de la jambe posée, sans t'aider de la jambe arrière.","Redescends lentement et contrôlé."],
+  "Vérifie que le banc est stable ; commence sans charge pour valider l'équilibre."],
+["squat_sumo_haltere","Squat sumo haltère",["quadriceps","fessiers"],["dumbbells"],"squat",false,{sets:3,repsMin:10,repsMax:15,restSec:75},
+  ["Pieds plus larges que les épaules, pointes ouvertes, un haltère tenu à deux mains entre les jambes.","Descends en gardant le buste droit et les genoux dans l'axe des pieds.","Remonte en poussant le sol."],
+  "Les genoux doivent suivre l'ouverture des pieds, sans rentrer vers l'intérieur."],
+["hip_thrust_haltere","Hip thrust haltère",["fessiers","ischios"],["dumbbells","bench"],"hinge",false,{sets:3,repsMin:10,repsMax:15,restSec:75},
+  ["Haut du dos calé sur le banc, haltère posé sur les hanches et tenu à deux mains.","Pousse les hanches vers le haut jusqu'à l'alignement épaules-hanches-genoux.","Redescends contrôlé."],
+  "Menton rentré et côtes basses en haut du mouvement, pour ne pas cambrer le bas du dos."],
+["renegade_row","Rowing renegade",["dos","abdos"],["dumbbells"],"pull",true,{sets:3,repsMin:6,repsMax:10,restSec:75},
+  ["En planche haute, mains sur les haltères, pieds écartés pour la stabilité.","Tire un haltère vers la hanche sans faire pivoter le bassin.","Repose-le et alterne."],
+  "Utilise des haltères stables (à faces plates) et une charge légère au début."],
+["marche_fermier","Marche du fermier",["avantbras","dos","cardio"],["dumbbells"],"core",false,{sets:3,repsMin:20,repsMax:40,restSec:75},
+  ["Un haltère lourd dans chaque main, bras le long du corps.","Marche à petits pas, buste droit, épaules basses.","Continue pendant la durée prévue (en secondes), puis repose les haltères en fléchissant les jambes."],
+  "Ramasse et repose les haltères dos neutre, comme un soulevé de terre."],
+["curl_poignets","Curl poignets haltère",["avantbras"],["dumbbells","bench"],"pull",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Assis, avant-bras posés sur les cuisses ou le banc, poignets dans le vide, paumes vers le haut.","Enroule les poignets vers le haut.","Redescends lentement."],
+  "Charge légère et amplitude contrôlée : les poignets tolèrent mal les à-coups."],
+// barre
+["curl_barre","Curl barre",["biceps"],["barbell"],"pull",false,{sets:3,repsMin:8,repsMax:12,restSec:60},
+  ["Debout, barre tenue en supination, mains largeur d'épaules.","Monte la barre en gardant les coudes près du buste.","Redescends lentement jusqu'à l'extension."],
+  "Évite de balancer le buste pour monter la charge."],
+["rdl_barre","Soulevé de terre roumain barre",["ischios","fessiers"],["barbell"],"hinge",false,{sets:3,repsMin:6,repsMax:10,restSec:120},
+  ["Debout, barre en main devant les cuisses, genoux légèrement fléchis.","Bascule le bassin en arrière, barre le long des cuisses, dos neutre.","Remonte en poussant les hanches vers l'avant."],
+  "Arrête la descente dès que le dos commence à s'arrondir ; la barre reste au contact des jambes."],
+["dc_incline_barre","Développé incliné barre",["pect","epaules","triceps"],["barbell","bench"],"push",false,{sets:3,repsMin:6,repsMax:10,restSec:120},
+  ["Banc incliné à 30-45°, barre au-dessus du haut de la poitrine.","Descends la barre contrôlée vers le haut de la poitrine.","Pousse vers le haut en gardant les omoplates serrées."],
+  "Nécessite un banc réglable ; utilise des butées ou un partenaire pour les charges lourdes."],
+["dc_serre_barre","Développé couché prise serrée",["triceps","pect"],["barbell","bench"],"push",false,{sets:3,repsMin:6,repsMax:10,restSec:120},
+  ["Allongé, mains à largeur d'épaules sur la barre.","Descends la barre vers le bas de la poitrine, coudes près du corps.","Pousse en expirant jusqu'à l'extension."],
+  "Ne serre pas les mains plus que la largeur des épaules : une prise trop étroite charge les poignets."],
+["barre_front","Barre au front",["triceps"],["barbell","bench"],"push",false,{sets:3,repsMin:8,repsMax:12,restSec:75},
+  ["Allongé, barre tendue au-dessus des épaules.","Fléchis les coudes pour descendre la barre vers le front, coudes fixes.","Tends les bras sans verrouiller brutalement."],
+  "Charge modérée et descente lente : la barre passe près du visage."],
+// kettlebell
+["kb_sumo_deadlift","Soulevé de terre sumo kettlebell",["fessiers","quadriceps","ischios"],["kettlebell"],"hinge",false,{sets:3,repsMin:10,repsMax:15,restSec:75},
+  ["Pieds larges, pointes ouvertes, kettlebell entre les pieds.","Descends en gardant le dos neutre et saisis la poignée bras tendus.","Remonte en poussant le sol, genoux dans l'axe des pieds."],
+  "Dos neutre du début à la fin ; si tu dois arrondir le dos pour attraper la kettlebell, surélève-la."],
+["kb_fermier","Marche du fermier kettlebell",["avantbras","dos","cardio"],["kettlebell"],"core",false,{sets:3,repsMin:20,repsMax:40,restSec:75},
+  ["Une kettlebell dans chaque main (ou une seule, côté alterné).","Marche à petits pas, buste droit, épaules basses.","Continue pendant la durée prévue (en secondes)."],
+  "Avec une seule kettlebell, résiste à l'inclinaison du buste : c'est tout l'intérêt du gainage."],
+// élastiques
+["face_pull_elastique","Face pull élastique",["epaules","dos"],["bands"],"pull",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Élastique fixé à hauteur de visage, tenu à deux mains.","Tire vers le visage en écartant les mains, coudes hauts.","Reviens lentement."],
+  "Excellent pour l'arrière des épaules ; résistance légère et mouvement contrôlé."],
+["dev_epaules_elastique","Développé épaules élastique",["epaules","triceps"],["bands"],"push",false,{sets:3,repsMin:10,repsMax:15,restSec:60},
+  ["Élastique sous les pieds, mains à hauteur d'épaules.","Pousse vers le haut jusqu'à l'extension des bras.","Redescends contrôlé."],
+  "Gainage actif pour ne pas cambrer le bas du dos pendant la poussée."],
+["ecarte_elastique_pect","Écarté pectoraux élastique",["pect"],["bands"],"push",false,{sets:3,repsMin:12,repsMax:20,restSec:45},
+  ["Élastique fixé derrière toi à hauteur de poitrine, bras ouverts, coudes légèrement fléchis.","Ramène les mains devant la poitrine en arc de cercle.","Reviens lentement en gardant la tension."],
+  "Ne laisse pas l'élastique tirer les bras trop loin en arrière."],
+["pont_fessier_elastique","Pont fessier élastique",["fessiers"],["bands"],"hinge",false,{sets:3,repsMin:15,repsMax:20,restSec:45},
+  ["Élastique au-dessus des genoux, allongé, pieds à plat.","Monte les hanches en poussant les genoux vers l'extérieur contre l'élastique.","Redescends contrôlé."],
+  "Garde les genoux alignés avec les pieds, sans les laisser rentrer."],
 ];
 
 const EXOS = EXO_RAW.map(([id,n,muscles,equip,pattern,uni,def,cues,safety])=>({
@@ -782,6 +1024,8 @@ const EXOS = EXO_RAW.map(([id,n,muscles,equip,pattern,uni,def,cues,safety])=>({
   cues,safety
 }));
 const EXO_MAP = {}; EXOS.forEach(e=>EXO_MAP[e.id]=e);
+// exercices mesurés en secondes plutôt qu'en répétitions (planche, chaise, marche du fermier…)
+function isTimed(def){ return def.cues.some(c=>/en secondes/.test(c)); }
 // ================= ÉTAT & STOCKAGE =================
 const STORAGE_KEY = "forge.v1";
 
@@ -797,7 +1041,7 @@ function defaultState(){
     templates: [],         // modèles enregistrés : [{id, n, exos:[{exoId, sets}]}]
     importedProgram: [],
     medals: {},            // {familleId: {t: palier atteint 0-4, d: {1: iso, 2: iso…}}}
-    settings: { theme:"auto", unit:"kg", todayMode:"proposal" },
+    settings: { theme:"auto", unit:"kg", todayTab:"custom", name:"" },
     meta: { createdAt: new Date().toISOString(), prCount:0 },
   };
 }
@@ -824,6 +1068,7 @@ function load(){
     merged.templates = parsed.templates||[];
     merged.medals = parsed.medals||{};
     merged.importedProgram = parsed.importedProgram||[];
+    delete merged.settings.todayMode; // v1.2 : remplacé par todayTab (« Ma séance » en premier)
     delete merged.trophies; // ancien système de trophées (v1.0-1.1), remplacé par les médailles à paliers
     return merged;
   }catch(e){ return defaultState(); }
@@ -1045,6 +1290,53 @@ function levelInfo(xp){
   const base = 125*L*(L-1), next = 125*(L+1)*L;
   return { level:L, xp, base, next, pct:(xp-base)/(next-base), title:LEVEL_TITLES.find(([min])=>L>=min)[1] };
 }
+
+// ---------- planning hebdomadaire ----------
+const JOURS_COURTS = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+function weekdayIdx(iso){ return (parseISO(iso).getDay()+6)%7; } // lundi = 0
+function plannedTemplate(iso){
+  const wd = weekdayIdx(iso||todayISO());
+  return S.templates.find(t=>(t.days||[]).includes(wd)) || null;
+}
+
+// ---------- statistiques du profil ----------
+function favoriteExercise(){
+  const c = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) c[ex.exoId]=(c[ex.exoId]||0)+1; }));
+  const id = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
+  return id ? { def:EXO_MAP[id], n:c[id] } : null;
+}
+function favoriteWeekday(){
+  const c = [0,0,0,0,0,0,0];
+  S.sessions.forEach(s=>c[weekdayIdx(s.date)]++);
+  const max = Math.max(...c);
+  return max ? { i:c.indexOf(max), n:max } : null;
+}
+function favoriteMoment(){
+  const c = { "le matin":0, "à midi":0, "l'après-midi":0, "le soir":0 };
+  S.sessions.forEach(s=>{
+    const h = startHour(s); if(h===null) return;
+    c[h<11?"le matin":h<14?"à midi":h<18?"l'après-midi":"le soir"]++;
+  });
+  const k = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
+  return c[k] ? k : null;
+}
+function bestWeek(){
+  const per = {};
+  S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
+  const k = Object.keys(per).sort((a,b)=>per[b]-per[a])[0];
+  return k ? { wk:k, n:per[k] } : null;
+}
+function topLifts(n){
+  const best = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>ex.sets.forEach(st=>{
+    if(!st.done || !st.weight) return;
+    const b = best[ex.exoId];
+    if(!b || st.weight>b.w || (st.weight===b.w && st.reps>b.r)) best[ex.exoId] = { w:st.weight, r:st.reps, date:s.date };
+  })));
+  return Object.keys(best).filter(id=>EXO_MAP[id]).map(id=>Object.assign({ def:EXO_MAP[id] }, best[id])).sort((a,b)=>b.w-a.w).slice(0,n);
+}
+function firstSessionDate(){ return S.sessions.length ? S.sessions.reduce((m,s)=>s.date<m?s.date:m, S.sessions[0].date) : null; }
 // ================= MOTEUR DE SUGGESTION (100% local, aucun appel réseau) =================
 const PATTERN_CYCLE = ["squat","hinge","push","pull","lunge","core","calf"];
 const SESSION_SIZE = { court:4, moyen:6, long:8 };
@@ -1378,11 +1670,35 @@ function importProgramJSON(text){
     if(built.warnings) warnings.push(...built.warnings);
   });
   S.importedProgram = sessions;
+  S.settings.todayTab = "proposal"; // le programme importé s'affiche dans « Proposée »
   if(S.draft && S.draft.date===todayISO() && !S.draft.startedAt){
     S.draft = buildSessionFromImported(S.importedProgram[0]);
   }
   save();
   return { ok:true, count:sessions.length, warnings };
+}
+
+// « Compléter avec l'app » : ajoute des exercices à une séance composée à la main,
+// en visant les muscles et les mouvements que la séance ne couvre pas encore.
+function suggestComplement(existingIds, n){
+  const have = existingIds.map(id=>EXO_MAP[id]).filter(Boolean);
+  const coveredMuscles = new Set(have.map(e=>e.muscles[0]));
+  const coveredPatterns = new Set(have.map(e=>e.pattern));
+  const pool = availableExos().filter(e=>!existingIds.includes(e.id));
+  const jitter = {}; pool.forEach(e=>jitter[e.id]=Math.random()*1.2);
+  const out = [];
+  while(out.length<n && pool.length){
+    let best=null, bestScore=-Infinity;
+    pool.forEach(e=>{
+      if(out.includes(e)) return;
+      const sc = scoreExo(e) + jitter[e.id] - (coveredMuscles.has(e.muscles[0])?5:0) - (coveredPatterns.has(e.pattern)?2:0);
+      if(sc>bestScore){ bestScore=sc; best=e; }
+    });
+    if(!best) break;
+    out.push(best);
+    coveredMuscles.add(best.muscles[0]); coveredPatterns.add(best.pattern);
+  }
+  return out;
 }
 // ================= INTERFACE : coquille =================
 const TABS = [
@@ -1611,6 +1927,8 @@ const ACT = {
 };
 
 document.addEventListener("click", e=>{
+  // un glissement de carte ne doit pas déclencher le bouton sous le doigt
+  if(typeof suppressClicksUntil!=="undefined" && Date.now()<suppressClicksUntil){ e.preventDefault(); return; }
   const el = e.target.closest("[data-a]");
   if(!el) return;
   const name = el.dataset.a;
@@ -1618,6 +1936,9 @@ document.addEventListener("click", e=>{
 });
 document.addEventListener("keydown", e=>{
   if(e.key==="Enter" && e.target && e.target.id==="numInput"){ e.preventDefault(); ACT.numOk(); }
+  if(e.key==="Enter" && e.target && (e.target.id==="nameInput" || e.target.id==="tplName")){
+    e.preventDefault(); const b = qs('.center-modal [data-a^="save"]'); if(b) b.click();
+  }
 });
 document.addEventListener("change", e=>{
   const el = e.target.closest("[data-c]");
@@ -1828,35 +2149,117 @@ function masteredExosCount(){
 }
 const countSessions = pred => ()=>S.sessions.filter(pred).length;
 
-// t : seuils bronze / argent / or / platine
+// ---- valeurs des nouvelles familles (v1.3) ----
+function spanDays(){
+  const f = firstSessionDate(); if(!f) return 0;
+  const last = S.sessions.reduce((m,s)=>s.date>m?s.date:m, f);
+  return daysBetween(f, last);
+}
+function intenseWeeks(){
+  const per = {};
+  S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
+  return Object.values(per).filter(n=>n>=5).length;
+}
+// semaines où au moins 8 groupes musculaires différents ont été travaillés
+function balancedWeeks(){
+  const per = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{
+    const d = EXO_MAP[ex.exoId];
+    if(!d || !ex.sets.some(st=>st.done)) return;
+    const k = weekKey(s.date);
+    d.muscles.forEach(m=>{ if(m!=="cardio") (per[k]=per[k]||new Set()).add(m); });
+  }));
+  return Object.values(per).filter(ms=>ms.size>=8).length;
+}
+function maxRepsOneSession(){ return S.sessions.reduce((m,s)=>Math.max(m, sessionReps(s)), 0); }
+function heaviestSet(){
+  let m = 0;
+  S.sessions.forEach(s=>s.exos.forEach(ex=>ex.sets.forEach(st=>{ if(st.done && st.weight>m) m = st.weight; })));
+  return m;
+}
+// Progression de force sur un exercice chargé : meilleur 1RM estimé comparé à la
+// meilleure des 3 premières séances, pour un exercice pratiqué depuis au moins 90 jours
+// (évite qu'une progression de débutant de quelques semaines donne le platine).
+function bestStrengthRatio(){
+  const hist = {};
+  S.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>s.exos.forEach(ex=>{
+    const def = EXO_MAP[ex.exoId];
+    if(!def || !loadableTypeOf(def)) return;
+    const e = Math.max(0, ...ex.sets.filter(st=>st.done&&st.weight).map(st=>estimated1RM(st.weight, st.reps)));
+    if(e) (hist[ex.exoId]=hist[ex.exoId]||[]).push({ date:s.date, e });
+  }));
+  let best = 0;
+  Object.values(hist).forEach(h=>{
+    if(h.length<4 || daysBetween(h[0].date, h[h.length-1].date)<90) return;
+    const base = Math.max(...h.slice(0,3).map(x=>x.e));
+    const top = Math.max(...h.slice(3).map(x=>x.e));
+    best = Math.max(best, top/base);
+  });
+  return best;
+}
+function fullMonths(){
+  const per = {};
+  S.sessions.forEach(s=>{ const k=s.date.slice(0,7); per[k]=(per[k]||0)+1; });
+  return Object.values(per).filter(n=>n>=12).length;
+}
+// années civiles avec au moins 48 semaines d'entraînement
+function ironYears(){
+  const per = {};
+  S.sessions.forEach(s=>{ const y=s.date.slice(0,4); (per[y]=per[y]||new Set()).add(weekKey(s.date)); });
+  return Object.values(per).filter(w=>w.size>=48).length;
+}
+function equipCatsTrained(){
+  const c = new Set();
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{ const d=EXO_MAP[ex.exoId]; if(d && ex.sets.some(st=>st.done)) c.add(exoCategory(d)); }));
+  return c.size;
+}
+
+const MEDAL_CATS = [
+  ["regular", "Régularité"], ["force", "Force"], ["volume", "Volume"], ["explore", "Découverte"], ["style", "Style"],
+];
+// t : seuils bronze / argent / or / platine. Le platine vise le très long terme :
+// plusieurs années d'entraînement régulier pour la plupart des familles.
 const MEDALS = [
-  { id:"sessions", n:"Assiduité",        em:"🏋️", unit:"séances terminées", one:"séance terminée",           t:[1,20,75,200],          val:()=>S.sessions.length },
-  { id:"streak",   n:"Régularité",       em:"📅", unit:"semaines d'affilée",          t:[2,4,12,26],            val:maxStreakWeeksEver },
-  { id:"perfect",  n:"Semaine parfaite", em:"🎯", unit:"semaines à l'objectif", one:"semaine à l'objectif",       t:[1,4,12,30],            val:perfectWeeksCount, desc:"Semaines où tu atteins ton objectif de séances hebdomadaires." },
-  { id:"volume",   n:"Tonnage",          em:"🪨", unit:"kg soulevés au total",        t:[1000,10000,100000,500000], val:totalVolumeAllTime },
-  { id:"bigday",   n:"Grosse séance",    em:"💪", unit:"kg en une seule séance",      t:[1000,3000,6000,10000], val:bestSessionVolume },
-  { id:"sets",     n:"Séries",           em:"🔁", unit:"séries validées",             t:[50,250,1000,3000],     val:totalSets },
-  { id:"prs",      n:"Records",          em:"💥", unit:"records personnels battus", one:"record personnel battu",   t:[1,10,50,150],          val:()=>S.meta.prCount||0 },
-  { id:"mastery",  n:"Maîtrise",         em:"🎓", unit:"exercices maîtrisés", one:"exercice maîtrisé",         t:[1,5,10,20],            val:masteredExosCount, desc:"Un exercice est maîtrisé quand tu l'as pratiqué dans 8 séances." },
-  { id:"variety",  n:"Polyvalence",      em:"🧭", unit:"exercices différents",        t:[5,15,30,50],           val:distinctExosCount },
-  { id:"muscles",  n:"Corps complet",    em:"🧬", unit:"groupes musculaires travaillés", t:[4,7,9,11],          val:distinctMusclesCount },
-  { id:"time",     n:"Temps sous la barre", em:"⏱️", unit:"heures d'entraînement", one:"heure d'entraînement",    t:[1,10,50,150],          val:()=>totalDurationSec()/3600 },
-  { id:"marathon", n:"Endurance",        em:"⌛", unit:"séances de 45 min ou plus", one:"séance de 45 min ou plus",   t:[1,5,20,50],            val:countSessions(s=>(s.durationSec||0)>=45*60) },
-  { id:"early",    n:"Lève-tôt",         em:"🌅", unit:"séances commencées avant 8 h", one:"séance commencée avant 8 h", t:[1,5,20,50],           val:countSessions(s=>{ const h=startHour(s); return h!==null && h<8; }) },
-  { id:"night",    n:"Oiseau de nuit",   em:"🌙", unit:"séances commencées après 21 h", one:"séance commencée après 21 h", t:[1,5,20,50],          val:countSessions(s=>startHour(s)>=21) },
-  { id:"custom",   n:"Sur mesure",       em:"✍️", unit:"séances composées par toi", one:"séance composée par toi",   t:[1,5,20,50],            val:countSessions(s=>s.source==="custom") },
+  { id:"sessions", cat:"regular", n:"Assiduité",        em:"🏋️", unit:"séances terminées", one:"séance terminée",     t:[1,25,150,500],   val:()=>S.sessions.length, desc:"Le platine représente environ trois ans à trois séances par semaine." },
+  { id:"streak",   cat:"regular", n:"Régularité",       em:"📅", unit:"semaines d'affilée",                          t:[2,8,26,104],     val:maxStreakWeeksEver, desc:"Semaines consécutives avec au moins une séance. Le platine demande deux ans sans interruption." },
+  { id:"perfect",  cat:"regular", n:"Semaine parfaite", em:"🎯", unit:"semaines à l'objectif", one:"semaine à l'objectif", t:[1,8,40,150],   val:perfectWeeksCount, desc:"Semaines où tu atteins ton objectif de séances hebdomadaires." },
+  { id:"fullmonth",cat:"regular", n:"Mois complet",     em:"🗓️", unit:"mois à 12 séances ou plus", one:"mois à 12 séances ou plus", t:[1,3,6,12], val:fullMonths },
+  { id:"ironyear", cat:"regular", n:"Année de fer",     em:"⚒️", unit:"années à 48 semaines actives", one:"année à 48 semaines actives", t:[1,2,3,5], val:ironYears, desc:"Une année civile où tu t'entraînes au moins 48 semaines sur 52. Le platine demande cinq années de ce niveau." },
+  { id:"fidelity", cat:"regular", n:"Fidélité",         em:"🤝", unit:"jours entre ta première et ta dernière séance", one:"jour entre ta première et ta dernière séance", t:[30,180,365,1095], val:spanDays, desc:"L'ancienneté de ta pratique. Le platine correspond à trois ans." },
+  { id:"planned",  cat:"regular", n:"Planificateur",    em:"📌", unit:"séances prévues faites le bon jour", one:"séance prévue faite le bon jour", t:[1,10,50,200], val:countSessions(s=>s.planned), desc:"Séances de ton planning hebdomadaire faites le jour prévu." },
+
+  { id:"prs",      cat:"force", n:"Records",           em:"💥", unit:"records personnels battus", one:"record personnel battu", t:[1,15,75,300], val:()=>S.meta.prCount||0 },
+  { id:"heavy",    cat:"force", n:"Poids lourd",       em:"🪨", unit:"kg sur une seule série",                       t:[20,60,100,150],  val:heaviestSet, desc:"La charge la plus lourde que tu as déplacée sur une série." },
+  { id:"doubled",  cat:"force", n:"Deux fois plus fort", em:"📈", unit:"ta force de départ",     t:[1.2,1.5,2,2.5], base:1, val:bestStrengthRatio, fmt:v=>v?"×"+round1(v).toLocaleString("fr-CH",{minimumFractionDigits:1}):"–", desc:"Ton meilleur 1RM estimé sur un exercice chargé, comparé à tes 3 premières séances de cet exercice (pratiqué depuis au moins 90 jours). Le platine demande ×2,5." },
+  { id:"mastery",  cat:"force", n:"Maîtrise",          em:"🎓", unit:"exercices maîtrisés", one:"exercice maîtrisé", t:[1,5,15,30],       val:masteredExosCount, desc:"Un exercice est maîtrisé quand tu l'as pratiqué dans 8 séances." },
+
+  { id:"volume",   cat:"volume", n:"Tonnage",          em:"🏔️", unit:"kg soulevés au total",                         t:[1000,25000,250000,1500000], val:totalVolumeAllTime },
+  { id:"bigday",   cat:"volume", n:"Grosse séance",    em:"💪", unit:"kg en une seule séance",                       t:[1000,4000,8000,15000], val:bestSessionVolume },
+  { id:"sets",     cat:"volume", n:"Séries",           em:"🔁", unit:"séries validées",                              t:[50,500,3000,12000], val:totalSets },
+  { id:"centurion",cat:"volume", n:"Centurion",        em:"💯", unit:"répétitions en une séance",                    t:[100,250,500,1000], val:maxRepsOneSession },
+  { id:"time",     cat:"volume", n:"Temps sous la barre", em:"⏱️", unit:"heures d'entraînement", one:"heure d'entraînement", t:[1,20,100,400], val:()=>totalDurationSec()/3600, fmt:v=>v<10?round1(v).toLocaleString("fr-CH"):fmtNum(v) },
+  { id:"marathon", cat:"volume", n:"Endurance",        em:"⌛", unit:"séances de 45 min ou plus", one:"séance de 45 min ou plus", t:[1,10,50,200], val:countSessions(s=>(s.durationSec||0)>=45*60) },
+
+  { id:"variety",  cat:"explore", n:"Polyvalence",     em:"🧭", unit:"exercices différents",                         t:[5,20,45,80],     val:distinctExosCount },
+  { id:"muscles",  cat:"explore", n:"Corps complet",   em:"🧬", unit:"semaines équilibrées", one:"semaine équilibrée", t:[1,10,40,100], val:balancedWeeks, desc:"Semaines où tu travailles au moins 8 groupes musculaires différents." },
+  { id:"equipcats",cat:"explore", n:"Touche-à-tout",   em:"🧰", unit:"types de matériel utilisés", one:"type de matériel utilisé", t:[2,3,4,6], val:equipCatsTrained, desc:"Poids du corps, haltères, barre, kettlebell, élastiques, barre de traction." },
+  { id:"intense",  cat:"regular", n:"Semaine intense", em:"⚡", unit:"semaines à 5 séances ou plus", one:"semaine à 5 séances ou plus", t:[1,5,20,52], val:intenseWeeks, desc:"Semaines d'au moins 5 séances. Le platine en demande 52." },
+
+  { id:"early",    cat:"style", n:"Lève-tôt",          em:"🌅", unit:"séances commencées avant 8 h", one:"séance commencée avant 8 h", t:[1,10,50,150], val:countSessions(s=>{ const h=startHour(s); return h!==null && h<8; }) },
+  { id:"night",    cat:"style", n:"Oiseau de nuit",    em:"🌙", unit:"séances commencées après 21 h", one:"séance commencée après 21 h", t:[1,10,50,150], val:countSessions(s=>startHour(s)>=21) },
+  { id:"custom",   cat:"style", n:"Sur mesure",        em:"✍️", unit:"séances composées par toi", one:"séance composée par toi", t:[1,10,50,200], val:countSessions(s=>s.source==="custom") },
 ];
 const MEDAL_MAP = {}; MEDALS.forEach(m=>MEDAL_MAP[m.id]=m);
 
 function medalTier(m){ return (S.medals[m.id]||{}).t||0; }
 function medalProgress(m){
   const v = m.val(), t = medalTier(m);
-  const next = t<4 ? m.t[t] : null, prev = t>0 ? m.t[t-1] : 0;
+  const next = t<4 ? m.t[t] : null, prev = t>0 ? m.t[t-1] : (m.base||0);
   return { v, t, next, pct: next==null ? 1 : Math.max(0,Math.min(1,(v-prev)/(next-prev))) };
 }
 function medalUnit(m, v){ return v<=1 && m.one ? m.one : m.unit; }
 function fmtMedalVal(m, v){
-  if(m.id==="time") return v<10 ? round1(v).toLocaleString("fr-CH") : fmtNum(v);
+  if(m.fmt) return m.fmt(v);
   return fmtNum(Math.floor(v));
 }
 
@@ -2047,25 +2450,28 @@ function doneTodayHTML(){
 
 // ---------- aperçu ----------
 function renderTodayPreview(draft){
-  const mode = S.settings.todayMode==="custom" ? "custom" : "proposal";
+  const mode = S.settings.todayTab==="proposal" ? "proposal" : "custom";
   return `<div class="navbar"><div class="nb-title">Aujourd'hui</div></div><div class="content">
     <div class="eyebrow">${fmtDate(todayISO(),"long")}</div>
     <h1 class="lt">Aujourd'hui</h1>
     ${motivRowHTML()}
     ${doneTodayHTML()}
-    ${segHTML("today", [["proposal","Proposée"],["custom","Ma séance"]], mode, "todayMode")}
+    ${segHTML("today", [["custom","Ma séance"],["proposal","Proposée par l'app"]], mode, "todayMode")}
     <div class="seg-pane">${mode==="custom" ? customPaneHTML() : proposalPaneHTML(draft)}</div>
   </div>`;
 }
 
-function exoRowHTML(def, sub, i, actions){
-  return `<div class="row stagger" style="--i:${i+2}">
+let freshIds = new Set(); // exercices qui viennent d'être ajoutés : animation d'apparition
+function exoRowHTML(def, sub, i, actions, app){
+  const fresh = freshIds.has(def.id);
+  return `<div class="row stagger ${fresh?"fresh":""}" style="--i:${i+2}">
     <button class="row-main" data-a="showExoInfo" data-id="${def.id}">
       <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
-      <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${sub}</div></div>
+      <div class="grow"><div class="t">${esc(def.n)}${app?' <span class="app-badge" title="Ajouté par l\'app">✨</span>':""}</div><div class="s">${sub}</div></div>
     </button>${actions}
   </div>`;
 }
+function catLabel(def){ const c = EXO_CATS.find(c=>c.id===exoCategory(def)); return c ? c.n : ""; }
 
 function proposalPaneHTML(draft){
   const imported = draft.source==="imported";
@@ -2107,42 +2513,67 @@ function proposalPaneHTML(draft){
     <div class="btnrow"><button class="btn big" data-a="startSession">${icon("play")} Commencer cette séance</button></div>`;
 }
 
+function weekPlanHTML(){
+  const today = todayISO(), monday = weekKey(today);
+  const doneDays = new Set(S.sessions.map(s=>s.date));
+  return `<div class="week-plan stagger" style="--i:0">
+    <div class="wp-h"><span>Mon planning</span><span class="wp-hint">touche un jour pour y placer une séance</span></div>
+    <div class="wp-days">${JOURS_COURTS.map((j,i)=>{
+      const iso = addDaysISO(monday,i);
+      const t = S.templates.find(t=>(t.days||[]).includes(i));
+      return `<button class="wp-day ${iso===today?"today":""} ${t?"has":""} ${doneDays.has(iso)?"done":""}" data-a="planDay" data-d="${i}">
+        <span class="wp-j">${j}</span><span class="wp-n">${parseISO(iso).getDate()}</span>
+        <span class="wp-t">${t?esc(t.n):"—"}</span>
+        ${doneDays.has(iso)?`<span class="wp-check">${icon("check")}</span>`:""}
+      </button>`;
+    }).join("")}</div>
+  </div>`;
+}
+
 function customPaneHTML(){
   const c = S.custom.exos;
-  const tpls = S.templates.length ? `<h2 class="sh">Mes modèles</h2>
-    <div class="tpl-scroll">${S.templates.map((t,i)=>`<div class="tpl-card stagger" style="--i:${i}">
+  const planned = plannedTemplate();
+  const plannedBanner = planned && S.custom.tplId===planned.id && !sessionsToday().some(s=>s.tplId===planned.id) ? `<div class="plan-banner stagger" style="--i:1">
+      <span class="pb-ico">📌</span><div class="grow"><div class="pb-t">Séance prévue aujourd'hui</div><div class="pb-s">${esc(planned.n)} · ${JOURS[parseISO(todayISO()).getDay()]}</div></div>
+    </div>` : "";
+  const tpls = S.templates.length ? `<h2 class="sh">Mes séances enregistrées</h2>
+    <div class="tpl-scroll">${S.templates.map((t,i)=>`<div class="tpl-card stagger ${S.custom.tplId===t.id?"on":""}" style="--i:${i+1}">
       <button class="tpl-main" data-a="loadTemplate" data-id="${t.id}">
         <div class="tpl-name">${esc(t.n)}</div>
         <div class="tpl-sub">${t.exos.length} exercice${t.exos.length>1?"s":""} · ${t.exos.reduce((a,e)=>a+e.sets,0)} séries</div>
-        <div class="tpl-ems">${t.exos.slice(0,5).map(e=>EXO_MAP[e.exoId]?PATTERN_EMOJI[EXO_MAP[e.exoId].pattern]:"").join("")}</div>
+        <div class="tpl-days">${(t.days||[]).length ? (t.days||[]).slice().sort().map(d=>`<span>${JOURS_COURTS[d]}</span>`).join("") : `<em>pas de jour</em>`}</div>
       </button>
-      <button class="tpl-del" aria-label="Supprimer le modèle" data-a="deleteTemplate" data-id="${t.id}">${icon("close")}</button>
+      <button class="tpl-del" aria-label="Options du modèle" data-a="templateMenu" data-id="${t.id}">•••</button>
     </div>`).join("")}</div>` : "";
+  const head = weekPlanHTML() + plannedBanner + tpls;
   if(!c.length){
-    return `${tpls}<div class="builder-empty stagger" style="--i:1">
+    return `${head}<div class="builder-empty stagger" style="--i:2">
       <div class="be-ico">✍️</div>
       <div class="be-t">Compose ta séance</div>
-      <div class="be-s">Choisis les exercices que tu veux faire aujourd'hui. Forge calcule les charges à partir de ton historique.</div>
+      <div class="be-s">Choisis tes exercices, ou laisse l'app te proposer un complément. Forge calcule les charges à partir de ton historique.</div>
       <button class="btn" data-a="customAddOpen">${icon("plus")} Choisir des exercices</button>
+      <button class="btn secondary" style="margin-top:8px" data-a="customFill">✨ Laisser l'app choisir</button>
       <button class="btn ghost sm" style="margin-top:6px" data-a="customFromProposal">Partir de la séance proposée</button>
     </div>`;
   }
   const rows = c.map((e,i)=>{
     const def = EXO_MAP[e.exoId]; if(!def) return "";
-    return exoRowHTML(def, musclesLabel(def), i, `<div class="mini-step">
+    return exoRowHTML(def, `${catLabel(def)} · ${MUSCLE_MAP[def.muscles[0]].n}`, i, `<div class="mini-step">
         <button aria-label="Moins de séries" data-a="customSets" data-idx="${i}" data-d="-1">−</button><span>${e.sets}×</span><button aria-label="Plus de séries" data-a="customSets" data-idx="${i}" data-d="1">+</button>
       </div>
-      <button class="icon-btn" aria-label="Retirer" data-a="customRemove" data-idx="${i}">${icon("close")}</button>`);
+      <button class="icon-btn" aria-label="Retirer" data-a="customRemove" data-idx="${i}">${icon("close")}</button>`, e.app);
   }).join("");
+  freshIds = new Set();
   const sets = c.reduce((t,e)=>t+e.sets,0);
   const preview = { exos: c.map(e=>({ exoId:e.exoId, sets:new Array(e.sets).fill(0) })) };
-  return `${tpls}
+  return `${head}
     <h2 class="sh">${esc(S.custom.name||"Ma séance")}<button class="more" data-a="customClear">Vider</button></h2>
     <div class="sh-sub">${c.length} exercice${c.length>1?"s":""} · ${sets} séries · ≈ ${estimateMinutes(preview)} min</div>
-    <div class="group">${rows}</div>
+    <div class="group builder">${rows}</div>
     <div class="btnrow">
       <button class="btn secondary sm" data-a="customAddOpen">${icon("plus")} Ajouter</button>
-      <button class="btn secondary sm" data-a="saveTemplateOpen">${icon("bookmark")} Enregistrer</button>
+      <button class="btn secondary sm" data-a="customFill">✨ Compléter</button>
+      <button class="btn secondary sm" data-a="saveTemplateOpen">${icon("bookmark")} ${S.custom.tplId?"Mettre à jour":"Enregistrer"}</button>
     </div>
     <div class="btnrow"><button class="btn big" data-a="startCustom">${icon("play")} Commencer ma séance</button></div>`;
 }
@@ -2150,12 +2581,15 @@ function customPaneHTML(){
 // ---------- sélecteur d'exercices (recherche, filtre musculaire, multi-sélection) ----------
 let picker = null;
 function openPicker(opts){
-  picker = Object.assign({ multi:false, selected:[], exclude:new Set(), q:"", muscle:null }, opts);
-  const chips = [["","Tous"]].concat(MUSCLES.map(m=>[m.id,m.n])).map(([id,n])=>`<button class="chip ${(picker.muscle||"")===id?"on":""}" data-a="pickerMuscle" data-v="${id}">${esc(n)}</button>`).join("");
+  picker = Object.assign({ multi:false, selected:[], exclude:new Set(), q:"", muscle:null, cat:null }, opts);
+  const owned = new Set(availableExos().map(exoCategory));
+  const cats = [["","Tout le matériel"]].concat(EXO_CATS.filter(c=>owned.has(c.id)).map(c=>[c.id, c.em+" "+c.n])).map(([id,n])=>`<button class="chip cat ${(picker.cat||"")===id?"on":""}" data-a="pickerCat" data-v="${id}">${esc(n)}</button>`).join("");
+  const chips = [["","Tous les muscles"]].concat(MUSCLES.map(m=>[m.id,m.n])).map(([id,n])=>`<button class="chip ${(picker.muscle||"")===id?"on":""}" data-a="pickerMuscle" data-v="${id}">${esc(n)}</button>`).join("");
   openSheet(`<div class="sheet-hd"><span class="t">${esc(picker.title)}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
     <div class="picker-top">
       <label class="search">${icon("search")}<input id="pickerSearch" type="search" placeholder="Rechercher un exercice" autocomplete="off"></label>
-      <div class="chip-scroll" id="pickerChips">${chips}</div>
+      <div class="chip-scroll" id="pickerCats">${cats}</div>
+      <div class="chip-scroll" id="pickerChips" style="margin-top:8px">${chips}</div>
     </div>
     <div class="sheet-body" id="pickerList">${pickerListHTML()}</div>`,
     { tall:true, footer: picker.multi ? `<button class="btn" id="pickerDone" data-a="pickerDone" disabled>Ajouter</button>` : null });
@@ -2164,20 +2598,26 @@ function openPicker(opts){
 }
 function pickerListHTML(){
   const q = normName(picker.q);
+  const muscleOrder = {}; MUSCLES.forEach((m,i)=>muscleOrder[m.id]=i);
   const pool = availableExos().filter(e=>!picker.exclude.has(e.id)
     && (!picker.muscle || e.muscles.includes(picker.muscle))
+    && (!picker.cat || exoCategory(e)===picker.cat)
     && (!q || normName(e.n).includes(q) || e.muscles.some(m=>normName(MUSCLE_MAP[m].n).includes(q))));
   if(!pool.length) return `<div class="empty-state"><span class="em">🔍</span>Aucun exercice ne correspond.</div>`;
-  const byPattern = {};
-  pool.forEach(e=>{ (byPattern[e.pattern]=byPattern[e.pattern]||[]).push(e); });
-  return Object.keys(byPattern).map(p=>`<div class="pick-h">${esc(PATTERN_LABEL[p]||p)}</div><div class="group">${byPattern[p].map(e=>{
-    const on = picker.selected.includes(e.id);
-    return `<button class="row tap pick-row ${on?"on":""}" data-a="pickerTap" data-id="${e.id}">
-      <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[p]}</div>
-      <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${musclesLabel(e)}</div></div>
-      ${picker.multi?`<span class="pick-check">${on?icon("check"):""}</span>`:""}
-    </button>`;
-  }).join("")}</div>`).join("");
+  return EXO_CATS.map(c=>{
+    const list = pool.filter(e=>exoCategory(e)===c.id).sort((a,b)=>muscleOrder[a.muscles[0]]-muscleOrder[b.muscles[0]] || a.n.localeCompare(b.n,"fr"));
+    if(!list.length) return "";
+    let lastM = null;
+    return `<div class="pick-h"><span>${c.em}</span> ${esc(c.n)} <span class="pick-n">${list.length}</span></div><div class="group">${list.map(e=>{
+      const on = picker.selected.includes(e.id);
+      const m = e.muscles[0], sub = m!==lastM ? `<div class="pick-m">${esc(MUSCLE_MAP[m].n)}</div>` : ""; lastM = m;
+      return `${sub}<button class="row tap pick-row ${on?"on":""}" data-a="pickerTap" data-id="${e.id}">
+        <div class="ico" style="background:var(--tint)">${PATTERN_EMOJI[e.pattern]}</div>
+        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${musclesLabel(e)}${e.equip.includes("bench")?" · banc":""}</div></div>
+        ${picker.multi?`<span class="pick-check">${on?icon("check"):""}</span>`:""}
+      </button>`;
+    }).join("")}</div>`;
+  }).join("");
 }
 function refreshPickerFooter(){
   const b = qs("#pickerDone"); if(!b) return;
@@ -2197,9 +2637,32 @@ function renderTodayLive(draft){
   <div class="content">
     <div class="eyebrow" id="todayEyebrow">${liveEyebrow(draft)}</div>
     <h1 class="lt">${esc(draft.name || (draft.source==="custom"?"Ma séance":"Séance en cours"))}</h1>
+    <div class="live-strip" id="liveStrip">${liveStripHTML(draft)}</div>
     <div id="focusRegion">${renderFocusRegionInner(draft)}</div>
     <div class="btnrow"><button class="btn" data-a="finishSession">Terminer la séance</button></div>
   </div>`;
+}
+function liveStripHTML(draft){
+  const idx = Math.min(liveFocusIdx, draft.exos.length-1);
+  const doneExos = draft.exos.filter(e=>e.sets.every(s=>s.done)).length;
+  const left = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>!s.done).length,0);
+  const leftMin = Math.round(draft.exos.reduce((t,e)=>{ const d=EXO_MAP[e.exoId]; return t + e.sets.filter(s=>!s.done).length*(40+(d?d.restSec:60)); },0)/60);
+  const chips = draft.exos.map((e,i)=>{
+    const def = EXO_MAP[e.exoId], n = e.sets.length, d = e.sets.filter(s=>s.done).length;
+    const cls = i===idx ? "current" : d===n ? "done" : d ? "started" : "";
+    return `<button class="ls-chip ${cls}" data-a="focusJump" data-idx="${i}" aria-label="${esc(def.n)} : ${d} sur ${n} séries">
+      <span class="ls-ring" style="--p:${Math.round(d/n*100)}"><span>${d===n?icon("check"):PATTERN_EMOJI[def.pattern]||"💪"}</span></span>
+      <span class="ls-name">${esc(def.n)}</span>
+      <span class="ls-sets">${d}/${n}</span>
+    </button>`;
+  }).join("");
+  return `<div class="ls-sum"><span><b>${doneExos}/${draft.exos.length}</b> exercices</span><span><b>${left}</b> série${left>1?"s":""} restante${left>1?"s":""}</span>${left?`<span>≈ ${leftMin} min</span>`:""}</div>
+    <div class="ls-chips" id="lsChips">${chips}</div>`;
+}
+function centerStripChip(smooth){
+  const strip = qs("#lsChips"), c = strip && qs(".ls-chip.current", strip);
+  if(!c) return;
+  strip.scrollTo({ left: c.offsetLeft - strip.clientWidth/2 + c.offsetWidth/2, behavior: smooth?"smooth":"auto" });
 }
 function liveEyebrow(draft){
   const totalSets = draft.exos.reduce((t,e)=>t+e.sets.length,0);
@@ -2228,17 +2691,13 @@ function renderFocusRegionInner(draft){
   const idx = Math.min(liveFocusIdx, draft.exos.length-1);
   liveFocusIdx = idx;
   const ex = draft.exos[idx], def = EXO_MAP[ex.exoId];
-  const dots = draft.exos.map((e,i)=>{
-    const allDone = e.sets.every(s=>s.done);
-    return `<button class="${i===idx?"current":allDone?"done":""}" data-a="focusJump" data-idx="${i}" aria-label="Exercice ${i+1}"></button>`;
-  }).join("");
   const finishedCount = draft.exos.filter(e=>e.sets.every(s=>s.done)).length;
   const nav = `<div class="focus-nav">
     <button class="navbtn" aria-label="Exercice précédent" data-a="focusPrev" ${idx===0?"disabled":""} style="transform:scaleX(-1)">${icon("chev")}</button>
     <button class="center-link" data-a="openOverview">Voir la séance (${finishedCount}/${draft.exos.length})</button>
     <button class="navbtn" aria-label="Exercice suivant" data-a="focusNext" ${idx===draft.exos.length-1?"disabled":""}>${icon("chev")}</button>
   </div>`;
-  return `<div class="focus-dots">${dots}</div>${renderFocusCard(idx, ex, def)}${nav}`;
+  return `${renderFocusCard(idx, ex, def)}${nav}<div class="swipe-hint">Glisse la carte pour changer d'exercice</div>`;
 }
 
 function lastTimeHTML(exoId){
@@ -2285,7 +2744,7 @@ function renderFocusCard(idx, ex, def){
   const si = ex.sets.findIndex(s=>!s.done);
   const st = ex.sets[si];
   const hasWeight = !!loadableTypeOf(def);
-  const unit = def.cues.some(c=>/durée en secondes/.test(c)) ? "Secondes" : "Répétitions";
+  const unit = isTimed(def) ? "Secondes" : "Répétitions";
   return `<div class="focus-card ${animClass}">${header}
     <div class="fc-phase">Série ${si+1} / ${ex.sets.length} · objectif ${repsLabel(ex.targetReps)}</div>
     ${setDots(si)}
@@ -2312,6 +2771,8 @@ function refreshFocusRegion(){
   const el = qs("#focusRegion");
   if(!el || !S.draft || !S.draft.startedAt) return;
   el.innerHTML = renderFocusRegionInner(S.draft);
+  const strip = qs("#liveStrip");
+  if(strip){ const sl = (qs("#lsChips")||{}).scrollLeft||0; strip.innerHTML = liveStripHTML(S.draft); qs("#lsChips").scrollLeft = sl; centerStripChip(true); }
   const eyebrow = qs("#todayEyebrow");
   if(eyebrow) eyebrow.textContent = liveEyebrow(S.draft);
   if(typeof renderRestBar==="function") renderRestBar();
@@ -2349,28 +2810,151 @@ function finalizeSession(){
   const ups = checkMedals();
   const xpAfter = totalXP();
   save();
+  scrollTodayTop();
   renderViewAnimated("today");
   showCelebration(draft, ups, xpBefore, xpAfter);
 }
 
+// changer d'écran (aperçu ↔ séance en cours) repart du haut de la page
+function scrollTodayTop(){ const v = qs("#v-today"); if(v) v.scrollTop = 0; }
 function centerOf(sel){
   const el = qs(sel); if(!el) return [null,null];
   const r = el.getBoundingClientRect();
   return [r.left+r.width/2, r.top+r.height/2];
 }
 
+// ---------- planning : séances enregistrées assignées à des jours ----------
+function openTemplateModal(name, days, id){
+  openModal(`<div style="font-weight:700;font-size:calc(17rem/17);margin-bottom:4px">${id?"Séance enregistrée":"Enregistrer ma séance"}</div>
+    <div class="hr-note" style="margin:0 0 12px">Choisis les jours où tu veux la faire : elle s'affichera directement ces jours-là à l'ouverture de l'app.</div>
+    <div class="num-field"><input id="tplName" type="text" maxlength="40" placeholder="Ex. Haut du corps A" value="${esc(name)}"></div>
+    <div class="tpl-daypick">${JOURS_COURTS.map((j,i)=>`<button class="${days.includes(i)?"on":""}" data-a="tplDayToggle" data-d="${i}">${j}</button>`).join("")}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+      <button class="btn" data-a="saveTemplateOk" ${id?`data-id="${id}"`:""} ${id&&S.custom.tplId!==id?'data-edit="1"':""}>Enregistrer</button>
+      <button class="btn ghost" data-a="closesheet" style="height:40px">Annuler</button>
+    </div>`);
+}
+function openPlanDaySheet(day){
+  const cur = S.templates.find(t=>(t.days||[]).includes(day));
+  const label = JOURS[(day+1)%7];
+  const rows = S.templates.map(t=>`<button class="row tap" data-a="planSet" data-d="${day}" data-id="${t.id}">
+      <div class="ico" style="background:${cur&&cur.id===t.id?"var(--green)":"var(--tint)"}">${cur&&cur.id===t.id?icon("check"):"📋"}</div>
+      <div class="grow"><div class="t">${esc(t.n)}</div><div class="s">${t.exos.length} exercices · ${t.exos.reduce((a,e)=>a+e.sets,0)} séries</div></div>
+    </button>`).join("");
+  openSheet(`<div class="sheet-hd"><span class="t">Le ${label}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+    <div class="sheet-body">
+      ${S.templates.length ? `<p class="body" style="margin-bottom:12px">Quelle séance enregistrée veux-tu faire chaque ${label} ?</p><div class="group">${rows}</div>
+        ${cur?`<div class="btnrow"><button class="btn ghost" data-a="planSet" data-d="${day}">Ne rien prévoir le ${label}</button></div>`:""}`
+      : `<div class="empty-state"><span class="em">📋</span>Tu n'as pas encore de séance enregistrée.<br>Compose une séance dans « Ma séance », puis touche « Enregistrer » pour la placer sur ce jour.</div>`}
+    </div>`);
+}
+// À l'ouverture (et quand on planifie le jour même) : charge la séance prévue aujourd'hui dans « Ma séance »
+function applyPlannedSession(force){
+  if(S.draft && S.draft.startedAt) return false;
+  const t = plannedTemplate();
+  if(!t) return false;
+  if(!force && S.custom.planDate===todayISO()) return false; // déjà chargée aujourd'hui (et peut-être modifiée)
+  if(sessionsToday().some(s=>s.tplId===t.id)) return false;
+  S.custom = { exos: clone(t.exos), name: t.n, tplId: t.id, planDate: todayISO() };
+  S.settings.todayTab = "custom";
+  save();
+  return true;
+}
+
+// ---------- glisser la carte pour changer d'exercice ----------
+let swipe = null;
+let suppressClicksUntil = 0;
+document.addEventListener("pointerdown", e=>{
+  const card = e.target.closest && e.target.closest(".focus-card");
+  if(!card || !S.draft || !S.draft.startedAt || (e.pointerType==="mouse" && e.button!==0)) return;
+  swipe = { card, x:e.clientX, y:e.clientY, dx:0, active:false, id:e.pointerId, t:performance.now() };
+});
+document.addEventListener("pointermove", e=>{
+  if(!swipe || e.pointerId!==swipe.id) return;
+  const dx = e.clientX-swipe.x, dy = e.clientY-swipe.y;
+  if(!swipe.active){
+    if(Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)*1.3){ swipe.active = true; swipe.card.classList.add("dragging"); }
+    else { if(Math.abs(dy)>10) swipe = null; return; }
+  }
+  const n = S.draft.exos.length;
+  const edge = (liveFocusIdx===0 && dx>0) || (liveFocusIdx===n-1 && dx<0);
+  swipe.dx = edge ? dx*0.25 : dx;
+  swipe.card.style.transform = `translateX(${swipe.dx}px) rotate(${swipe.dx/45}deg)`;
+});
+function endSwipe(e){
+  if(!swipe || e.pointerId!==swipe.id) return;
+  const s = swipe; swipe = null;
+  if(!s.active) return;
+  suppressClicksUntil = Date.now()+350;
+  const v = s.dx/Math.max(1, performance.now()-s.t), n = S.draft.exos.length;
+  const go = (s.dx<-70 || v<-0.6) && liveFocusIdx<n-1 ? 1 : (s.dx>70 || v>0.6) && liveFocusIdx>0 ? -1 : 0;
+  s.card.classList.remove("dragging");
+  if(go){
+    s.card.classList.add(go>0?"fly-l":"fly-r");
+    if(navigator.vibrate) try{ navigator.vibrate(8); }catch(err){}
+    setTimeout(()=>{ liveFocusIdx += go; focusAnimDir = go>0?"r":"l"; refreshFocusRegion(); }, 170);
+  } else {
+    s.card.classList.add("snap");
+    s.card.style.transform = "";
+    setTimeout(()=>s.card.classList.remove("snap"), 350);
+  }
+}
+document.addEventListener("pointerup", endSwipe);
+document.addEventListener("pointercancel", endSwipe);
+
 Object.assign(ACT, {
-  todayMode(d){ S.settings.todayMode = d.v; save(); renderViewAnimated("today"); },
+  todayMode(d){ S.settings.todayTab = d.v; save(); renderViewAnimated("today"); },
+  pickerCat(d){
+    picker.cat = d.v || null;
+    qsa("#pickerCats .chip").forEach(c=>c.classList.toggle("on", c.dataset.v===(d.v||"")));
+    qs("#pickerList").innerHTML = pickerListHTML();
+    qs("#pickerList").scrollTop = 0;
+  },
+  customFill(){
+    const have = S.custom.exos.map(e=>e.exoId);
+    const target = SESSION_SIZE[S.goals.sessionLength]||6;
+    const n = Math.max(have.length ? 1 : 3, target-have.length);
+    const add = suggestComplement(have, Math.min(n, 4));
+    if(!add.length){ toast("Aucun exercice disponible avec ton matériel"); return; }
+    add.forEach(e=>{ S.custom.exos.push({ exoId:e.id, sets:e.sets, app:true }); freshIds.add(e.id); });
+    save(); changed();
+    toast(`✨ ${add.length} exercice${add.length>1?"s":""} ajouté${add.length>1?"s":""} par l'app`);
+  },
+  planDay(d){ openPlanDaySheet(+d.d); },
+  planSet(d){
+    const day = +d.d;
+    S.templates.forEach(t=>{ t.days = (t.days||[]).filter(x=>x!==day); });
+    if(d.id){ const t = S.templates.find(x=>x.id===d.id); if(t) t.days.push(day); }
+    save(); closeSheet(); changed();
+    if(day===weekdayIdx(todayISO())) applyPlannedSession(true);
+    toast(d.id ? `Planifié le ${JOURS[(day+1)%7]}` : "Jour libéré");
+  },
+  templateMenu(d){
+    const t = S.templates.find(x=>x.id===d.id); if(!t) return;
+    openModal(`<div style="font-weight:700;font-size:calc(17rem/17)">${esc(t.n)}</div>
+      <div class="hr-note" style="margin:4px 0 14px">${t.exos.length} exercices · ${(t.days||[]).length?"le "+t.days.slice().sort().map(x=>JOURS[(x+1)%7]).join(", "):"aucun jour assigné"}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn" data-a="loadTemplate" data-id="${t.id}">Charger dans Ma séance</button>
+        <button class="btn secondary" data-a="editTemplateDays" data-id="${t.id}">Choisir les jours</button>
+        <button class="btn ghost" style="color:var(--red)" data-a="deleteTemplate" data-id="${t.id}">Supprimer</button>
+      </div>`);
+  },
+  editTemplateDays(d){ const t = S.templates.find(x=>x.id===d.id); if(t) openTemplateModal(t.n, t.days||[], t.id); },
+  tplDayToggle(d, el){ el.classList.toggle("on"); },
   setType(d){ regenerateDraft(d.v); renderViewAnimated("today"); },
-  startSession(){ S.draft.startedAt = new Date().toISOString(); liveFocusIdx = 0; save(); renderViewAnimated("today"); },
+  startSession(){ S.draft.startedAt = new Date().toISOString(); liveFocusIdx = 0; save(); scrollTodayTop(); renderViewAnimated("today"); },
   regenSession(){ regenerateDraft(); renderViewAnimated("today"); toast("Nouvelle proposition"); },
   dropImported(){
     confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); liveFocusIdx=0; save(); renderViewAnimated("today"); } });
   },
-  removeExo(d){
-    S.draft.exos.splice(+d.idx,1);
-    if(liveFocusIdx>=S.draft.exos.length) liveFocusIdx = Math.max(0,S.draft.exos.length-1);
-    changed();
+  removeExo(d, el){
+    const row = el && !S.draft.startedAt && el.closest(".row");
+    const go = ()=>{
+      S.draft.exos.splice(+d.idx,1);
+      if(liveFocusIdx>=S.draft.exos.length) liveFocusIdx = Math.max(0,S.draft.exos.length-1);
+      changed();
+    };
+    if(row){ row.classList.add("leaving"); setTimeout(go, 220); } else go();
   },
   addExoOpen(){
     openPicker({ title:"Ajouter des exercices", multi:true, exclude:new Set(S.draft.exos.map(e=>e.exoId)), onDone:ids=>{
@@ -2405,13 +2989,13 @@ Object.assign(ACT, {
   // --- Ma séance ---
   customAddOpen(){
     openPicker({ title:"Choisir des exercices", multi:true, exclude:new Set(S.custom.exos.map(e=>e.exoId)), onDone:ids=>{
-      ids.forEach(id=>S.custom.exos.push({ exoId:id, sets:EXO_MAP[id].sets }));
-      closeSheet(); save(); renderViewAnimated("today");
+      ids.forEach(id=>{ S.custom.exos.push({ exoId:id, sets:EXO_MAP[id].sets }); freshIds.add(id); });
+      closeSheet(); save(); changed();
     }});
   },
   customFromProposal(){
     const d = getOrCreateDraft();
-    S.custom = { exos: d.exos.map(e=>({ exoId:e.exoId, sets:e.sets.length })), name:null };
+    S.custom = { exos: d.exos.map(e=>({ exoId:e.exoId, sets:e.sets.length, app:true })), name:null };
     save(); renderViewAnimated("today"); toast("Séance proposée copiée : modifie-la à ton goût");
   },
   customSets(d){
@@ -2419,44 +3003,54 @@ Object.assign(ACT, {
     e.sets = Math.max(1, Math.min(10, e.sets+parseInt(d.d,10)));
     changed();
   },
-  customRemove(d){ S.custom.exos.splice(+d.idx,1); changed(); },
+  customRemove(d, el){
+    const row = el.closest(".row");
+    const go = ()=>{ S.custom.exos.splice(+d.idx,1); changed(); };
+    if(row){ row.classList.add("leaving"); setTimeout(go, 220); } else go();
+  },
   customClear(){
-    confirmSheet({ title:"Vider ma séance ?", html:"Les exercices choisis seront retirés. Tes modèles enregistrés ne changent pas.", ok:"Vider", danger:true,
+    confirmSheet({ title:"Vider ma séance ?", html:"Les exercices choisis seront retirés. Tes séances enregistrées ne changent pas.", ok:"Vider", danger:true,
       onOk:()=>{ S.custom = { exos:[] }; save(); renderViewAnimated("today"); } });
   },
   startCustom(){
     if(!S.custom.exos.length) return;
     S.draft = buildCustomSession(S.custom.exos, S.custom.name);
+    const planned = plannedTemplate();
+    if(S.custom.tplId){ S.draft.tplId = S.custom.tplId; S.draft.planned = !!planned && planned.id===S.custom.tplId; }
     S.draft.startedAt = new Date().toISOString();
     liveFocusIdx = 0;
-    save(); renderViewAnimated("today");
+    save(); scrollTodayTop(); renderViewAnimated("today");
   },
   saveTemplateOpen(){
-    openModal(`<div style="font-weight:700;font-size:calc(17rem/17);margin-bottom:4px">Enregistrer comme modèle</div>
-      <div class="hr-note" style="margin:0 0 12px">Retrouve cette séance en un geste dans « Mes modèles ».</div>
-      <div class="num-field"><input id="tplName" type="text" maxlength="40" placeholder="Ex. Haut du corps A" value="${esc(S.custom.name||"")}"></div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
-        <button class="btn" data-a="saveTemplateOk">Enregistrer</button>
-        <button class="btn ghost" data-a="closesheet" style="height:40px">Annuler</button>
-      </div>`);
-    setTimeout(()=>{ const i=qs("#tplName"); if(i) i.focus(); }, 80);
+    const t = S.custom.tplId && S.templates.find(x=>x.id===S.custom.tplId);
+    openTemplateModal(S.custom.name||"", t ? (t.days||[]) : [], t ? t.id : null);
   },
-  saveTemplateOk(){
+  saveTemplateOk(d){
     const name = ((qs("#tplName")||{}).value||"").trim() || `Séance ${S.templates.length+1}`;
-    const existing = S.templates.find(t=>t.n.toLowerCase()===name.toLowerCase());
-    const exos = clone(S.custom.exos);
-    if(existing) existing.exos = exos; else S.templates.push({ id:uid(), n:name, exos });
-    S.custom.name = name;
-    closeSheet(); save(); changed(); toast(existing?"Modèle mis à jour":"Modèle enregistré");
+    const days = qsa(".tpl-daypick .on").map(b=>+b.dataset.d);
+    const editOnly = d.edit==="1";
+    let t = d.id ? S.templates.find(x=>x.id===d.id) : S.templates.find(x=>x.n.toLowerCase()===name.toLowerCase());
+    // un jour de la semaine ne porte qu'une seule séance
+    S.templates.forEach(x=>{ if(x!==t) x.days = (x.days||[]).filter(k=>!days.includes(k)); });
+    if(t){ t.n = name; t.days = days; if(!editOnly) t.exos = clone(S.custom.exos.map(e=>({ exoId:e.exoId, sets:e.sets }))); }
+    else { t = { id:uid(), n:name, days, exos:clone(S.custom.exos.map(e=>({ exoId:e.exoId, sets:e.sets }))) }; S.templates.push(t); }
+    if(!editOnly || S.custom.tplId===t.id){ S.custom.name = name; S.custom.tplId = t.id; }
+    closeSheet(); save(); changed();
+    toast(days.length ? `« ${name} » enregistrée pour le ${days.slice().sort().map(k=>JOURS[(k+1)%7]).join(", ")}` : `« ${name} » enregistrée`);
   },
   loadTemplate(d){
     const t = S.templates.find(x=>x.id===d.id); if(!t) return;
-    S.custom = { exos: clone(t.exos), name: t.n };
-    save(); renderViewAnimated("today"); toast(`« ${t.n} » chargé`);
+    S.custom = { exos: clone(t.exos), name: t.n, tplId: t.id };
+    t.exos.forEach(e=>freshIds.add(e.exoId));
+    closeSheet(); save(); renderViewAnimated("today"); toast(`« ${t.n} » chargée`);
   },
   deleteTemplate(d){
     const t = S.templates.find(x=>x.id===d.id); if(!t) return;
-    confirmSheet({ title:`Supprimer « ${t.n} » ?`, ok:"Supprimer", danger:true, onOk:()=>{ S.templates = S.templates.filter(x=>x.id!==d.id); save(); changed(); } });
+    confirmSheet({ title:`Supprimer « ${t.n} » ?`, html:"La séance enregistrée et ses jours de planning seront supprimés.", ok:"Supprimer", danger:true, onOk:()=>{
+      S.templates = S.templates.filter(x=>x.id!==d.id);
+      if(S.custom.tplId===d.id) delete S.custom.tplId;
+      save(); changed();
+    } });
   },
 
   // --- séance en cours ---
@@ -2668,7 +3262,7 @@ Object.assign(ACT, {
   redoSession(d){
     const s = S.sessions.find(x=>x.id===d.id); if(!s) return;
     S.custom = { exos: s.exos.filter(ex=>EXO_MAP[ex.exoId]).map(ex=>({ exoId:ex.exoId, sets:Math.max(1,ex.sets.length) })), name: s.name||null };
-    S.settings.todayMode = "custom";
+    S.settings.todayTab = "custom";
     save(); closeSheet();
     switchTab("today");
     toast("Séance chargée dans « Ma séance »");
@@ -2852,15 +3446,19 @@ function medalsPaneHTML(){
   return `<div class="medal-summary stagger" style="--i:0">
       ${[1,2,3,4].map(k=>`<div class="ms-cell"><span class="pip big t${k}"></span><div class="ms-n" data-count="${c[k]}">${c[k]}</div><div class="ms-l">${TIERS[k].n}</div></div>`).join("")}
     </div>
-    <div class="sh-sub" style="margin-top:10px">${fmtNum(pts)} points de médailles · ${MEDALS.length} médailles × 4 paliers</div>
+    <div class="sh-sub" style="margin-top:10px">${fmtNum(pts)} points de médailles · ${MEDALS.length} médailles × 4 paliers · les paliers platine demandent des années</div>
     ${next.length?`<h2 class="sh">Prochains paliers</h2><div class="group">${next.map((x,i)=>`<button class="row tap stagger" style="--i:${i+1}" data-a="showMedal" data-id="${x.m.id}">
       ${medalHTML(x.m, x.p.t, "sm")}
       <div class="grow"><div class="t">${esc(x.m.n)} <span class="tier-tag t${x.p.t+1}">${TIERS[x.p.t+1].n}</span></div>
       <div class="mc-bar" style="margin-top:6px"><span style="width:${Math.round(x.p.pct*100)}%"></span></div>
       <div class="s" style="margin-top:4px">${fmtMedalVal(x.m,x.p.v)} / ${fmtMedalVal(x.m,x.p.next)} ${esc(medalUnit(x.m,x.p.next))}</div></div>
     </button>`).join("")}</div>`:""}
-    <h2 class="sh">Toutes les médailles</h2>
-    <div class="medal-grid">${MEDALS.map((m,i)=>medalCardHTML(m,i+4)).join("")}</div>`;
+    ${MEDAL_CATS.map(([cat,label])=>{
+      const list = MEDALS.filter(m=>m.cat===cat);
+      const done = list.reduce((t,m)=>t+medalTier(m),0);
+      return `<h2 class="sh">${label}<span class="more" style="color:var(--label2)">${done}/${list.length*4}</span></h2>
+        <div class="medal-grid">${list.map((m,i)=>medalCardHTML(m,i+4)).join("")}</div>`;
+    }).join("")}`;
 }
 
 Object.assign(ACT, {
@@ -2874,9 +3472,57 @@ const LEN_LABELS = { court:"Courte (≈20 min)", moyen:"Moyenne (≈35 min)", lo
 
 function ownedEquipCount(){ return EQUIP_TYPES.filter(e=>!e.always && S.equipment.owned[e.id]).length; }
 
+function profileHeroHTML(){
+  const lv = levelInfo(), name = (S.settings.name||"").trim();
+  const since = firstSessionDate();
+  const c = tierCounts();
+  const initial = name ? name[0].toUpperCase() : "🔥";
+  return `<div class="profile-hero stagger" style="--i:0">
+    <button class="ph-avatar" data-a="editName" aria-label="Modifier ton prénom"><span>${esc(initial)}</span><em>${lv.level}</em></button>
+    <div class="ph-main">
+      <button class="ph-name" data-a="editName">${name?esc(name):"Ajoute ton prénom"} ${icon("edit")}</button>
+      <div class="ph-title">Niveau ${lv.level} · ${esc(lv.title)}</div>
+      <div class="xpbar"><span style="width:${Math.round(lv.pct*100)}%"></span></div>
+      <div class="ph-sub">${since?`Membre actif depuis le ${fmtDate(since)} ${parseISO(since).getFullYear()}`:"Ta première séance t'attend"}</div>
+    </div>
+  </div>
+  <div class="ph-medals stagger" style="--i:1">
+    ${[1,2,3,4].map(k=>`<div><span class="pip big t${k}"></span><b data-count="${c[k]}">${c[k]}</b><small>${TIERS[k].n}</small></div>`).join("")}
+  </div>`;
+}
+function profileStatsHTML(){
+  if(!S.sessions.length) return "";
+  const fav = favoriteExercise(), wd = favoriteWeekday(), moment = favoriteMoment(), bw = bestWeek();
+  const avg = Math.round(totalDurationSec()/S.sessions.length);
+  const rows = [
+    ["🏋️","Séances terminées", fmtNum(S.sessions.length), `${sessionsInYear()} cette année`],
+    ["🔥","Semaines d'affilée", currentStreakWeeks(), `record : ${maxStreakWeeksEver()}`],
+    ["⭐","Exercice favori", fav?esc(fav.def.n):"–", fav?`${fav.n} séance${fav.n>1?"s":""}`:""],
+    ["📆","Jour préféré", wd?JOURS[(wd.i+1)%7]:"–", moment?`plutôt ${moment}`:""],
+    ["⏱️","Durée moyenne", fmtDuration(avg), `${fmtDec(totalDurationSec()/3600)} h au total`],
+    ["🏆","Meilleure semaine", bw?`${bw.n} séance${bw.n>1?"s":""}`:"–", bw?`semaine du ${fmtDate(bw.wk)}`:""],
+    ["🪨","Tonnage total", fmtKg(totalVolumeAllTime()), `${fmtNum(totalSets())} séries validées`],
+    ["💥","Records battus", S.meta.prCount||0, `${distinctExosCount()} exercice${distinctExosCount()>1?"s":""} pratiqué${distinctExosCount()>1?"s":""}`],
+  ];
+  const lifts = topLifts(5);
+  return `<h2 class="sh">Mes habitudes<button class="more" data-a="tab" data-id="progress">Tout voir</button></h2>
+    <div class="group">${rows.map((r,i)=>`<div class="row stat-row stagger" style="--i:${i+2}">
+      <div class="ico" style="background:var(--fill);font-size:16px">${r[0]}</div>
+      <div class="grow"><div class="t">${r[1]}</div>${r[3]?`<div class="s">${r[3]}</div>`:""}</div>
+      <div class="val strong">${r[2]}</div>
+    </div>`).join("")}</div>
+    ${lifts.length?`<h2 class="sh">Mes records</h2><div class="group">${lifts.map((l,i)=>`<button class="row tap stagger" style="--i:${i+10}" data-a="openExoChart" data-id="${l.def.id}">
+      <div class="rank">${i+1}</div>
+      <div class="grow"><div class="t">${esc(l.def.n)}</div><div class="s">${l.r} ${isTimed(l.def)?"s":"reps"} · ${fmtRelative(l.date)}</div></div>
+      <div class="val strong">${fmtDec(l.w)} kg</div><span class="chev">${icon("chev")}</span>
+    </button>`).join("")}</div>`:""}`;
+}
+
 function renderProfil(){
   return `<div class="navbar"><div class="nb-title">Profil</div></div><div class="content">
     <h1 class="lt">Profil</h1>
+    ${profileHeroHTML()}
+    ${profileStatsHTML()}
 
     <h2 class="sh">Entraînement</h2>
     <div class="group">
@@ -2992,18 +3638,19 @@ function refreshGoals(){ const b=qs(".sheet-body"); if(b) b.innerHTML = goalsBod
 
 // ---------- Exercices inclus / exclus ----------
 function exoPrefsBodyHTML(){
-  const byPattern = {};
-  EXOS.forEach(e=>{ (byPattern[e.pattern]=byPattern[e.pattern]||[]).push(e); });
-  return Object.keys(byPattern).map(p=>{
-    const rows = byPattern[p].map(e=>{
-      const excl = isExcluded(e.id), incl = isIncluded(e.id);
-      return `<div class="row">
-        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}</div></div>
-        <button class="chip ${incl?"on":""}" data-a="toggleIncluded" data-id="${e.id}">★</button>
+  const muscleOrder = {}; MUSCLES.forEach((m,i)=>muscleOrder[m.id]=i);
+  return `<p class="hr-note" style="margin:0 20px 4px">★ = à privilégier dans les propositions · Exclure = ne jamais le proposer (blessure, goût…). Les exercices grisés demandent du matériel que tu n'as pas renseigné.</p>` +
+  EXO_CATS.map(c=>{
+    const list = EXOS.filter(e=>exoCategory(e)===c.id).sort((a,b)=>muscleOrder[a.muscles[0]]-muscleOrder[b.muscles[0]] || a.n.localeCompare(b.n,"fr"));
+    const rows = list.map(e=>{
+      const excl = isExcluded(e.id), incl = isIncluded(e.id), avail = hasEquip(S.equipment, e.equip);
+      return `<div class="row ${avail?"":"unavail"}">
+        <div class="grow"><div class="t">${esc(e.n)}</div><div class="s">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}${e.equip.includes("bench")?" · banc":""}</div></div>
+        <button class="chip ${incl?"on":""}" aria-label="Privilégier" data-a="toggleIncluded" data-id="${e.id}">★</button>
         <button class="chip ${excl?"excl":""}" data-a="toggleExcluded" data-id="${e.id}">Exclure</button>
       </div>`;
     }).join("");
-    return `<h2 class="sh">${esc(PATTERN_LABEL[p]||p)}</h2><div class="group">${rows}</div>`;
+    return `<h2 class="sh">${c.em} ${esc(c.n)}<span class="more" style="color:var(--label2)">${list.length}</span></h2><div class="group">${rows}</div>`;
   }).join("");
 }
 const PATTERN_LABEL = { squat:"Squat", hinge:"Hanche", push:"Poussée", pull:"Tirage", lunge:"Fentes", core:"Gainage", calf:"Mollets" };
@@ -3047,6 +3694,16 @@ function openAbout(){
 }
 
 Object.assign(ACT, {
+  editName(){
+    openModal(`<div style="font-weight:700;font-size:calc(17rem/17);margin-bottom:12px">Ton prénom</div>
+      <div class="num-field"><input id="nameInput" type="text" maxlength="30" placeholder="Prénom" value="${esc(S.settings.name||"")}"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+        <button class="btn" data-a="saveName">Enregistrer</button>
+        <button class="btn ghost" data-a="closesheet" style="height:40px">Annuler</button>
+      </div>`);
+    setTimeout(()=>{ const i=qs("#nameInput"); if(i) i.focus(); }, 80);
+  },
+  saveName(){ S.settings.name = ((qs("#nameInput")||{}).value||"").trim(); closeSheet(); save(); changed(); },
   openEquip, openGoals, openExoPrefs, openExportImport, openAppearance, openAbout,
   toggleEquip(d){ S.equipment.owned[d.id] = !S.equipment.owned[d.id]; save(); refreshEquip(); },
   addWeight(d){
@@ -3105,7 +3762,7 @@ Object.assign(ACT, {
 });
 VIEWS.profil = renderProfil;
 // ================= INITIALISATION =================
-const APP_VERSION = "1.2";
+const APP_VERSION = "1.3";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){
@@ -3115,11 +3772,52 @@ function applyTheme(){
   else document.documentElement.removeAttribute("data-theme");
 }
 
+// ---------- animation de lancement ----------
+// Les animations portent sur des <div> (le marteau, l'enclume, les étincelles) et
+// jamais sur des éléments internes aux SVG : piège Safari documenté dans Zeste.
+function splashTagline(){
+  const t = plannedTemplate();
+  if(t && !sessionsToday().some(s=>s.tplId===t.id)) return `Aujourd'hui : ${t.n}`;
+  const streak = currentStreakWeeks();
+  if(streak>=2) return `${streak} semaines d'affilée — on continue`;
+  if(sessionsToday().length) return "Séance du jour déjà faite, bravo";
+  return "Forge ton corps, séance après séance";
+}
+function showSplash(){
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sp = document.createElement("div");
+  sp.id = "splash";
+  sp.className = reduce ? "splash reduce" : "splash";
+  const sparks = Array.from({length:18}, (_,i)=>{
+    const a = -170 + i*(160/17) + (Math.random()*10-5);
+    return `<i style="--a:${a.toFixed(0)}deg;--d:${(46+Math.random()*50).toFixed(0)}px;--t:${(Math.random()*0.08).toFixed(2)}s;--s:${(0.6+Math.random()*0.7).toFixed(2)}"></i>`;
+  }).join("");
+  sp.innerHTML = `<div class="sp-stage">
+      <div class="sp-glow"></div>
+      <div class="sp-anvil"><svg viewBox="0 0 120 64" aria-hidden="true"><path d="M4 6H86c14 0 26 4 32 10H86v8c0 6-6 8-12 10l-4 12h12v12H38V46h12l-4-12c-10-2-20-6-26-14H4Z" fill="#34343a"/><path d="M4 6H86c14 0 26 4 32 10H86" stroke="#7a7a84" stroke-width="3" fill="none"/></svg></div>
+      <div class="sp-hammer"><svg viewBox="0 0 80 80" aria-hidden="true"><rect x="36" y="18" width="8" height="60" rx="3" fill="#8a5a34"/><rect x="12" y="4" width="56" height="18" rx="4" fill="#9aa0a8"/><rect x="12" y="4" width="56" height="5" rx="2" fill="#c8ccd2"/></svg></div>
+      <div class="sp-sparks">${sparks}</div>
+    </div>
+    <div class="sp-word">${"Forge".split("").map((c,i)=>`<span style="--i:${i}">${c}</span>`).join("")}</div>
+    <div class="sp-tag">${esc(splashTagline())}</div>`;
+  document.body.appendChild(sp);
+  let gone = false;
+  const leave = ()=>{
+    if(gone) return; gone = true;
+    sp.classList.add("out");
+    setTimeout(()=>sp.remove(), 450);
+  };
+  sp.addEventListener("click", leave);
+  setTimeout(leave, reduce ? 700 : 2000);
+}
+
 function init(){
   buildShell();
   applyTheme();
   checkMedals(true); // médailles déjà méritées (ex. après mise à jour) : attribuées sans célébration
+  applyPlannedSession(); // la séance prévue aujourd'hui s'affiche directement
   switchTab("today");
+  showSplash();
 
   const fi = qs("#fileImport");
   if(fi){

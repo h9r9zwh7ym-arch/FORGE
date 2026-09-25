@@ -85,7 +85,7 @@ Object.assign(ACT, {
   redoSession(d){
     const s = S.sessions.find(x=>x.id===d.id); if(!s) return;
     S.custom = { exos: s.exos.filter(ex=>EXO_MAP[ex.exoId]).map(ex=>({ exoId:ex.exoId, sets:Math.max(1,ex.sets.length) })), name: s.name||null };
-    S.settings.todayMode = "custom";
+    S.settings.todayTab = "custom";
     save(); closeSheet();
     switchTab("today");
     toast("Séance chargée dans « Ma séance »");

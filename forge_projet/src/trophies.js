@@ -16,35 +16,117 @@ function masteredExosCount(){
 }
 const countSessions = pred => ()=>S.sessions.filter(pred).length;
 
-// t : seuils bronze / argent / or / platine
+// ---- valeurs des nouvelles familles (v1.3) ----
+function spanDays(){
+  const f = firstSessionDate(); if(!f) return 0;
+  const last = S.sessions.reduce((m,s)=>s.date>m?s.date:m, f);
+  return daysBetween(f, last);
+}
+function intenseWeeks(){
+  const per = {};
+  S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
+  return Object.values(per).filter(n=>n>=5).length;
+}
+// semaines où au moins 8 groupes musculaires différents ont été travaillés
+function balancedWeeks(){
+  const per = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{
+    const d = EXO_MAP[ex.exoId];
+    if(!d || !ex.sets.some(st=>st.done)) return;
+    const k = weekKey(s.date);
+    d.muscles.forEach(m=>{ if(m!=="cardio") (per[k]=per[k]||new Set()).add(m); });
+  }));
+  return Object.values(per).filter(ms=>ms.size>=8).length;
+}
+function maxRepsOneSession(){ return S.sessions.reduce((m,s)=>Math.max(m, sessionReps(s)), 0); }
+function heaviestSet(){
+  let m = 0;
+  S.sessions.forEach(s=>s.exos.forEach(ex=>ex.sets.forEach(st=>{ if(st.done && st.weight>m) m = st.weight; })));
+  return m;
+}
+// Progression de force sur un exercice chargé : meilleur 1RM estimé comparé à la
+// meilleure des 3 premières séances, pour un exercice pratiqué depuis au moins 90 jours
+// (évite qu'une progression de débutant de quelques semaines donne le platine).
+function bestStrengthRatio(){
+  const hist = {};
+  S.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>s.exos.forEach(ex=>{
+    const def = EXO_MAP[ex.exoId];
+    if(!def || !loadableTypeOf(def)) return;
+    const e = Math.max(0, ...ex.sets.filter(st=>st.done&&st.weight).map(st=>estimated1RM(st.weight, st.reps)));
+    if(e) (hist[ex.exoId]=hist[ex.exoId]||[]).push({ date:s.date, e });
+  }));
+  let best = 0;
+  Object.values(hist).forEach(h=>{
+    if(h.length<4 || daysBetween(h[0].date, h[h.length-1].date)<90) return;
+    const base = Math.max(...h.slice(0,3).map(x=>x.e));
+    const top = Math.max(...h.slice(3).map(x=>x.e));
+    best = Math.max(best, top/base);
+  });
+  return best;
+}
+function fullMonths(){
+  const per = {};
+  S.sessions.forEach(s=>{ const k=s.date.slice(0,7); per[k]=(per[k]||0)+1; });
+  return Object.values(per).filter(n=>n>=12).length;
+}
+// années civiles avec au moins 48 semaines d'entraînement
+function ironYears(){
+  const per = {};
+  S.sessions.forEach(s=>{ const y=s.date.slice(0,4); (per[y]=per[y]||new Set()).add(weekKey(s.date)); });
+  return Object.values(per).filter(w=>w.size>=48).length;
+}
+function equipCatsTrained(){
+  const c = new Set();
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{ const d=EXO_MAP[ex.exoId]; if(d && ex.sets.some(st=>st.done)) c.add(exoCategory(d)); }));
+  return c.size;
+}
+
+const MEDAL_CATS = [
+  ["regular", "Régularité"], ["force", "Force"], ["volume", "Volume"], ["explore", "Découverte"], ["style", "Style"],
+];
+// t : seuils bronze / argent / or / platine. Le platine vise le très long terme :
+// plusieurs années d'entraînement régulier pour la plupart des familles.
 const MEDALS = [
-  { id:"sessions", n:"Assiduité",        em:"🏋️", unit:"séances terminées", one:"séance terminée",           t:[1,20,75,200],          val:()=>S.sessions.length },
-  { id:"streak",   n:"Régularité",       em:"📅", unit:"semaines d'affilée",          t:[2,4,12,26],            val:maxStreakWeeksEver },
-  { id:"perfect",  n:"Semaine parfaite", em:"🎯", unit:"semaines à l'objectif", one:"semaine à l'objectif",       t:[1,4,12,30],            val:perfectWeeksCount, desc:"Semaines où tu atteins ton objectif de séances hebdomadaires." },
-  { id:"volume",   n:"Tonnage",          em:"🪨", unit:"kg soulevés au total",        t:[1000,10000,100000,500000], val:totalVolumeAllTime },
-  { id:"bigday",   n:"Grosse séance",    em:"💪", unit:"kg en une seule séance",      t:[1000,3000,6000,10000], val:bestSessionVolume },
-  { id:"sets",     n:"Séries",           em:"🔁", unit:"séries validées",             t:[50,250,1000,3000],     val:totalSets },
-  { id:"prs",      n:"Records",          em:"💥", unit:"records personnels battus", one:"record personnel battu",   t:[1,10,50,150],          val:()=>S.meta.prCount||0 },
-  { id:"mastery",  n:"Maîtrise",         em:"🎓", unit:"exercices maîtrisés", one:"exercice maîtrisé",         t:[1,5,10,20],            val:masteredExosCount, desc:"Un exercice est maîtrisé quand tu l'as pratiqué dans 8 séances." },
-  { id:"variety",  n:"Polyvalence",      em:"🧭", unit:"exercices différents",        t:[5,15,30,50],           val:distinctExosCount },
-  { id:"muscles",  n:"Corps complet",    em:"🧬", unit:"groupes musculaires travaillés", t:[4,7,9,11],          val:distinctMusclesCount },
-  { id:"time",     n:"Temps sous la barre", em:"⏱️", unit:"heures d'entraînement", one:"heure d'entraînement",    t:[1,10,50,150],          val:()=>totalDurationSec()/3600 },
-  { id:"marathon", n:"Endurance",        em:"⌛", unit:"séances de 45 min ou plus", one:"séance de 45 min ou plus",   t:[1,5,20,50],            val:countSessions(s=>(s.durationSec||0)>=45*60) },
-  { id:"early",    n:"Lève-tôt",         em:"🌅", unit:"séances commencées avant 8 h", one:"séance commencée avant 8 h", t:[1,5,20,50],           val:countSessions(s=>{ const h=startHour(s); return h!==null && h<8; }) },
-  { id:"night",    n:"Oiseau de nuit",   em:"🌙", unit:"séances commencées après 21 h", one:"séance commencée après 21 h", t:[1,5,20,50],          val:countSessions(s=>startHour(s)>=21) },
-  { id:"custom",   n:"Sur mesure",       em:"✍️", unit:"séances composées par toi", one:"séance composée par toi",   t:[1,5,20,50],            val:countSessions(s=>s.source==="custom") },
+  { id:"sessions", cat:"regular", n:"Assiduité",        em:"🏋️", unit:"séances terminées", one:"séance terminée",     t:[1,25,150,500],   val:()=>S.sessions.length, desc:"Le platine représente environ trois ans à trois séances par semaine." },
+  { id:"streak",   cat:"regular", n:"Régularité",       em:"📅", unit:"semaines d'affilée",                          t:[2,8,26,104],     val:maxStreakWeeksEver, desc:"Semaines consécutives avec au moins une séance. Le platine demande deux ans sans interruption." },
+  { id:"perfect",  cat:"regular", n:"Semaine parfaite", em:"🎯", unit:"semaines à l'objectif", one:"semaine à l'objectif", t:[1,8,40,150],   val:perfectWeeksCount, desc:"Semaines où tu atteins ton objectif de séances hebdomadaires." },
+  { id:"fullmonth",cat:"regular", n:"Mois complet",     em:"🗓️", unit:"mois à 12 séances ou plus", one:"mois à 12 séances ou plus", t:[1,3,6,12], val:fullMonths },
+  { id:"ironyear", cat:"regular", n:"Année de fer",     em:"⚒️", unit:"années à 48 semaines actives", one:"année à 48 semaines actives", t:[1,2,3,5], val:ironYears, desc:"Une année civile où tu t'entraînes au moins 48 semaines sur 52. Le platine demande cinq années de ce niveau." },
+  { id:"fidelity", cat:"regular", n:"Fidélité",         em:"🤝", unit:"jours entre ta première et ta dernière séance", one:"jour entre ta première et ta dernière séance", t:[30,180,365,1095], val:spanDays, desc:"L'ancienneté de ta pratique. Le platine correspond à trois ans." },
+  { id:"planned",  cat:"regular", n:"Planificateur",    em:"📌", unit:"séances prévues faites le bon jour", one:"séance prévue faite le bon jour", t:[1,10,50,200], val:countSessions(s=>s.planned), desc:"Séances de ton planning hebdomadaire faites le jour prévu." },
+
+  { id:"prs",      cat:"force", n:"Records",           em:"💥", unit:"records personnels battus", one:"record personnel battu", t:[1,15,75,300], val:()=>S.meta.prCount||0 },
+  { id:"heavy",    cat:"force", n:"Poids lourd",       em:"🪨", unit:"kg sur une seule série",                       t:[20,60,100,150],  val:heaviestSet, desc:"La charge la plus lourde que tu as déplacée sur une série." },
+  { id:"doubled",  cat:"force", n:"Deux fois plus fort", em:"📈", unit:"ta force de départ",     t:[1.2,1.5,2,2.5], base:1, val:bestStrengthRatio, fmt:v=>v?"×"+round1(v).toLocaleString("fr-CH",{minimumFractionDigits:1}):"–", desc:"Ton meilleur 1RM estimé sur un exercice chargé, comparé à tes 3 premières séances de cet exercice (pratiqué depuis au moins 90 jours). Le platine demande ×2,5." },
+  { id:"mastery",  cat:"force", n:"Maîtrise",          em:"🎓", unit:"exercices maîtrisés", one:"exercice maîtrisé", t:[1,5,15,30],       val:masteredExosCount, desc:"Un exercice est maîtrisé quand tu l'as pratiqué dans 8 séances." },
+
+  { id:"volume",   cat:"volume", n:"Tonnage",          em:"🏔️", unit:"kg soulevés au total",                         t:[1000,25000,250000,1500000], val:totalVolumeAllTime },
+  { id:"bigday",   cat:"volume", n:"Grosse séance",    em:"💪", unit:"kg en une seule séance",                       t:[1000,4000,8000,15000], val:bestSessionVolume },
+  { id:"sets",     cat:"volume", n:"Séries",           em:"🔁", unit:"séries validées",                              t:[50,500,3000,12000], val:totalSets },
+  { id:"centurion",cat:"volume", n:"Centurion",        em:"💯", unit:"répétitions en une séance",                    t:[100,250,500,1000], val:maxRepsOneSession },
+  { id:"time",     cat:"volume", n:"Temps sous la barre", em:"⏱️", unit:"heures d'entraînement", one:"heure d'entraînement", t:[1,20,100,400], val:()=>totalDurationSec()/3600, fmt:v=>v<10?round1(v).toLocaleString("fr-CH"):fmtNum(v) },
+  { id:"marathon", cat:"volume", n:"Endurance",        em:"⌛", unit:"séances de 45 min ou plus", one:"séance de 45 min ou plus", t:[1,10,50,200], val:countSessions(s=>(s.durationSec||0)>=45*60) },
+
+  { id:"variety",  cat:"explore", n:"Polyvalence",     em:"🧭", unit:"exercices différents",                         t:[5,20,45,80],     val:distinctExosCount },
+  { id:"muscles",  cat:"explore", n:"Corps complet",   em:"🧬", unit:"semaines équilibrées", one:"semaine équilibrée", t:[1,10,40,100], val:balancedWeeks, desc:"Semaines où tu travailles au moins 8 groupes musculaires différents." },
+  { id:"equipcats",cat:"explore", n:"Touche-à-tout",   em:"🧰", unit:"types de matériel utilisés", one:"type de matériel utilisé", t:[2,3,4,6], val:equipCatsTrained, desc:"Poids du corps, haltères, barre, kettlebell, élastiques, barre de traction." },
+  { id:"intense",  cat:"regular", n:"Semaine intense", em:"⚡", unit:"semaines à 5 séances ou plus", one:"semaine à 5 séances ou plus", t:[1,5,20,52], val:intenseWeeks, desc:"Semaines d'au moins 5 séances. Le platine en demande 52." },
+
+  { id:"early",    cat:"style", n:"Lève-tôt",          em:"🌅", unit:"séances commencées avant 8 h", one:"séance commencée avant 8 h", t:[1,10,50,150], val:countSessions(s=>{ const h=startHour(s); return h!==null && h<8; }) },
+  { id:"night",    cat:"style", n:"Oiseau de nuit",    em:"🌙", unit:"séances commencées après 21 h", one:"séance commencée après 21 h", t:[1,10,50,150], val:countSessions(s=>startHour(s)>=21) },
+  { id:"custom",   cat:"style", n:"Sur mesure",        em:"✍️", unit:"séances composées par toi", one:"séance composée par toi", t:[1,10,50,200], val:countSessions(s=>s.source==="custom") },
 ];
 const MEDAL_MAP = {}; MEDALS.forEach(m=>MEDAL_MAP[m.id]=m);
 
 function medalTier(m){ return (S.medals[m.id]||{}).t||0; }
 function medalProgress(m){
   const v = m.val(), t = medalTier(m);
-  const next = t<4 ? m.t[t] : null, prev = t>0 ? m.t[t-1] : 0;
+  const next = t<4 ? m.t[t] : null, prev = t>0 ? m.t[t-1] : (m.base||0);
   return { v, t, next, pct: next==null ? 1 : Math.max(0,Math.min(1,(v-prev)/(next-prev))) };
 }
 function medalUnit(m, v){ return v<=1 && m.one ? m.one : m.unit; }
 function fmtMedalVal(m, v){
-  if(m.id==="time") return v<10 ? round1(v).toLocaleString("fr-CH") : fmtNum(v);
+  if(m.fmt) return m.fmt(v);
   return fmtNum(Math.floor(v));
 }
 

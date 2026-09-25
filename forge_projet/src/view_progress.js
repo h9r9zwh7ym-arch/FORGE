@@ -171,15 +171,19 @@ function medalsPaneHTML(){
   return `<div class="medal-summary stagger" style="--i:0">
       ${[1,2,3,4].map(k=>`<div class="ms-cell"><span class="pip big t${k}"></span><div class="ms-n" data-count="${c[k]}">${c[k]}</div><div class="ms-l">${TIERS[k].n}</div></div>`).join("")}
     </div>
-    <div class="sh-sub" style="margin-top:10px">${fmtNum(pts)} points de médailles · ${MEDALS.length} médailles × 4 paliers</div>
+    <div class="sh-sub" style="margin-top:10px">${fmtNum(pts)} points de médailles · ${MEDALS.length} médailles × 4 paliers · les paliers platine demandent des années</div>
     ${next.length?`<h2 class="sh">Prochains paliers</h2><div class="group">${next.map((x,i)=>`<button class="row tap stagger" style="--i:${i+1}" data-a="showMedal" data-id="${x.m.id}">
       ${medalHTML(x.m, x.p.t, "sm")}
       <div class="grow"><div class="t">${esc(x.m.n)} <span class="tier-tag t${x.p.t+1}">${TIERS[x.p.t+1].n}</span></div>
       <div class="mc-bar" style="margin-top:6px"><span style="width:${Math.round(x.p.pct*100)}%"></span></div>
       <div class="s" style="margin-top:4px">${fmtMedalVal(x.m,x.p.v)} / ${fmtMedalVal(x.m,x.p.next)} ${esc(medalUnit(x.m,x.p.next))}</div></div>
     </button>`).join("")}</div>`:""}
-    <h2 class="sh">Toutes les médailles</h2>
-    <div class="medal-grid">${MEDALS.map((m,i)=>medalCardHTML(m,i+4)).join("")}</div>`;
+    ${MEDAL_CATS.map(([cat,label])=>{
+      const list = MEDALS.filter(m=>m.cat===cat);
+      const done = list.reduce((t,m)=>t+medalTier(m),0);
+      return `<h2 class="sh">${label}<span class="more" style="color:var(--label2)">${done}/${list.length*4}</span></h2>
+        <div class="medal-grid">${list.map((m,i)=>medalCardHTML(m,i+4)).join("")}</div>`;
+    }).join("")}`;
 }
 
 Object.assign(ACT, {

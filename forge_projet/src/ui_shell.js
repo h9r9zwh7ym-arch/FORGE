@@ -225,6 +225,8 @@ const ACT = {
 };
 
 document.addEventListener("click", e=>{
+  // un glissement de carte ne doit pas déclencher le bouton sous le doigt
+  if(typeof suppressClicksUntil!=="undefined" && Date.now()<suppressClicksUntil){ e.preventDefault(); return; }
   const el = e.target.closest("[data-a]");
   if(!el) return;
   const name = el.dataset.a;
@@ -232,6 +234,9 @@ document.addEventListener("click", e=>{
 });
 document.addEventListener("keydown", e=>{
   if(e.key==="Enter" && e.target && e.target.id==="numInput"){ e.preventDefault(); ACT.numOk(); }
+  if(e.key==="Enter" && e.target && (e.target.id==="nameInput" || e.target.id==="tplName")){
+    e.preventDefault(); const b = qs('.center-modal [data-a^="save"]'); if(b) b.click();
+  }
 });
 document.addEventListener("change", e=>{
   const el = e.target.closest("[data-c]");

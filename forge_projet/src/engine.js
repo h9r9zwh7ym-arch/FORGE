@@ -331,9 +331,33 @@ function importProgramJSON(text){
     if(built.warnings) warnings.push(...built.warnings);
   });
   S.importedProgram = sessions;
+  S.settings.todayTab = "proposal"; // le programme importé s'affiche dans « Proposée »
   if(S.draft && S.draft.date===todayISO() && !S.draft.startedAt){
     S.draft = buildSessionFromImported(S.importedProgram[0]);
   }
   save();
   return { ok:true, count:sessions.length, warnings };
+}
+
+// « Compléter avec l'app » : ajoute des exercices à une séance composée à la main,
+// en visant les muscles et les mouvements que la séance ne couvre pas encore.
+function suggestComplement(existingIds, n){
+  const have = existingIds.map(id=>EXO_MAP[id]).filter(Boolean);
+  const coveredMuscles = new Set(have.map(e=>e.muscles[0]));
+  const coveredPatterns = new Set(have.map(e=>e.pattern));
+  const pool = availableExos().filter(e=>!existingIds.includes(e.id));
+  const jitter = {}; pool.forEach(e=>jitter[e.id]=Math.random()*1.2);
+  const out = [];
+  while(out.length<n && pool.length){
+    let best=null, bestScore=-Infinity;
+    pool.forEach(e=>{
+      if(out.includes(e)) return;
+      const sc = scoreExo(e) + jitter[e.id] - (coveredMuscles.has(e.muscles[0])?5:0) - (coveredPatterns.has(e.pattern)?2:0);
+      if(sc>bestScore){ bestScore=sc; best=e; }
+    });
+    if(!best) break;
+    out.push(best);
+    coveredMuscles.add(best.muscles[0]); coveredPatterns.add(best.pattern);
+  }
+  return out;
 }

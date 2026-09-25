@@ -8,7 +8,7 @@ Tu reprends **Forge**, une app web de suivi de musculation pour iPhone, dévelop
 - Usage **solo sur iPhone (Safari)**. Cible réelle = Safari/WebKit, même si le développement peut se tester sous Chromium.
 - **Véracité des informations d'exercice** : toute consigne d'exécution ou de sécurité ajoutée doit s'appuyer sur des repères techniques reconnus (alignement articulaire, dos neutre, amplitude contrôlée...). Ne jamais inventer une consigne dangereuse. En cas de doute, reste conservateur et renvoie vers un professionnel.
 - **100% local** : aucun backend, aucun compte, aucun appel réseau. Tout est stocké dans `localStorage` (clé `forge.v1`).
-- **Numérotation des versions** : version actuelle **1.2**. Incrémente `APP_VERSION` (`src/init.js`) à chaque livraison notable.
+- **Numérotation des versions** : version actuelle **1.3**. Incrémente `APP_VERSION` (`src/init.js`) à chaque livraison notable.
 - Copyright affiché dans « À propos » : `© <année> Yannick Wahler. Tous droits réservés.` (constante `COPYRIGHT`, `src/init.js`).
 - Cahier des charges d'origine : voir la conversation initiale (résumé ci-dessous, section 6).
 
@@ -37,12 +37,12 @@ init.js
 ```
 
 - **`data_equipment.js`** : catalogue du matériel (`EQUIP_TYPES`), poids réellement possédés (`S.equipment.weights`).
-- **`data_exercises.js`** : bibliothèque d'exercices (`EXOS`, ~65 exercices). Chaque exercice a un `pattern` (squat/hinge/push/pull/lunge/core/calf), des `muscles`, un `equip` requis, des `cues` et une consigne `safety`.
+- **`data_exercises.js`** : bibliothèque d'exercices (`EXOS`, 98 exercices depuis la v1.3). `isTimed(def)` repère les exercices mesurés en secondes (consigne contenant « en secondes »). Les catégories d'affichage par matériel sont dans `data_equipment.js` (`EXO_CATS`, `exoCategory(e)` : l'équipement principal, le banc n'étant qu'un accessoire). Chaque exercice a un `pattern` (squat/hinge/push/pull/lunge/core/calf), des `muscles`, un `equip` requis, des `cues` et une consigne `safety`.
 - **`core.js`** : état global `S` (persisté via `save()`/`load()` dans `localStorage`), utilitaires de date, agrégats d'historique (PR, volume, streaks).
 - **`engine.js`** : moteur de suggestion 100% local. `getOrCreateDraft()` génère ou récupère la séance du jour. `generateEngineSession()` fait la rotation des groupes musculaires + progression de charge. `buildExportPrompt()` / `importProgramJSON()` gèrent l'aller-retour avec une IA externe (voir section 5).
 - **`ui_shell.js`** : tabbar, sheets/modals, toast, délégation d'actions par `data-a="nom"` → `ACT.nom(dataset, élément)` (clic) et `data-c="nom"` (changement d'un input).
 - **Vues** (`view_*.js`) : chacune expose une fonction assignée à `VIEWS.<id>` et ajoute ses handlers à `ACT` via `Object.assign(ACT, {...})`. **Convention importante, comme dans Zeste** : si tu ajoutes un module après un autre, tu peux enrichir `ACT` par `Object.assign`, ou redéfinir une fonction existante (la déclaration la plus tardive gagne, hissage JS). Avant de modifier une fonction, vérifie qu'elle n'est pas redéfinie ailleurs.
-- **État** (`S`, voir `core.js: defaultState()`) : `equipment`, `prefs` (exclus/privilégiés), `goals`, `sessions` (historique complet), `draft` (séance du jour, éditable), `custom` (« Ma séance » en cours de composition : `{exos:[{exoId,sets}], name}`), `templates` (modèles enregistrés), `importedProgram` (file d'attente de séances importées), `medals` (`{famille: {t: palier 0-4, d: {palier: date ISO}}}`), `settings` (dont `todayMode` : `proposal`/`custom`), `meta` (dont `prCount`). L'ancien champ `trophies` (v1.0-1.1) est supprimé au chargement.
+- **État** (`S`, voir `core.js: defaultState()`) : `equipment`, `prefs` (exclus/privilégiés), `goals`, `sessions` (historique complet), `draft` (séance du jour, éditable), `custom` (« Ma séance » en cours de composition : `{exos:[{exoId,sets}], name}`), `templates` (modèles enregistrés), `importedProgram` (file d'attente de séances importées), `medals` (`{famille: {t: palier 0-4, d: {palier: date ISO}}}`), `settings` (dont `todayTab` : `custom`/`proposal`, et `name`, le prénom affiché dans le profil), `meta` (dont `prCount`). L'ancien champ `trophies` (v1.0-1.1) est supprimé au chargement.
 - **Rendu** : `renderView(id)` régénère tout le HTML de l'onglet actif. `changed()` sauvegarde et redessine, sauf si une sheet est ouverte (elle sera redessinée à la fermeture via `dirtyOnClose`). Les inputs texte (reps/poids) utilisent l'événement `change` (pas `input`) pour ne pas perdre le focus à chaque frappe — ils ne déclenchent qu'un `save()`, pas un `changed()` complet.
 
 ### Piège déjà rencontré
@@ -95,11 +95,23 @@ Demande de YaYa : pouvoir dire quelle séance on veut faire, séparer la proposi
 - **Graphiques** (`charts.js`) : suivi des règles du skill *dataviz* — une seule série par graphique, couleur d'accent, période en cours mise en valeur, étiquettes sélectives, lignes de grille fines, info-bulle au toucher, tableau « Voir les données » sous chaque graphique. Colonnes et calendrier en **HTML** (piège Safari de Zeste : les animations CSS à l'intérieur d'un SVG bouclent quand un parent anime) ; courbes en SVG révélées par un `clip-path` animé sur leur conteneur HTML.
 - **Animations** : `renderViewAnimated(id)` ajoute la classe `.enter` le temps d'une entrée d'onglet/de section (apparition décalée des éléments `.stagger`, barres qui poussent, compteurs `data-count` animés par `animateCounts`). Les rendus après une simple action (`changed()`) ne rejouent pas ces animations. Indicateur glissant des contrôles segmentés : `segHTML` + `settleSegs`. Tout est coupé sous `prefers-reduced-motion`.
 
-## 8. Cahier des charges d'origine (résumé)
+## 8. Planning, profil et médailles au long cours (v1.3)
+
+Demande de YaYa : trier les exercices par matériel, en ajouter (pectoraux aux haltères notamment), mettre « Ma séance » en premier avec la possibilité de la compléter par l'app, mémoriser des séances et leur assigner des jours pour qu'elles s'affichent à l'ouverture, une animation de lancement, plus d'animations, plus d'infos dans le profil, plus de trophées dont les plus durs demandent des années, et en séance une vue d'ensemble discrète en haut avec navigation par glissement et par appui.
+
+- **Exercices** : +33 exercices (dont 8 pour les pectoraux aux haltères, avec des variantes sans banc : développé et écarté au sol). Sélecteur et réglages « inclus / exclus » groupés par matériel puis par muscle principal, filtre par matériel dans le sélecteur.
+- **Ma séance en premier** (`S.settings.todayTab`, défaut `custom`). « ✨ Compléter » / « Laisser l'app choisir » : `suggestComplement(existingIds, n)` (`engine.js`) vise les muscles et mouvements pas encore couverts ; les exercices ajoutés ainsi portent `app:true` (badge ✨).
+- **Planning hebdomadaire** : chaque séance enregistrée (`S.templates[]`) a `days` (0 = lundi … 6 = dimanche), un jour ne porte qu'une séance. Bandeau « Mon planning » (touche un jour → `openPlanDaySheet`). À l'initialisation, `applyPlannedSession()` charge la séance du jour dans « Ma séance » (une seule fois par jour : `S.custom.planDate`, pour ne pas écraser des modifications) et l'animation de lancement l'annonce. Une séance faite le jour prévu est marquée `planned` (médaille « Planificateur »). Après un import de programme IA, l'onglet bascule sur « Proposée » où le programme s'affiche.
+- **Séance en cours** : barre collante en haut (`liveStripHTML`) — exercices terminés, séries restantes, temps estimé, puces cliquables par exercice avec anneau de progression (`conic-gradient`, en HTML). Glisser la carte d'exercice (événements pointer, `touch-action: pan-y` pour garder le défilement vertical natif) ; après un glissement, `suppressClicksUntil` empêche le clic parasite sur le bouton sous le doigt. Démarrer ou terminer une séance remet la vue en haut (`scrollTodayTop`) — bug trouvé en test : la vue gardait le défilement de l'aperçu et cachait le haut de la carte.
+- **Lancement** (`showSplash` dans `init.js`) : marteau, enclume, étincelles, lueur, puis le mot « Forge » ; un appui la passe ; ~2 s, réduite sous `prefers-reduced-motion`. Les tests Playwright doivent attendre `#splash` détaché avant d'interagir.
+- **Profil** : carte d'identité (prénom modifiable, niveau, ancienneté), bilan des médailles par palier, « Mes habitudes » (exercice favori, jour et moment préférés, durée moyenne, meilleure semaine…), « Mes records » (5 charges les plus lourdes). Fonctions dans `core.js` (`favoriteExercise`, `favoriteWeekday`, `favoriteMoment`, `bestWeek`, `topLifts`).
+- **Médailles** : 24 familles en 5 catégories (`MEDAL_CATS`). Les platines visent plusieurs années (500 séances, 104 semaines d'affilée, 5 « années de fer » à 48 semaines actives, 1,5 million de kg…). Vérifié sur 10 semaines de données simulées régulières : aucun or ni platine. « Deux fois plus fort » compare au meilleur des 3 premières séances d'un exercice pratiqué depuis 90 jours au moins (sinon une progression de débutant donnait le platine en quelques semaines). Les paliers déjà obtenus sous d'anciens seuils sont conservés (`checkMedals` ne fait que monter).
+
+## 9. Cahier des charges d'origine (résumé)
 
 Voir le fichier `4a3df5ee-cahier-des-charges-forge.md` fourni au lancement du projet pour le texte complet. Points clés déjà couverts en v1.0 : matériel personnalisable et extensible, bibliothèque d'exercices filtrée, inclusion/exclusion d'exercices, objectifs personnalisés, suivi détaillé de séance (éditable, timer de repos, coche rapide), moteur de suggestion 100% local avec export/import IA, graphiques de progression, PR, streaks/régularité, trophées, écran d'accueil = séance du jour, thème clair/sombre automatique, page À propos avec copyright.
 
-## 9. Chantiers proposés pour la suite
+## 10. Chantiers proposés pour la suite
 
 1. Historique modifiable a posteriori (éditer les séries d'une séance déjà enregistrée ; la suppression existe depuis la v1.2).
 2. Export/partage d'une séance ou d'un récap (image), comme le Rewind de Zeste.
@@ -108,11 +120,11 @@ Voir le fichier `4a3df5ee-cahier-des-charges-forge.md` fourni au lancement du pr
 5. Vrai test sur iPhone Safari via WebKit : **bloqué dans cet environnement cloud** — `playwright install webkit` télécharge le binaire depuis `cdn.playwright.dev` / `playwright.download.prss.microsoft.com`, tous deux refusés par la politique réseau de l'environnement (403 « request blocked »). Les dépendances système WebKitGTK, elles, s'installent sans problème. Pour débloquer : ajouter l'un de ces deux hôtes à la liste des domaines autorisés dans les réglages réseau de l'environnement (menu de l'environnement cloud → Modifier), puis relancer `playwright install webkit`.
 6. Geste de balayage (swipe) pour naviguer entre exercices en mode focus, en plus des flèches actuelles — nécessiterait de gérer `touchstart`/`touchend` proprement sans casser le scroll vertical.
 
-## 10. Aperçu en artifact Claude
+## 11. Aperçu en artifact Claude
 
 En plus du dépôt Git (source de vérité), l'app peut être publiée comme Artifact claude.ai pour un aperçu rapide sans avoir à cloner/ouvrir le fichier : extraire le `<title>`, le `<style>` et le contenu de `<body>` de `dist/forge.html` (sans les balises `<!doctype>`/`<html>`/`<head>`/`<body>`, qu'un Artifact fournit lui-même), puis publier ce fragment avec l'outil Artifact. L'app n'utilise aucune ressource externe (polices système, pas de script CDN), donc elle passe telle quelle la politique de sécurité des Artifacts. Ce n'est qu'un aperçu de confort : le livrable réel reste le fichier unique du dépôt.
 
-## 11. Méthode de travail attendue
+## 12. Méthode de travail attendue
 
 - Lire le code concerné avant de modifier, ne pas réécrire inutilement.
 - Un changement à la fois, reconstruire (`sh build.sh`), tester (au minimum un smoke test navigateur : tous les onglets, démarrer/terminer une séance en mode focus, naviguer entre exercices, ouvrir les sheets du Profil).

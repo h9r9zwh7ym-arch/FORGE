@@ -13,7 +13,7 @@ function defaultState(){
     templates: [],         // modèles enregistrés : [{id, n, exos:[{exoId, sets}]}]
     importedProgram: [],
     medals: {},            // {familleId: {t: palier atteint 0-4, d: {1: iso, 2: iso…}}}
-    settings: { theme:"auto", unit:"kg", todayMode:"proposal" },
+    settings: { theme:"auto", unit:"kg", todayTab:"custom", name:"" },
     meta: { createdAt: new Date().toISOString(), prCount:0 },
   };
 }
@@ -40,6 +40,7 @@ function load(){
     merged.templates = parsed.templates||[];
     merged.medals = parsed.medals||{};
     merged.importedProgram = parsed.importedProgram||[];
+    delete merged.settings.todayMode; // v1.2 : remplacé par todayTab (« Ma séance » en premier)
     delete merged.trophies; // ancien système de trophées (v1.0-1.1), remplacé par les médailles à paliers
     return merged;
   }catch(e){ return defaultState(); }
@@ -261,3 +262,50 @@ function levelInfo(xp){
   const base = 125*L*(L-1), next = 125*(L+1)*L;
   return { level:L, xp, base, next, pct:(xp-base)/(next-base), title:LEVEL_TITLES.find(([min])=>L>=min)[1] };
 }
+
+// ---------- planning hebdomadaire ----------
+const JOURS_COURTS = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+function weekdayIdx(iso){ return (parseISO(iso).getDay()+6)%7; } // lundi = 0
+function plannedTemplate(iso){
+  const wd = weekdayIdx(iso||todayISO());
+  return S.templates.find(t=>(t.days||[]).includes(wd)) || null;
+}
+
+// ---------- statistiques du profil ----------
+function favoriteExercise(){
+  const c = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>{ if(ex.sets.some(st=>st.done)) c[ex.exoId]=(c[ex.exoId]||0)+1; }));
+  const id = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
+  return id ? { def:EXO_MAP[id], n:c[id] } : null;
+}
+function favoriteWeekday(){
+  const c = [0,0,0,0,0,0,0];
+  S.sessions.forEach(s=>c[weekdayIdx(s.date)]++);
+  const max = Math.max(...c);
+  return max ? { i:c.indexOf(max), n:max } : null;
+}
+function favoriteMoment(){
+  const c = { "le matin":0, "à midi":0, "l'après-midi":0, "le soir":0 };
+  S.sessions.forEach(s=>{
+    const h = startHour(s); if(h===null) return;
+    c[h<11?"le matin":h<14?"à midi":h<18?"l'après-midi":"le soir"]++;
+  });
+  const k = Object.keys(c).sort((a,b)=>c[b]-c[a])[0];
+  return c[k] ? k : null;
+}
+function bestWeek(){
+  const per = {};
+  S.sessions.forEach(s=>{ const k=weekKey(s.date); per[k]=(per[k]||0)+1; });
+  const k = Object.keys(per).sort((a,b)=>per[b]-per[a])[0];
+  return k ? { wk:k, n:per[k] } : null;
+}
+function topLifts(n){
+  const best = {};
+  S.sessions.forEach(s=>s.exos.forEach(ex=>ex.sets.forEach(st=>{
+    if(!st.done || !st.weight) return;
+    const b = best[ex.exoId];
+    if(!b || st.weight>b.w || (st.weight===b.w && st.reps>b.r)) best[ex.exoId] = { w:st.weight, r:st.reps, date:s.date };
+  })));
+  return Object.keys(best).filter(id=>EXO_MAP[id]).map(id=>Object.assign({ def:EXO_MAP[id] }, best[id])).sort((a,b)=>b.w-a.w).slice(0,n);
+}
+function firstSessionDate(){ return S.sessions.length ? S.sessions.reduce((m,s)=>s.date<m?s.date:m, S.sessions[0].date) : null; }

@@ -33,3 +33,18 @@ function hasEquip(eq, list){
   if(!list || !list.length) return true;
   return list.every(id=>id==="bodyweight" || eq.owned[id]);
 }
+
+// Catégories d'affichage des exercices : l'équipement principal qui les caractérise
+// (le banc est un accessoire, il ne crée pas de catégorie).
+const EXO_CATS = [
+  { id:"bodyweight", n:"Poids du corps",   em:"🤸" },
+  { id:"dumbbells",  n:"Haltères",         em:"🏋️" },
+  { id:"barbell",    n:"Barre & disques",  em:"🏋️‍♂️" },
+  { id:"kettlebell", n:"Kettlebell",       em:"🔔" },
+  { id:"bands",      n:"Élastiques",       em:"➰" },
+  { id:"pullup_bar", n:"Barre de traction", em:"🚪" },
+];
+function exoCategory(e){
+  for(const c of ["dumbbells","barbell","kettlebell","bands","pullup_bar"]) if(e.equip.includes(c)) return c;
+  return "bodyweight";
+}
