@@ -12,7 +12,7 @@ const ICONS = {
   chart:'<path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
   user:'<circle cx="12" cy="8" r="3.6" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
   check:'<path d="M5 13l4.5 4.5L19 8" stroke="currentColor" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-  chev:'<path d="M2 1l5 5.5L2 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  chev:'<path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   close:'<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   plus:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M7 6H4a3 3 0 0 0 3 5M17 6h3a3 3 0 0 1-3 5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M12 14v3M9 20h6M9.5 17h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
@@ -43,7 +43,10 @@ function buildShell(){
 }
 
 let currentTab = "today";
+const TAB_ORDER = ["today","history","progress","profil"];
 function switchTab(id){
+  const from = TAB_ORDER.indexOf(currentTab), to = TAB_ORDER.indexOf(id);
+  const v = qs("#v-"+id); if(v) v.dataset.dir = from<0||from===to ? "" : to>from ? "r" : "l";
   currentTab = id;
   qsa(".tabbtn").forEach(b=>b.classList.toggle("on", b.dataset.id===id));
   qsa(".view").forEach(v=>v.classList.toggle("active", v.id==="v-"+id));
@@ -72,7 +75,7 @@ function renderViewAnimated(id){
   renderView(id);
   animateCounts(el);
   clearTimeout(enterTimer);
-  enterTimer = setTimeout(()=>el.classList.remove("enter"), 1200);
+  enterTimer = setTimeout(()=>{ el.classList.remove("enter"); el.dataset.dir = ""; }, 1200);
 }
 
 // ---------- contrôle segmenté avec indicateur glissant ----------
