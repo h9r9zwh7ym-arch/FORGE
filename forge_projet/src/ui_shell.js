@@ -44,6 +44,7 @@ function switchTab(id){
   qsa(".view").forEach(v=>v.classList.toggle("active", v.id==="v-"+id));
   renderView(id);
   qs("#v-"+id).scrollTop = qs("#v-"+id)._keepScroll||0;
+  if(typeof renderRestBar==="function") renderRestBar();
 }
 
 const VIEWS = {};

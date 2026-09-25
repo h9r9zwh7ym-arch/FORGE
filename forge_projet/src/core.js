@@ -177,6 +177,10 @@ function sessionsInYear(){
   const y = new Date().getFullYear().toString();
   return S.sessions.filter(s=>s.date.slice(0,4)===y).length;
 }
+function sessionsThisWeek(){
+  const wk = weekKey(todayISO());
+  return S.sessions.filter(s=>weekKey(s.date)===wk).length;
+}
 function weeklyAverage(weeks){
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-weeks*7);
   const n = S.sessions.filter(s=>parseISO(s.date)>=cutoff).length;

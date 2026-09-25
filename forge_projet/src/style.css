@@ -34,6 +34,7 @@
 html{height:100%;font-size:17px;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
 body{height:100%;margin:0;background:var(--bg);color:var(--label);font-family:var(--sans);font-size:calc(17rem / 17);line-height:1.35;-webkit-font-smoothing:antialiased;overflow:hidden;-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{width:20px;height:20px;display:inline-block;vertical-align:-5px;flex:none}
 input,textarea,select{font:inherit;color:inherit}
 a{color:var(--tint)}
 :focus-visible{outline:2px solid var(--tint);outline-offset:2px;border-radius:6px}
@@ -126,20 +127,6 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .stepper button:active{background:var(--tint);color:var(--on-tint)}
 .stepper .val{min-width:44px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
 
-/* today: séance */
-.set-card{background:var(--bg2);border-radius:16px;margin:10px 16px 0;overflow:hidden}
-.set-hd{display:flex;align-items:center;gap:10px;padding:13px 14px 9px}
-.set-hd .ico{width:34px;height:34px;border-radius:10px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;flex:none}
-.set-hd .nm{font-weight:700;font-size:calc(16rem / 17);flex:1;min-width:0}
-.set-hd .mg{font-size:calc(12.5rem / 17);color:var(--label2)}
-.set-row{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center;padding:6px 14px;font-variant-numeric:tabular-nums}
-.set-row.hd{color:var(--label3);font-size:calc(12rem / 17);font-weight:600;padding-bottom:2px}
-.set-row input{width:100%;text-align:center;background:var(--fill2);border-radius:9px;height:34px;border:0;font-size:calc(15rem / 17)}
-.checkbtn{width:30px;height:30px;border-radius:15px;border:1.5px solid var(--sep);display:grid;place-items:center;color:transparent}
-.checkbtn.done{background:var(--green);border-color:var(--green);color:#fff}
-.set-actions{display:flex;gap:8px;padding:8px 14px 14px}
-.set-actions button{flex:1;height:36px;border-radius:10px;background:var(--fill2);font-size:calc(13.5rem / 17);font-weight:600;color:var(--label2)}
-.set-actions button:active{opacity:.6}
 .exo-note{margin:0 14px 12px;padding:9px 11px;background:var(--fill2);border-radius:10px;font-size:calc(13rem / 17);color:var(--label2);line-height:1.4}
 
 /* timer */
@@ -183,3 +170,111 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .switch.on{background:var(--green)}
 .switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
 .switch.on::after{transform:translateX(20px)}
+
+/* ---- transitions & micro-interactions générales ---- */
+.view.active{animation:viewFade .2s ease}
+@keyframes viewFade{from{opacity:0}to{opacity:1}}
+.btn{transition:opacity .12s,transform .12s}
+.btn:active{transform:scale(.97)}
+.icon-btn{transition:opacity .12s,transform .12s}
+.icon-btn:active{transform:scale(.88)}
+.chip{transition:transform .12s,background .15s,color .15s}
+.chip:active{transform:scale(.94)}
+.tro{transition:transform .15s}
+.tro:active{transform:scale(.94)}
+.row.tap{transition:background .12s}
+@media (prefers-reduced-motion:reduce){
+  .view.active,.focus-card,.tro,.celebrate-ring,.fc-done-badge{animation:none!important}
+  .btn:active,.icon-btn:active,.chip:active,.tro:active{transform:none}
+}
+
+/* ---- motivation : mini anneau hebdo + flamme ---- */
+.motiv-row{display:flex;align-items:center;gap:14px;padding:0 20px 14px;margin-top:-2px}
+.motiv-ring{width:46px;height:46px;flex:none;position:relative}
+.motiv-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.motiv-ring circle{fill:none;stroke-width:5}
+.motiv-ring .bgc{stroke:var(--fill)}
+.motiv-ring .fgc{stroke:var(--tint);stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.motiv-txt{flex:1;min-width:0}
+.motiv-txt .m1{font-weight:700;font-size:calc(15rem/17)}
+.motiv-txt .m2{color:var(--label2);font-size:calc(13rem/17);margin-top:1px}
+.streak-badge{display:flex;align-items:center;gap:4px;background:var(--tint-bg);color:var(--tint);border-radius:12px;padding:5px 10px;font-weight:700;font-size:calc(14rem/17);flex:none}
+.streak-badge svg{width:15px;height:15px}
+
+/* ---- mode focus : séance en cours ---- */
+.focus-dots{display:flex;gap:6px;padding:2px 20px 16px}
+.focus-dots button{flex:1;height:5px;border-radius:3px;background:var(--fill);position:relative;overflow:hidden;transition:background .2s}
+.focus-dots button.done{background:var(--green)}
+.focus-dots button.current{background:var(--tint)}
+.focus-dots button.current::after{content:"";position:absolute;inset:0;background:var(--tint);animation:dotPulse 1.7s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.focus-card{background:var(--bg2);border-radius:26px;margin:0 16px;padding:26px 22px 22px;text-align:center;box-shadow:var(--shadow);position:relative}
+@keyframes focusInR{from{opacity:0;transform:translateX(28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes focusInL{from{opacity:0;transform:translateX(-28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
+.focus-card.anim-r{animation:focusInR .3s cubic-bezier(.32,.72,0,1)}
+.focus-card.anim-l{animation:focusInL .3s cubic-bezier(.32,.72,0,1)}
+.fc-icon{width:60px;height:60px;border-radius:18px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;margin:0 auto 12px;font-size:28px}
+.fc-name{font-family:var(--serif);font-weight:700;font-size:calc(23rem/17);letter-spacing:-.01em;line-height:1.15;margin-bottom:3px}
+.fc-sub{color:var(--label2);font-size:calc(13.5rem/17);margin-bottom:18px}
+.fc-phase{font-size:calc(12rem/17);font-weight:700;color:var(--tint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px}
+
+.set-dots{display:flex;justify-content:center;gap:9px;margin-bottom:22px}
+.set-dots .sd{width:12px;height:12px;border-radius:50%;border:2px solid var(--sep);transition:transform .2s,background .2s,border-color .2s}
+.set-dots .sd.done{background:var(--green);border-color:var(--green)}
+.set-dots .sd.current{border-color:var(--tint);transform:scale(1.3)}
+
+.big-steppers{display:flex;gap:12px;justify-content:center;margin-bottom:20px}
+.big-stepper{flex:1;max-width:152px;background:var(--fill2);border-radius:18px;padding:12px 8px 14px}
+.big-stepper .bs-label{font-size:calc(11.5rem/17);color:var(--label2);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.big-stepper .bs-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.big-stepper button{width:34px;height:34px;border-radius:17px;background:var(--bg2);color:var(--tint);font-size:19px;font-weight:700;display:grid;place-items:center;transition:transform .12s,background .12s,color .12s;flex:none}
+.big-stepper button:active{background:var(--tint);color:var(--on-tint);transform:scale(.9)}
+.big-stepper .bs-val{font-size:calc(22rem/17);font-weight:700;font-variant-numeric:tabular-nums;min-width:46px}
+
+@keyframes badgePop{0%{transform:scale(.5)}65%{transform:scale(1.15)}100%{transform:scale(1)}}
+.fc-done-badge{width:56px;height:56px;border-radius:50%;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;margin:4px auto 14px;animation:badgePop .35s cubic-bezier(.32,1.4,.4,1)}
+.fc-done-badge svg{width:28px;height:28px}
+.fc-recap{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
+.fc-recap .chip{background:var(--fill2);font-variant-numeric:tabular-nums}
+
+.fc-quiet{display:flex;gap:16px;justify-content:center;margin-top:2px}
+.fc-quiet button{font-size:calc(13.5rem/17);font-weight:600;color:var(--label2)}
+.fc-quiet button:active{opacity:.5}
+
+.focus-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 16px 0}
+.focus-nav .navbtn{width:46px;height:46px;border-radius:23px;background:var(--fill);color:var(--tint);display:grid;place-items:center;flex:none;transition:opacity .15s,transform .12s}
+.focus-nav .navbtn:active{transform:scale(.9)}
+.focus-nav .navbtn[disabled]{opacity:.25;pointer-events:none}
+.focus-nav .navbtn svg{width:20px;height:20px}
+.focus-nav .center-link{flex:1;text-align:center;font-size:calc(14rem/17);font-weight:600;color:var(--tint)}
+
+.rest-pill{display:inline-flex;align-items:center;gap:6px;background:var(--fill2);color:var(--label2);border-radius:10px;padding:5px 10px;font-size:calc(12.5rem/17);font-weight:600;font-variant-numeric:tabular-nums;margin-bottom:12px}
+
+/* anneau de repos (grand, dans la carte focus) */
+.ring-wrap{width:172px;height:172px;margin:0 auto 18px;position:relative}
+.ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-wrap .ring-bg{fill:none;stroke:var(--fill);stroke-width:10}
+.ring-wrap .ring-fg{fill:none;stroke:var(--tint);stroke-width:10;stroke-linecap:round}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-time{font-size:calc(32rem/17);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ring-sub{font-size:calc(12.5rem/17);color:var(--label2);margin-top:2px}
+.ring-adjust{display:flex;gap:10px;justify-content:center;margin-bottom:6px}
+.ring-adjust button{background:var(--fill2);border-radius:11px;padding:8px 14px;font-size:calc(13.5rem/17);font-weight:600;color:var(--label)}
+.ring-adjust button:active{opacity:.6}
+
+/* fiche exercice (sheet info) */
+.exo-hero{display:flex;flex-direction:column;align-items:center;padding:6px 0 4px}
+.exo-hero .ico{width:64px;height:64px;border-radius:20px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;font-size:30px;margin-bottom:10px}
+.exo-hero .nm{font-family:var(--serif);font-weight:700;font-size:calc(21rem/17);text-align:center;letter-spacing:-.01em}
+.exo-muscle-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px 16px 2px}
+.cue-list{padding:4px 16px}
+.cue-item{display:flex;gap:10px;padding:10px 0;border-bottom:.5px solid var(--sep);opacity:0;animation:cueIn .35s ease forwards}
+.cue-item:last-child{border-bottom:0}
+.cue-num{width:22px;height:22px;border-radius:11px;background:var(--tint-bg);color:var(--tint);font-size:calc(12rem/17);font-weight:700;display:grid;place-items:center;flex:none;margin-top:1px}
+.cue-txt{font-size:calc(14.5rem/17);line-height:1.4}
+@keyframes cueIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.safety-box{margin:6px 16px 4px;padding:12px 14px;border-radius:12px;background:rgba(255,159,10,.1);border-left:3px solid var(--orange)}
+.safety-box .lbl{font-size:calc(11.5rem/17);font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+.safety-box .txt{font-size:calc(13.5rem/17);color:var(--label2);line-height:1.4}
+@media (prefers-reduced-motion:reduce){.cue-item{animation:none;opacity:1}}

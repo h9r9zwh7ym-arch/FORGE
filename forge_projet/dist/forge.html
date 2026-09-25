@@ -35,6 +35,7 @@
 html{height:100%;font-size:17px;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
 body{height:100%;margin:0;background:var(--bg);color:var(--label);font-family:var(--sans);font-size:calc(17rem / 17);line-height:1.35;-webkit-font-smoothing:antialiased;overflow:hidden;-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{width:20px;height:20px;display:inline-block;vertical-align:-5px;flex:none}
 input,textarea,select{font:inherit;color:inherit}
 a{color:var(--tint)}
 :focus-visible{outline:2px solid var(--tint);outline-offset:2px;border-radius:6px}
@@ -127,20 +128,6 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .stepper button:active{background:var(--tint);color:var(--on-tint)}
 .stepper .val{min-width:44px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
 
-/* today: séance */
-.set-card{background:var(--bg2);border-radius:16px;margin:10px 16px 0;overflow:hidden}
-.set-hd{display:flex;align-items:center;gap:10px;padding:13px 14px 9px}
-.set-hd .ico{width:34px;height:34px;border-radius:10px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;flex:none}
-.set-hd .nm{font-weight:700;font-size:calc(16rem / 17);flex:1;min-width:0}
-.set-hd .mg{font-size:calc(12.5rem / 17);color:var(--label2)}
-.set-row{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center;padding:6px 14px;font-variant-numeric:tabular-nums}
-.set-row.hd{color:var(--label3);font-size:calc(12rem / 17);font-weight:600;padding-bottom:2px}
-.set-row input{width:100%;text-align:center;background:var(--fill2);border-radius:9px;height:34px;border:0;font-size:calc(15rem / 17)}
-.checkbtn{width:30px;height:30px;border-radius:15px;border:1.5px solid var(--sep);display:grid;place-items:center;color:transparent}
-.checkbtn.done{background:var(--green);border-color:var(--green);color:#fff}
-.set-actions{display:flex;gap:8px;padding:8px 14px 14px}
-.set-actions button{flex:1;height:36px;border-radius:10px;background:var(--fill2);font-size:calc(13.5rem / 17);font-weight:600;color:var(--label2)}
-.set-actions button:active{opacity:.6}
 .exo-note{margin:0 14px 12px;padding:9px 11px;background:var(--fill2);border-radius:10px;font-size:calc(13rem / 17);color:var(--label2);line-height:1.4}
 
 /* timer */
@@ -184,6 +171,114 @@ p.body{margin:0 20px;color:var(--label2);font-size:calc(15rem / 17)}
 .switch.on{background:var(--green)}
 .switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
 .switch.on::after{transform:translateX(20px)}
+
+/* ---- transitions & micro-interactions générales ---- */
+.view.active{animation:viewFade .2s ease}
+@keyframes viewFade{from{opacity:0}to{opacity:1}}
+.btn{transition:opacity .12s,transform .12s}
+.btn:active{transform:scale(.97)}
+.icon-btn{transition:opacity .12s,transform .12s}
+.icon-btn:active{transform:scale(.88)}
+.chip{transition:transform .12s,background .15s,color .15s}
+.chip:active{transform:scale(.94)}
+.tro{transition:transform .15s}
+.tro:active{transform:scale(.94)}
+.row.tap{transition:background .12s}
+@media (prefers-reduced-motion:reduce){
+  .view.active,.focus-card,.tro,.celebrate-ring,.fc-done-badge{animation:none!important}
+  .btn:active,.icon-btn:active,.chip:active,.tro:active{transform:none}
+}
+
+/* ---- motivation : mini anneau hebdo + flamme ---- */
+.motiv-row{display:flex;align-items:center;gap:14px;padding:0 20px 14px;margin-top:-2px}
+.motiv-ring{width:46px;height:46px;flex:none;position:relative}
+.motiv-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.motiv-ring circle{fill:none;stroke-width:5}
+.motiv-ring .bgc{stroke:var(--fill)}
+.motiv-ring .fgc{stroke:var(--tint);stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.motiv-txt{flex:1;min-width:0}
+.motiv-txt .m1{font-weight:700;font-size:calc(15rem/17)}
+.motiv-txt .m2{color:var(--label2);font-size:calc(13rem/17);margin-top:1px}
+.streak-badge{display:flex;align-items:center;gap:4px;background:var(--tint-bg);color:var(--tint);border-radius:12px;padding:5px 10px;font-weight:700;font-size:calc(14rem/17);flex:none}
+.streak-badge svg{width:15px;height:15px}
+
+/* ---- mode focus : séance en cours ---- */
+.focus-dots{display:flex;gap:6px;padding:2px 20px 16px}
+.focus-dots button{flex:1;height:5px;border-radius:3px;background:var(--fill);position:relative;overflow:hidden;transition:background .2s}
+.focus-dots button.done{background:var(--green)}
+.focus-dots button.current{background:var(--tint)}
+.focus-dots button.current::after{content:"";position:absolute;inset:0;background:var(--tint);animation:dotPulse 1.7s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.focus-card{background:var(--bg2);border-radius:26px;margin:0 16px;padding:26px 22px 22px;text-align:center;box-shadow:var(--shadow);position:relative}
+@keyframes focusInR{from{opacity:0;transform:translateX(28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes focusInL{from{opacity:0;transform:translateX(-28px) scale(.98)}to{opacity:1;transform:translateX(0) scale(1)}}
+.focus-card.anim-r{animation:focusInR .3s cubic-bezier(.32,.72,0,1)}
+.focus-card.anim-l{animation:focusInL .3s cubic-bezier(.32,.72,0,1)}
+.fc-icon{width:60px;height:60px;border-radius:18px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;margin:0 auto 12px;font-size:28px}
+.fc-name{font-family:var(--serif);font-weight:700;font-size:calc(23rem/17);letter-spacing:-.01em;line-height:1.15;margin-bottom:3px}
+.fc-sub{color:var(--label2);font-size:calc(13.5rem/17);margin-bottom:18px}
+.fc-phase{font-size:calc(12rem/17);font-weight:700;color:var(--tint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px}
+
+.set-dots{display:flex;justify-content:center;gap:9px;margin-bottom:22px}
+.set-dots .sd{width:12px;height:12px;border-radius:50%;border:2px solid var(--sep);transition:transform .2s,background .2s,border-color .2s}
+.set-dots .sd.done{background:var(--green);border-color:var(--green)}
+.set-dots .sd.current{border-color:var(--tint);transform:scale(1.3)}
+
+.big-steppers{display:flex;gap:12px;justify-content:center;margin-bottom:20px}
+.big-stepper{flex:1;max-width:152px;background:var(--fill2);border-radius:18px;padding:12px 8px 14px}
+.big-stepper .bs-label{font-size:calc(11.5rem/17);color:var(--label2);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.big-stepper .bs-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.big-stepper button{width:34px;height:34px;border-radius:17px;background:var(--bg2);color:var(--tint);font-size:19px;font-weight:700;display:grid;place-items:center;transition:transform .12s,background .12s,color .12s;flex:none}
+.big-stepper button:active{background:var(--tint);color:var(--on-tint);transform:scale(.9)}
+.big-stepper .bs-val{font-size:calc(22rem/17);font-weight:700;font-variant-numeric:tabular-nums;min-width:46px}
+
+@keyframes badgePop{0%{transform:scale(.5)}65%{transform:scale(1.15)}100%{transform:scale(1)}}
+.fc-done-badge{width:56px;height:56px;border-radius:50%;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;margin:4px auto 14px;animation:badgePop .35s cubic-bezier(.32,1.4,.4,1)}
+.fc-done-badge svg{width:28px;height:28px}
+.fc-recap{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
+.fc-recap .chip{background:var(--fill2);font-variant-numeric:tabular-nums}
+
+.fc-quiet{display:flex;gap:16px;justify-content:center;margin-top:2px}
+.fc-quiet button{font-size:calc(13.5rem/17);font-weight:600;color:var(--label2)}
+.fc-quiet button:active{opacity:.5}
+
+.focus-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 16px 0}
+.focus-nav .navbtn{width:46px;height:46px;border-radius:23px;background:var(--fill);color:var(--tint);display:grid;place-items:center;flex:none;transition:opacity .15s,transform .12s}
+.focus-nav .navbtn:active{transform:scale(.9)}
+.focus-nav .navbtn[disabled]{opacity:.25;pointer-events:none}
+.focus-nav .navbtn svg{width:20px;height:20px}
+.focus-nav .center-link{flex:1;text-align:center;font-size:calc(14rem/17);font-weight:600;color:var(--tint)}
+
+.rest-pill{display:inline-flex;align-items:center;gap:6px;background:var(--fill2);color:var(--label2);border-radius:10px;padding:5px 10px;font-size:calc(12.5rem/17);font-weight:600;font-variant-numeric:tabular-nums;margin-bottom:12px}
+
+/* anneau de repos (grand, dans la carte focus) */
+.ring-wrap{width:172px;height:172px;margin:0 auto 18px;position:relative}
+.ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-wrap .ring-bg{fill:none;stroke:var(--fill);stroke-width:10}
+.ring-wrap .ring-fg{fill:none;stroke:var(--tint);stroke-width:10;stroke-linecap:round}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-time{font-size:calc(32rem/17);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ring-sub{font-size:calc(12.5rem/17);color:var(--label2);margin-top:2px}
+.ring-adjust{display:flex;gap:10px;justify-content:center;margin-bottom:6px}
+.ring-adjust button{background:var(--fill2);border-radius:11px;padding:8px 14px;font-size:calc(13.5rem/17);font-weight:600;color:var(--label)}
+.ring-adjust button:active{opacity:.6}
+
+/* fiche exercice (sheet info) */
+.exo-hero{display:flex;flex-direction:column;align-items:center;padding:6px 0 4px}
+.exo-hero .ico{width:64px;height:64px;border-radius:20px;background:var(--tint-bg);color:var(--tint);display:grid;place-items:center;font-size:30px;margin-bottom:10px}
+.exo-hero .nm{font-family:var(--serif);font-weight:700;font-size:calc(21rem/17);text-align:center;letter-spacing:-.01em}
+.exo-muscle-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px 16px 2px}
+.cue-list{padding:4px 16px}
+.cue-item{display:flex;gap:10px;padding:10px 0;border-bottom:.5px solid var(--sep);opacity:0;animation:cueIn .35s ease forwards}
+.cue-item:last-child{border-bottom:0}
+.cue-num{width:22px;height:22px;border-radius:11px;background:var(--tint-bg);color:var(--tint);font-size:calc(12rem/17);font-weight:700;display:grid;place-items:center;flex:none;margin-top:1px}
+.cue-txt{font-size:calc(14.5rem/17);line-height:1.4}
+@keyframes cueIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.safety-box{margin:6px 16px 4px;padding:12px 14px;border-radius:12px;background:rgba(255,159,10,.1);border-left:3px solid var(--orange)}
+.safety-box .lbl{font-size:calc(11.5rem/17);font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+.safety-box .txt{font-size:calc(13.5rem/17);color:var(--label2);line-height:1.4}
+@media (prefers-reduced-motion:reduce){.cue-item{animation:none;opacity:1}}
 </style></head><body><div id="app"></div><nav class="tabbar" aria-label="Onglets"></nav><div id="restbar"></div><div id="overlay" role="dialog"></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="fileImport" accept="application/json,.json" style="display:none"><script>
 // ================= MATÉRIEL =================
 // Catalogue du matériel reconnu par le moteur de suggestion. Chaque exercice de la
@@ -616,6 +711,10 @@ function sessionsInYear(){
   const y = new Date().getFullYear().toString();
   return S.sessions.filter(s=>s.date.slice(0,4)===y).length;
 }
+function sessionsThisWeek(){
+  const wk = weekKey(todayISO());
+  return S.sessions.filter(s=>weekKey(s.date)===wk).length;
+}
 function weeklyAverage(weeks){
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-weeks*7);
   const n = S.sessions.filter(s=>parseISO(s.date)>=cutoff).length;
@@ -720,11 +819,27 @@ function suggestForExo(exo){
 }
 
 function buildSetsFor(exo, suggestion){
+  const midReps = Math.round((suggestion.targetReps[0]+suggestion.targetReps[1])/2);
   const sets = [];
   for(let i=0;i<exo.sets;i++){
-    sets.push({ reps:null, weight:suggestion.weight, done:false, rpe:null });
+    sets.push({ reps:midReps, weight:suggestion.weight, done:false, rpe:null });
   }
   return sets;
+}
+
+function stepWeightValue(exo, current, dir){
+  const type = loadableTypeOf(exo);
+  if(!type) return current;
+  const owned = (S.equipment.weights[type]||[]).slice().sort((a,b)=>a-b);
+  if(owned.length){
+    const idx = owned.findIndex(w=>Math.abs(w-current)<0.001);
+    if(idx>=0){ const ni=idx+dir; return (ni>=0&&ni<owned.length) ? owned[ni] : current; }
+    if(dir>0){ const higher = owned.find(w=>w>current); return higher!==undefined?higher:current; }
+    const lower = owned.slice().reverse().find(w=>w<current);
+    return lower!==undefined?lower:current;
+  }
+  const inc = DEFAULT_INCREMENT[type]||2.5;
+  return Math.max(0, round1(current+dir*inc));
 }
 
 function pickExosForSession(n){
@@ -927,6 +1042,7 @@ function switchTab(id){
   qsa(".view").forEach(v=>v.classList.toggle("active", v.id==="v-"+id));
   renderView(id);
   qs("#v-"+id).scrollTop = qs("#v-"+id)._keepScroll||0;
+  if(typeof renderRestBar==="function") renderRestBar();
 }
 
 const VIEWS = {};
@@ -1009,11 +1125,11 @@ document.addEventListener("change", e=>{
   if(ACT[name]) ACT[name](el.dataset, el);
 });
 // ================= TIMER DE REPOS =================
-let restState = null; // {endAt, totalSec, label}
+let restState = null; // {endAt, totalSec, label, exoIdx}
 let restInterval = null;
 
-function startRestTimer(sec, label){
-  restState = { endAt: Date.now()+sec*1000, totalSec:sec, label:label||"Repos" };
+function startRestTimer(sec, label, exoIdx){
+  restState = { endAt: Date.now()+sec*1000, totalSec:sec, label:label||"Repos", exoIdx };
   renderRestBar();
   clearInterval(restInterval);
   restInterval = setInterval(tickRest, 250);
@@ -1028,6 +1144,7 @@ function stopRestTimer(){
   clearInterval(restInterval);
   const bar = qs("#restbar");
   if(bar) bar.classList.remove("show");
+  if(typeof refreshFocusRegion==="function") refreshFocusRegion();
 }
 function tickRest(){
   if(!restState) return;
@@ -1039,6 +1156,7 @@ function tickRest(){
     return;
   }
   renderRestBar(remain);
+  if(typeof updateFocusRing==="function") updateFocusRing(remain, restState.totalSec);
 }
 function fmtMMSS(sec){
   const m = Math.floor(sec/60), s = sec%60;
@@ -1048,6 +1166,10 @@ function renderRestBar(remainOverride){
   const bar = qs("#restbar");
   if(!bar || !restState) return;
   const remain = remainOverride!=null? remainOverride : Math.max(0,Math.round((restState.endAt-Date.now())/1000));
+  // sur l'onglet Aujourd'hui, l'anneau du mode focus remplace la pastille tant que
+  // l'exercice au repos est celui affiché ; sinon la pastille reste visible partout.
+  const focusShowing = typeof currentTab!=="undefined" && currentTab==="today" && typeof liveFocusIdx!=="undefined" && liveFocusIdx===restState.exoIdx;
+  if(focusShowing){ bar.classList.remove("show"); return; }
   bar.classList.add("show");
   bar.innerHTML = `<div class="rt-time">${fmtMMSS(remain)}</div><div class="rt-label">${esc(restState.label)}</div>
     <button data-a="restAdjust" data-d="-15">−15</button><button data-a="restAdjust" data-d="15">+15</button><button data-a="restSkip">Passer</button>`;
@@ -1158,8 +1280,11 @@ function showCelebration(session, newTrophies){
     }, 50);
   }
 }
-// ================= VUE : AUJOURD'HUI =================
+// ================= VUE : AUJOURD'HUI (mode focus) =================
 const PATTERN_EMOJI = { squat:"🏋️", hinge:"⚙️", push:"⬆️", pull:"⬇️", lunge:"🚶", core:"🔲", calf:"🦶" };
+
+let liveFocusIdx = 0;
+let focusAnimDir = null;
 
 function fmtDuration(sec){
   if(sec<60) return `${sec} s`;
@@ -1171,7 +1296,25 @@ function repsLabel(range){ return range[0]===range[1] ? `${range[0]}` : `${range
 
 function renderToday(){
   const draft = getOrCreateDraft();
+  liveFocusIdx = Math.min(liveFocusIdx, Math.max(0, draft.exos.length-1));
   return draft.startedAt ? renderTodayLive(draft) : renderTodayPreview(draft);
+}
+
+function miniRingSVG(pct){
+  const r=18, c=2*Math.PI*r;
+  const off = c*(1-Math.min(1,pct));
+  return `<svg viewBox="0 0 46 46"><circle class="bgc" cx="23" cy="23" r="${r}"/><circle class="fgc" cx="23" cy="23" r="${r}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>`;
+}
+function motivRowHTML(){
+  const goal = S.goals.daysPerWeek||3;
+  const done = sessionsThisWeek();
+  const pct = done/goal;
+  const streak = currentStreakWeeks();
+  return `<div class="motiv-row">
+    <div class="motiv-ring">${miniRingSVG(pct)}</div>
+    <div class="motiv-txt"><div class="m1">${done}/${goal} séances cette semaine</div><div class="m2">${done>=goal?"Objectif atteint — bravo !":"Continue, tu y es presque."}</div></div>
+    <div class="streak-badge">${icon("flame")}${streak}</div>
+  </div>`;
 }
 
 function sourceChip(draft){
@@ -1198,6 +1341,7 @@ function renderTodayPreview(draft){
   return `<div class="navbar"><div class="nb-title">Aujourd'hui</div></div><div class="content">
     <div class="eyebrow">${fmtDate(todayISO(),"long")}</div>
     <h1 class="lt">Séance du jour</h1>
+    ${motivRowHTML()}
     ${draft.source==="imported"?`<div class="chips" style="margin-bottom:12px">${sourceChip(draft)}</div>`:""}
     <div class="group">${rows}</div>
     <div class="btnrow"><button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter</button>${draft.source==="engine"?`<button class="btn secondary sm" data-a="regenSession">${icon("swap")} Autre séance</button>`:`<button class="btn secondary sm" data-a="dropImported">${icon("swap")} Suggestion auto</button>`}</div>
@@ -1207,43 +1351,140 @@ function renderTodayPreview(draft){
 }
 
 function renderTodayLive(draft){
+  if(!draft.exos.length){
+    return `<div class="navbar"><div class="nb-title">Séance en cours</div><div class="nb-right"><button class="icon-btn" data-a="abandonSession">${icon("trash")}</button></div></div>
+    <div class="content"><div class="empty-state"><span class="em">🧰</span>Tous les exercices ont été retirés.<br>Ajoute-en un pour continuer.</div>
+    <div class="btnrow"><button class="btn" data-a="addExoOpen">${icon("plus")} Ajouter un exercice</button></div></div>`;
+  }
   const totalSets = draft.exos.reduce((t,e)=>t+e.sets.length,0);
   const doneSets = draft.exos.reduce((t,e)=>t+e.sets.filter(s=>s.done).length,0);
   const elapsed = Math.round((Date.now()-Date.parse(draft.startedAt))/1000);
-  const cards = draft.exos.map((ex,i)=>renderExoCard(ex,i)).join("");
   return `<div class="navbar"><div class="nb-title">Séance en cours</div><div class="nb-right"><button class="icon-btn" data-a="abandonSession">${icon("trash")}</button></div></div>
   <div class="content">
-    <div class="eyebrow">${fmtDuration(elapsed)} · ${doneSets}/${totalSets} séries</div>
+    <div class="eyebrow" id="todayEyebrow">${fmtDuration(elapsed)} · ${doneSets}/${totalSets} séries</div>
     <h1 class="lt">Séance en cours</h1>
-    ${cards}
-    <div class="btnrow"><button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter un exercice</button></div>
+    <div id="focusRegion">${renderFocusRegionInner(draft)}</div>
     <div class="btnrow"><button class="btn" data-a="finishSession">Terminer la séance</button></div>
   </div>`;
 }
 
-function renderExoCard(ex,i){
-  const def = EXO_MAP[ex.exoId];
-  const rows = ex.sets.map((st,j)=>`<div class="set-row">
-      <button class="checkbtn ${st.done?"done":""}" data-a="toggleSet" data-exi="${i}" data-si="${j}">${st.done?icon("check"):""}</button>
-      <input type="number" inputmode="numeric" placeholder="reps" value="${st.reps??""}" data-c="setReps" data-exi="${i}" data-si="${j}">
-      <input type="number" inputmode="decimal" placeholder="${def.equip.includes('bodyweight')&&def.equip.length===1?"pdc":"kg"}" value="${st.weight??""}" data-c="setWeight" data-exi="${i}" data-si="${j}">
-      <button class="icon-btn" style="color:var(--label3)" data-a="removeSet" data-exi="${i}" data-si="${j}">${icon("close")}</button>
-    </div>`).join("");
-  return `<div class="set-card">
-    <div class="set-hd">
-      <div class="ico">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
-      <div class="grow"><div class="nm">${esc(def.n)}</div><div class="mg">${def.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")} — objectif ${repsLabel(ex.targetReps)} reps</div></div>
-      <button class="icon-btn" data-a="showExoInfo" data-id="${def.id}">ℹ️</button>
-    </div>
-    ${ex.note?`<div class="exo-note">${esc(ex.note)}</div>`:""}
-    <div class="set-row hd"><span></span><span>Reps</span><span>Charge</span><span></span></div>
-    ${rows}
-    <div class="set-actions">
-      <button data-a="addSet" data-exi="${i}">+ série</button>
-      <button data-a="swapExoOpen" data-idx="${i}">Remplacer</button>
-      <button data-a="removeExo" data-idx="${i}">Retirer</button>
-    </div>
+function ringSVG(remain, total){
+  const r=76, c=2*Math.PI*r;
+  const frac = total>0 ? Math.max(0,remain)/total : 0;
+  const off = c*(1-frac);
+  return `<div class="ring-wrap"><svg viewBox="0 0 172 172">
+    <circle class="ring-bg" cx="86" cy="86" r="${r}"/>
+    <circle class="ring-fg" id="ringFg" cx="86" cy="86" r="${r}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+  </svg><div class="ring-label"><div class="ring-time" id="ringTime">${fmtMMSS(Math.max(0,remain))}</div><div class="ring-sub">restant</div></div></div>`;
+}
+function updateFocusRing(remain, total){
+  const t = qs("#ringTime"), fg = qs("#ringFg");
+  if(!t || !fg) return;
+  t.textContent = fmtMMSS(Math.max(0,remain));
+  const r=76, c=2*Math.PI*r;
+  const frac = total>0 ? Math.max(0,remain)/total : 0;
+  fg.setAttribute("stroke-dashoffset", (c*(1-frac)).toFixed(1));
+}
+
+function renderFocusRegionInner(draft){
+  const idx = Math.min(liveFocusIdx, draft.exos.length-1);
+  liveFocusIdx = idx;
+  const ex = draft.exos[idx], def = EXO_MAP[ex.exoId];
+  const dots = draft.exos.map((e,i)=>{
+    const allDone = e.sets.every(s=>s.done);
+    return `<button class="${i===idx?"current":allDone?"done":""}" data-a="focusJump" data-idx="${i}" aria-label="Exercice ${i+1}"></button>`;
+  }).join("");
+  const finishedCount = draft.exos.filter(e=>e.sets.every(s=>s.done)).length;
+  const nav = `<div class="focus-nav">
+    <button class="navbtn" data-a="focusPrev" ${idx===0?"disabled":""} style="transform:scaleX(-1)">${icon("chev")}</button>
+    <button class="center-link" data-a="openOverview">Voir la séance (${finishedCount}/${draft.exos.length})</button>
+    <button class="navbtn" data-a="focusNext" ${idx===draft.exos.length-1?"disabled":""}>${icon("chev")}</button>
   </div>`;
+  return `<div class="focus-dots">${dots}</div>${renderFocusCard(idx, ex, def)}${nav}`;
+}
+
+function renderFocusCard(idx, ex, def){
+  const animClass = focusAnimDir==="r" ? "anim-r" : focusAnimDir==="l" ? "anim-l" : "";
+  focusAnimDir = null;
+  const resting = restState && restState.exoIdx===idx;
+  const allDone = ex.sets.every(s=>s.done);
+  const header = `<div class="fc-icon">${PATTERN_EMOJI[def.pattern]||"💪"}</div>
+    <div class="fc-name">${esc(def.n)}</div>
+    <div class="fc-sub"><button data-a="showExoInfo" data-id="${def.id}" style="color:var(--tint);font-weight:600">${def.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")} · détails</button></div>`;
+
+  if(resting){
+    const remain = Math.max(0, Math.round((restState.endAt-Date.now())/1000));
+    return `<div class="focus-card ${animClass}">${header}
+      <div class="fc-phase">Repos</div>
+      ${ringSVG(remain, restState.totalSec)}
+      <div class="ring-adjust"><button data-a="restAdjust" data-d="-15">−15 s</button><button data-a="restAdjust" data-d="15">+15 s</button></div>
+      <div class="fc-quiet"><button data-a="restSkip">Passer le repos</button></div>
+    </div>`;
+  }
+
+  if(allDone){
+    const recap = ex.sets.map(s=>`<span class="chip">${s.reps||"?"}${s.weight!=null?" × "+s.weight+" kg":""}</span>`).join("");
+    return `<div class="focus-card ${animClass}">${header}
+      <div class="fc-done-badge">${icon("check")}</div>
+      <div class="fc-recap">${recap}</div>
+      <div class="fc-quiet"><button data-a="swapExoOpen" data-idx="${idx}">Remplacer</button><button data-a="addSetFocus" data-exi="${idx}">+ série</button></div>
+    </div>`;
+  }
+
+  const si = ex.sets.findIndex(s=>!s.done);
+  const st = ex.sets[si];
+  const hasWeight = !!loadableTypeOf(def);
+  return `<div class="focus-card ${animClass}">${header}
+    <div class="fc-phase">Série ${si+1} / ${ex.sets.length}</div>
+    <div class="set-dots">${ex.sets.map((s,i)=>`<span class="sd ${s.done?"done":i===si?"current":""}"></span>`).join("")}</div>
+    <div class="big-steppers">
+      <div class="big-stepper"><div class="bs-label">Répétitions</div><div class="bs-row">
+        <button data-a="stepReps" data-exi="${idx}" data-si="${si}" data-d="-1">−</button>
+        <div class="bs-val">${st.reps??"–"}</div>
+        <button data-a="stepReps" data-exi="${idx}" data-si="${si}" data-d="1">+</button>
+      </div></div>
+      ${hasWeight?`<div class="big-stepper"><div class="bs-label">Charge (kg)</div><div class="bs-row">
+        <button data-a="stepWeight" data-exi="${idx}" data-si="${si}" data-d="-1">−</button>
+        <div class="bs-val">${st.weight??"–"}</div>
+        <button data-a="stepWeight" data-exi="${idx}" data-si="${si}" data-d="1">+</button>
+      </div></div>`:""}
+    </div>
+    ${ex.note?`<div class="exo-note" style="margin:0 0 16px">${esc(ex.note)}</div>`:""}
+    <button class="btn" data-a="validateSet" data-exi="${idx}">${icon("check")} Série validée</button>
+    <div class="fc-quiet" style="margin-top:14px"><button data-a="swapExoOpen" data-idx="${idx}">Remplacer</button><button data-a="removeExo" data-idx="${idx}">Retirer</button></div>
+  </div>`;
+}
+
+function refreshFocusRegion(){
+  const el = qs("#focusRegion");
+  if(!el || !S.draft || !S.draft.startedAt) return;
+  el.innerHTML = renderFocusRegionInner(S.draft);
+  const eyebrow = qs("#todayEyebrow");
+  if(eyebrow){
+    const totalSets = S.draft.exos.reduce((t,e)=>t+e.sets.length,0);
+    const doneSets = S.draft.exos.reduce((t,e)=>t+e.sets.filter(s=>s.done).length,0);
+    const elapsed = Math.round((Date.now()-Date.parse(S.draft.startedAt))/1000);
+    eyebrow.textContent = `${fmtDuration(elapsed)} · ${doneSets}/${totalSets} séries`;
+  }
+  if(typeof renderRestBar==="function") renderRestBar();
+}
+
+function overviewBodyHTML(){
+  const rows = S.draft.exos.map((ex,i)=>{
+    const def = EXO_MAP[ex.exoId];
+    const done = ex.sets.filter(s=>s.done).length;
+    const allDone = done===ex.sets.length;
+    return `<div class="row">
+      <button class="grow" style="display:flex;align-items:center;gap:12px;text-align:left" data-a="jumpFromOverview" data-idx="${i}">
+        <div class="ico" style="background:${allDone?"var(--green)":"var(--tint)"}">${allDone?icon("check"):PATTERN_EMOJI[def.pattern]||"💪"}</div>
+        <div class="grow"><div class="t">${esc(def.n)}</div><div class="s">${done}/${ex.sets.length} séries</div></div>
+      </button>
+      <button class="icon-btn" data-a="swapExoOpen" data-idx="${i}">${icon("swap")}</button>
+      <button class="icon-btn" data-a="removeExoOverview" data-idx="${i}">${icon("close")}</button>
+    </div>`;
+  }).join("");
+  return `<div class="group">${rows}</div>
+    <div class="btnrow"><button class="btn secondary sm" data-a="addExoOpen">${icon("plus")} Ajouter un exercice</button></div>`;
 }
 
 function exoPickerSheet(title, onPick, excludeIds){
@@ -1263,14 +1504,19 @@ function exoPickerSheet(title, onPick, excludeIds){
 }
 
 Object.assign(ACT, {
-  startSession(){ S.draft.startedAt = new Date().toISOString(); changed(); },
+  startSession(){ S.draft.startedAt = new Date().toISOString(); liveFocusIdx = 0; changed(); },
   regenSession(){
-    confirmSheet({ title:"Générer une autre séance ?", html:"La proposition actuelle sera remplacée.", ok:"Générer", onOk:()=>{ regenerateDraft(); changed(); } });
+    confirmSheet({ title:"Générer une autre séance ?", html:"La proposition actuelle sera remplacée.", ok:"Générer", onOk:()=>{ regenerateDraft(); liveFocusIdx=0; changed(); } });
   },
   dropImported(){
-    confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); save(); changed(); } });
+    confirmSheet({ title:"Revenir à la suggestion automatique ?", html:"Le programme importé restera disponible pour une prochaine séance.", ok:"Revenir à l'auto", onOk:()=>{ S.draft = generateEngineSession(); liveFocusIdx=0; save(); changed(); } });
   },
-  removeExo(d){ S.draft.exos.splice(+d.idx,1); changed(); },
+  removeExo(d){
+    const idx = +d.idx;
+    S.draft.exos.splice(idx,1);
+    if(liveFocusIdx>=S.draft.exos.length) liveFocusIdx = Math.max(0,S.draft.exos.length-1);
+    changed();
+  },
   addExoOpen(){
     exoPickerSheet("Ajouter un exercice", (id)=>{
       const exo = EXO_MAP[id]; const sug = suggestForExo(exo);
@@ -1287,38 +1533,69 @@ Object.assign(ACT, {
     }, S.draft.exos.map(e=>e.exoId));
   },
   pickExo(d){ const fn = qs("#overlay")._onPick; if(fn) fn(d.id); },
-  toggleSet(d){
-    const exi=+d.exi, si=+d.si;
-    const ex = S.draft.exos[exi], st = ex.sets[si], def = EXO_MAP[ex.exoId];
-    if(!st.done){
-      if(st.reps==null) st.reps = Math.round((ex.targetReps[0]+ex.targetReps[1])/2);
-      st.done = true;
-      if(isNewPR(ex.exoId, st.weight||0, st.reps||0) && (st.weight||st.reps)){ toast("💥 Nouveau record sur "+def.n+" !"); S.meta.prCount = (S.meta.prCount||0)+1; }
-      startRestTimer(def.restSec, def.n);
-    } else { st.done = false; }
-    changed();
+
+  focusPrev(){ if(liveFocusIdx>0){ liveFocusIdx--; focusAnimDir="l"; refreshFocusRegion(); } },
+  focusNext(){ if(S.draft && liveFocusIdx<S.draft.exos.length-1){ liveFocusIdx++; focusAnimDir="r"; refreshFocusRegion(); } },
+  focusJump(d){ const ni=+d.idx; focusAnimDir = ni>liveFocusIdx?"r":ni<liveFocusIdx?"l":null; liveFocusIdx=ni; refreshFocusRegion(); },
+  jumpFromOverview(d){ const ni=+d.idx; focusAnimDir = ni>liveFocusIdx?"r":ni<liveFocusIdx?"l":null; liveFocusIdx=ni; closeSheet(); refreshFocusRegion(); },
+
+  openOverview(){ openSheet(`<div class="sheet-hd"><span class="t">Séance complète</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div><div class="sheet-body">${overviewBodyHTML()}</div>`); },
+  removeExoOverview(d){
+    const idx = +d.idx;
+    S.draft.exos.splice(idx,1);
+    if(liveFocusIdx>=S.draft.exos.length) liveFocusIdx = Math.max(0,S.draft.exos.length-1);
+    save();
+    refreshFocusRegion();
+    const body = qs(".sheet-body");
+    if(body) body.innerHTML = overviewBodyHTML();
   },
-  setReps(d,el){ S.draft.exos[+d.exi].sets[+d.si].reps = el.value===""?null:parseFloat(el.value); save(); },
-  setWeight(d,el){ S.draft.exos[+d.exi].sets[+d.si].weight = el.value===""?null:parseFloat(el.value); save(); },
-  addSet(d){
+
+  addSetFocus(d){
     const ex = S.draft.exos[+d.exi];
     const last = ex.sets[ex.sets.length-1];
-    ex.sets.push({ reps:null, weight:last?last.weight:null, done:false, rpe:null });
+    ex.sets.push({ reps:last?last.reps:null, weight:last?last.weight:null, done:false, rpe:null });
     ex.targetSets = ex.sets.length;
-    changed();
+    save(); refreshFocusRegion();
   },
-  removeSet(d){
-    const ex = S.draft.exos[+d.exi];
-    if(ex.sets.length>1){ ex.sets.splice(+d.si,1); ex.targetSets = ex.sets.length; changed(); }
+  stepReps(d){
+    const st = S.draft.exos[+d.exi].sets[+d.si];
+    st.reps = Math.max(0,(st.reps||0)+parseInt(d.d,10));
+    save(); refreshFocusRegion();
   },
+  stepWeight(d){
+    const ex = S.draft.exos[+d.exi], def = EXO_MAP[ex.exoId], st = ex.sets[+d.si];
+    st.weight = stepWeightValue(def, st.weight||0, parseInt(d.d,10));
+    save(); refreshFocusRegion();
+  },
+  validateSet(d){
+    const exi = +d.exi;
+    const ex = S.draft.exos[exi], def = EXO_MAP[ex.exoId];
+    const si = ex.sets.findIndex(s=>!s.done);
+    if(si<0) return;
+    const st = ex.sets[si];
+    st.done = true;
+    if((st.weight||st.reps) && isNewPR(ex.exoId, st.weight||0, st.reps||0)){
+      toast("💥 Nouveau record sur "+def.n+" !");
+      S.meta.prCount = (S.meta.prCount||0)+1;
+    }
+    startRestTimer(def.restSec, def.n, exi);
+    if(!ex.sets.some(s=>!s.done) && exi<S.draft.exos.length-1){ liveFocusIdx = exi+1; focusAnimDir="r"; }
+    save();
+    refreshFocusRegion();
+  },
+
   showExoInfo(d){
     const e = EXO_MAP[d.id];
-    openSheet(`<div class="sheet-hd"><span class="t">${esc(e.n)}</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
-      <div class="sheet-body"><p class="body">${e.muscles.map(m=>MUSCLE_MAP[m].n).join(" · ")}</p>
-      <h2 class="sh" style="margin-top:18px">Exécution</h2>
-      <div class="group"><div style="padding:12px 16px">${e.cues.map(c=>`<div style="padding:6px 0">• ${esc(c)}</div>`).join("")}</div></div>
-      <h2 class="sh">Sécurité</h2><p class="body">${esc(e.safety)}</p></div>`);
+    openSheet(`<div class="sheet-hd"><span class="t">Détails</span><button class="icon-btn" data-a="closesheet">${icon("close")}</button></div>
+      <div class="sheet-body">
+      <div class="exo-hero"><div class="ico">${PATTERN_EMOJI[e.pattern]||"💪"}</div><div class="nm">${esc(e.n)}</div></div>
+      <div class="exo-muscle-chips">${e.muscles.map(m=>`<span class="chip">${MUSCLE_MAP[m].n}</span>`).join("")}</div>
+      <h2 class="sh">Exécution</h2>
+      <div class="cue-list">${e.cues.map((c,i)=>`<div class="cue-item" style="animation-delay:${i*0.06}s"><div class="cue-num">${i+1}</div><div class="cue-txt">${esc(c)}</div></div>`).join("")}</div>
+      <div class="safety-box"><div class="lbl">Sécurité</div><div class="txt">${esc(e.safety)}</div></div>
+      </div>`);
   },
+
   finishSession(){
     openSheet(`<div class="sheet-hd"><span class="t">Comment te sens-tu ?</span></div>
       <div class="sheet-body" style="padding:8px 16px 20px">
@@ -1334,6 +1611,7 @@ Object.assign(ACT, {
     S.sessions.push(clone(draft));
     if(draft.source==="imported" && S.importedProgram.length) S.importedProgram.shift();
     S.draft = null;
+    liveFocusIdx = 0;
     stopRestTimer();
     save();
     closeSheet();
@@ -1342,7 +1620,7 @@ Object.assign(ACT, {
   },
   abandonSession(){
     confirmSheet({ title:"Abandonner la séance ?", html:"La progression de cette séance sera perdue.", ok:"Abandonner", danger:true,
-      onOk:()=>{ S.draft=null; stopRestTimer(); changed(); } });
+      onOk:()=>{ S.draft=null; liveFocusIdx=0; stopRestTimer(); changed(); } });
   },
 });
 VIEWS.today = renderToday;
@@ -1742,7 +2020,7 @@ Object.assign(ACT, {
 });
 VIEWS.profil = renderProfil;
 // ================= INITIALISATION =================
-const APP_VERSION = "1.0";
+const APP_VERSION = "1.1";
 const COPYRIGHT = `© ${new Date().getFullYear()} Yannick Wahler. Tous droits réservés.`;
 
 function applyTheme(){

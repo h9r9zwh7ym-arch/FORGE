@@ -97,11 +97,27 @@ function suggestForExo(exo){
 }
 
 function buildSetsFor(exo, suggestion){
+  const midReps = Math.round((suggestion.targetReps[0]+suggestion.targetReps[1])/2);
   const sets = [];
   for(let i=0;i<exo.sets;i++){
-    sets.push({ reps:null, weight:suggestion.weight, done:false, rpe:null });
+    sets.push({ reps:midReps, weight:suggestion.weight, done:false, rpe:null });
   }
   return sets;
+}
+
+function stepWeightValue(exo, current, dir){
+  const type = loadableTypeOf(exo);
+  if(!type) return current;
+  const owned = (S.equipment.weights[type]||[]).slice().sort((a,b)=>a-b);
+  if(owned.length){
+    const idx = owned.findIndex(w=>Math.abs(w-current)<0.001);
+    if(idx>=0){ const ni=idx+dir; return (ni>=0&&ni<owned.length) ? owned[ni] : current; }
+    if(dir>0){ const higher = owned.find(w=>w>current); return higher!==undefined?higher:current; }
+    const lower = owned.slice().reverse().find(w=>w<current);
+    return lower!==undefined?lower:current;
+  }
+  const inc = DEFAULT_INCREMENT[type]||2.5;
+  return Math.max(0, round1(current+dir*inc));
 }
 
 function pickExosForSession(n){
